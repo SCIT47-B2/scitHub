@@ -1,0 +1,17 @@
+* text=auto
+
+# Gradle wrapper & 스크립트/설정 파일들 라인엔딩 고정
+/gradlew text eol=lf
+*.sh text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.properties text eol=lf
+*.java text eol=lf
+*.kt text eol=lf
+*.md text eol=lf
+
+# Windows 배치파일은 CRLF
+*.bat text eol=crlf
+
+# 바이너리는 변환 금지
+*.jar binary
