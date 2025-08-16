@@ -34,3 +34,54 @@ SCIT Master 47th B Class Group 2 Team Project
   <img src="https://img.shields.io/badge/jQuery-0769AD?style=flat-square&logo=jquery&logoColor=white"/>
   <img src="https://img.shields.io/badge/Lombok-CA4245?style=flat-square&logoColor=white"/>
 </p>
+
+---
+# Setting Up the Development Environment
+To run this project locally, you need to configure your own environment settings.
+We provide an `application-example.properties` file as a template.
+Copy it and adjust the values according to your local setup.
+
+```bash
+# Copy the example configuration
+cp src/main/resources/application-example.properties src/main/resources/application.properties
+```
+
+Then, open ```application.properties``` and update the following fields:
+
+<hr>
+
+## 🗄️Server Settings
+* **Server port**
+```server.port=YOUR_PORT_NUMBER```
+
+* **Context path**
+```server.servlet.context-path=YOUR_CONTEXT_PATH```
+
+## 🗄 Database (MySQL)
+* **Username**
+```spring.datasource.username=YOUR_DB_USERNAME```
+
+* **Password**
+```spring.datasource.password=YOUR_DB_PASSWORD```
+
+## 📂 File Upload
+* **Upload directory**
+```spring.servlet.multipart.location=YOUR_UPLOAD_PATH```
+
+## 📝 Custom Properties
+* **File upload path:**
+```board.uploadPath=YOUR_UPLOAD_PATH```
+
+<hr>
+
+## ▶ Running the Application
+
+Once you have updated ```application.properties```, run the project:
+
+```bash
+./gradlew bootRun      # macOS/Linux
+gradlew.bat bootRun    # Windows
+```
+
+The application will be available at:
+```http://localhost:<YOUR_PORT>/<YOUR_CONTEXT_PATH>```
