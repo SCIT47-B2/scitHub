@@ -116,46 +116,8 @@ CREATE INDEX idx_dm_sender_created ON direct_messages (sender_id, created_at);
 CREATE INDEX idx_dm_sender_id   ON direct_messages (sender_id);
 CREATE INDEX idx_dm_receiver_id ON direct_messages (receiver_id);
 
--- user 삭제 전 이 user가 수/발신한 쪽지의 수/발신자 id를
--- 삭제된 유저를 나타내는 고스트 계정의 id로 바꿈
-DELIMITER //
-CREATE TRIGGER trg_users_before_delete
-BEFORE DELETE ON users
-FOR EACH ROW
-BEGIN
-  DECLARE v_ghost BIGINT UNSIGNED;
-
-  -- 고스트 계정 삭제 시도 차단
-  IF OLD.username = '__deleted_user__' THEN
-    SIGNAL SQLSTATE '45000'
-      SET MESSAGE_TEXT = 'Cannot delete ghost user';
-  END IF;
-
-  -- 고스트 user_id 조회(유니크 username 기반)
-  SELECT user_id INTO v_ghost
-  FROM users
-  WHERE username = '__deleted_user__'
-  LIMIT 1;
-
-  IF v_ghost IS NULL THEN
-    SIGNAL SQLSTATE '45000'
-      SET MESSAGE_TEXT = 'Ghost user not found';
-  END IF;
-
-  -- 발신자/수신자 FK를 고스트로 업데이트
-  UPDATE direct_messages
-    SET sender_id = v_ghost
-  WHERE sender_id = OLD.user_id;
-
-  UPDATE direct_messages
-    SET receiver_id = v_ghost
-  WHERE receiver_id = OLD.user_id;
-END;
-//
-DELIMITER;
-
 -- -------------------------------------------------------------
--- 2) 게시판/검색/신고/북마크 (B_*, A_*)
+-- 2) 게시판/검색/신고/북마크
 -- -------------------------------------------------------------
 -- 게시판 마스터 (예: 공지-운영/IT/일본어, 자유, Q&A 등)
 CREATE TABLE boards (
@@ -172,13 +134,9 @@ CREATE TABLE boards (
   is_notice         TINYINT(1) NOT NULL DEFAULT 0,
   -- 공개 여부(비로그인 열람 허용 등 정책)
   is_public         TINYINT(1) NOT NULL DEFAULT 1,
-  -- 생성자
-  created_by        BIGINT UNSIGNED NULL,
   -- 생성 시각
-  created_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  -- FK
-  CONSTRAINT fk_boards_creator FOREIGN KEY (created_by) REFERENCES users(user_id) ON DELETE SET NULL
-) ENGINE=InnoDB;
+  created_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,  
+);
 
 -- 즐겨찾는 게시판 [B_003]
 CREATE TABLE board_favorites (
@@ -189,25 +147,23 @@ CREATE TABLE board_favorites (
   -- 등록 시각
   created_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (user_id, board_id),
+  -- FK
+  -- 게시판이나 유저가 삭제될 경우 즐겨찾기 정보도 같이 삭제
   CONSTRAINT fk_bf_user  FOREIGN KEY (user_id)  REFERENCES users(user_id)  ON DELETE CASCADE,
   CONSTRAINT fk_bf_board FOREIGN KEY (board_id) REFERENCES boards(board_id) ON DELETE CASCADE
-) ENGINE=InnoDB;
+);
 
 -- 게시글
 CREATE TABLE posts (
   post_id           BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   -- 게시판
   board_id          BIGINT UNSIGNED NOT NULL,
-  -- 작성자 (탈퇴 시 글 보존 → NULL 허용)
-  author_id         BIGINT UNSIGNED NULL,
-  -- 유형(일반/질문)
-  type              ENUM('POST','QNA') NOT NULL DEFAULT 'POST',
+  -- 작성자
+  author_id         BIGINT UNSIGNED NOT NULL,
   -- 제목
   title             VARCHAR(200) NOT NULL,
   -- 본문
   content           MEDIUMTEXT NOT NULL,
-  -- Q&A 답변 상태
-  answer_status     ENUM('PENDING','ANSWERED') NOT NULL DEFAULT 'PENDING',
   -- 상태(활성/삭제/차단)
   status            ENUM('ACTIVE','DELETED','BLOCKED') NOT NULL DEFAULT 'ACTIVE',
   -- 조회수
@@ -217,22 +173,36 @@ CREATE TABLE posts (
   updated_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   -- FK
   CONSTRAINT fk_posts_board  FOREIGN KEY (board_id)  REFERENCES boards(board_id) ON DELETE CASCADE,
-  CONSTRAINT fk_posts_author FOREIGN KEY (author_id) REFERENCES users(user_id)  ON DELETE SET NULL
-) ENGINE=InnoDB;
+  CONSTRAINT fk_posts_author FOREIGN KEY (author_id) REFERENCES users(user_id)  ON DELETE RESTRICT
+);
+
+-- author_id 갱신 시를 위한 보조 인덱스
+CREATE INDEX idx_posts_author_id   ON posts (author_id);
 
 -- CJK 품질 개선: ngram 파서 FULLTEXT
+-- 한국어, 중국어, 일본어 검색 성능 개선
 CREATE FULLTEXT INDEX ftx_posts_title_content
 ON posts (title, content) WITH PARSER ngram;
 
--- 전체/게시판별 정렬
+-- 전체/게시판별 정렬 인덱스
 CREATE INDEX idx_posts_board_created   ON posts (board_id, created_at DESC);
 CREATE INDEX idx_posts_author_created  ON posts (author_id, created_at);
 
--- 태그 마스터
+-- Q&A 게시글의 응답 여부
+CREATE TABLE qna_posts (
+	qna_posts_id      BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT
+	post_id           BIGINT UNSIGNED NOT NULL
+	-- Q&A 답변 상태
+  answer_status     ENUM('PENDING','ANSWERED') NOT NULL DEFAULT 'PENDING',
+  -- FK
+  CONSTRAINT fk_qna_posts_posts FOREIGN KEY (qna_posts_id) REFERENCES posts(post_id) ON DELETE CASCADE 
+);
+
+-- 태그 모음
 CREATE TABLE tags (
   tag_id            BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   name              VARCHAR(50) NOT NULL UNIQUE
-) ENGINE=InnoDB;
+);
 
 -- 게시글-태그 매핑
 CREATE TABLE post_tags (
@@ -241,15 +211,15 @@ CREATE TABLE post_tags (
   PRIMARY KEY (post_id, tag_id),
   CONSTRAINT fk_pt_post FOREIGN KEY (post_id) REFERENCES posts(post_id) ON DELETE CASCADE,
   CONSTRAINT fk_pt_tag  FOREIGN KEY (tag_id)  REFERENCES tags(tag_id)  ON DELETE CASCADE
-) ENGINE=InnoDB;
+);
 
 -- 댓글
 CREATE TABLE comments (
   comment_id        BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   -- 대상 게시글
   post_id           BIGINT UNSIGNED NOT NULL,
-  -- 작성자 (탈퇴 시 댓글 보존 → NULL 허용)
-  author_id         BIGINT UNSIGNED NULL,
+  -- 작성자
+  author_id         BIGINT UNSIGNED NOT NULL,
   -- 부모 댓글(대댓글)
   parent_id         BIGINT UNSIGNED NULL,
   -- 내용
@@ -261,22 +231,27 @@ CREATE TABLE comments (
   updated_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   -- FK
   CONSTRAINT fk_comments_post   FOREIGN KEY (post_id)  REFERENCES posts(post_id)     ON DELETE CASCADE,
-  CONSTRAINT fk_comments_author FOREIGN KEY (author_id) REFERENCES users(user_id)    ON DELETE SET NULL,
+  CONSTRAINT fk_comments_author FOREIGN KEY (author_id) REFERENCES users(user_id)    ON DELETE SET RESTRICT,
   CONSTRAINT fk_comments_parent FOREIGN KEY (parent_id) REFERENCES comments(comment_id) ON DELETE CASCADE
-) ENGINE=InnoDB;
+);
 
+-- 댓글 원글별/작성자별 정렬 인덱스
 CREATE INDEX idx_comments_post_created   ON comments (post_id, created_at);
 CREATE INDEX idx_comments_author_created ON comments (author_id, created_at);
 
+-- author_id 갱신 시를 위한 보조 인덱스
+CREATE INDEX idx_comments_author_id   ON comments (author_id);
+
 -- 좋아요(1인 1회)
 CREATE TABLE post_likes (
+  post_like_id      BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   post_id           BIGINT UNSIGNED NOT NULL,
-  user_id           BIGINT UNSIGNED NOT NULL,
+  user_id           BIGINT UNSIGNED NULL,
   created_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (post_id, user_id),
+  UNIQUE KEY (post_id, user_id),
   CONSTRAINT fk_pl_post FOREIGN KEY (post_id) REFERENCES posts(post_id) ON DELETE CASCADE,
-  CONSTRAINT fk_pl_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
-) ENGINE=InnoDB;
+  CONSTRAINT fk_pl_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE SET NULL
+);
 
 -- 북마크
 CREATE TABLE post_bookmarks (
@@ -286,7 +261,7 @@ CREATE TABLE post_bookmarks (
   PRIMARY KEY (post_id, user_id),
   CONSTRAINT fk_pb_post FOREIGN KEY (post_id) REFERENCES posts(post_id) ON DELETE CASCADE,
   CONSTRAINT fk_pb_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
-) ENGINE=InnoDB;
+);
 
 -- 첨부파일
 CREATE TABLE post_attachments (
@@ -303,7 +278,7 @@ CREATE TABLE post_attachments (
   created_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   -- FK
   CONSTRAINT fk_att_post FOREIGN KEY (post_id) REFERENCES posts(post_id) ON DELETE CASCADE
-) ENGINE=InnoDB;
+);
 
 -- 게시글 신고
 CREATE TABLE post_reports (
@@ -311,7 +286,7 @@ CREATE TABLE post_reports (
   -- 대상 게시글
   post_id           BIGINT UNSIGNED NOT NULL,
   -- 신고자
-  reporter_id       BIGINT UNSIGNED NOT NULL,
+  reporter_id       BIGINT UNSIGNED NULL,
   -- 사유(선택)
   reason            VARCHAR(255) NULL,
   -- 상태(PENDING/CONFIRMED/REJECTED)
@@ -322,9 +297,10 @@ CREATE TABLE post_reports (
   CONSTRAINT uq_report_once UNIQUE (post_id, reporter_id),
   -- FK
   CONSTRAINT fk_rep_post FOREIGN KEY (post_id)     REFERENCES posts(post_id)  ON DELETE CASCADE,
-  CONSTRAINT fk_rep_user FOREIGN KEY (reporter_id) REFERENCES users(user_id) ON DELETE CASCADE
-) ENGINE=InnoDB;
+  CONSTRAINT fk_rep_user FOREIGN KEY (reporter_id) REFERENCES users(user_id)  ON DELETE CASCADE
+);
 
+-- 신고 상태별 정렬 인덱스
 CREATE INDEX idx_post_reports_status_created ON post_reports (status, created_at);
 
 -- -------------------------------------------------------------
@@ -879,14 +855,50 @@ CREATE INDEX idx_pc_photo_created ON photo_comments (photo_id, created_at);
 
 DELIMITER //
 
--- 이메일 인증: verified_at 설정 시 자동 비활성화
-CREATE TRIGGER trg_ev_set_inactive
-BEFORE UPDATE ON email_verifications
+-- 유저 삭제 시 어떤 행동을 할지에 관한 트리거
+CREATE TRIGGER trg_users_before_delete
+BEFORE DELETE ON users
 FOR EACH ROW
 BEGIN
-  IF NEW.verified_at IS NOT NULL THEN
-    SET NEW.is_active = 0;
+  DECLARE v_ghost BIGINT UNSIGNED;
+
+  -- 고스트 계정 삭제 시도 차단
+  IF OLD.username = '__deleted_user__' THEN
+    SIGNAL SQLSTATE '45000'
+      SET MESSAGE_TEXT = 'Cannot delete ghost user';
   END IF;
+
+  -- 고스트 user_id 조회(유니크 username 기반)
+  SELECT user_id INTO v_ghost
+  FROM users
+  WHERE username = '__deleted_user__'
+  LIMIT 1;
+
+  IF v_ghost IS NULL THEN
+    SIGNAL SQLSTATE '45000'
+      SET MESSAGE_TEXT = 'Ghost user not found';
+  END IF;
+
+  -- 발신자/수신자 FK를 고스트로 업데이트
+	-- user 삭제 전 이 user가 수/발신한 쪽지의 수/발신자 id를
+	-- 삭제된 유저를 나타내는 고스트 계정 id로 바꿈
+  UPDATE direct_messages
+    SET sender_id = v_ghost
+  WHERE sender_id = OLD.user_id;
+
+  UPDATE direct_messages
+    SET receiver_id = v_ghost
+  WHERE receiver_id = OLD.user_id;
+  
+  -- user 삭제 전 이 user가 작성한 게시글의 작성자 id를 고스트 계정 id로 바꿈
+	UPDATE posts
+		SET author_id = v_ghost
+	WHERE author_id = OLD.user_id;
+	
+	-- user 삭제 전 이 user가 작성한 게시글 댓글의 작성자 id를 고스트 계정 id로 바꿈
+	UPDATE comments
+		SET author_id = v_ghost
+	WHERE author_id = OLD.user_id;
 END//
 
 -- Q&A 동기화: 정답 댓글 생성 시 → 게시글 ANSWERED
