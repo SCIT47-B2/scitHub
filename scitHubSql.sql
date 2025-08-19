@@ -46,7 +46,7 @@ CREATE TABLE users (
   -- IT 오전/오후(AM/PM)
   it_session        ENUM('AM','PM') NULL,
   -- 일본어 반(자유 텍스트)
-  jp_class          VARCHAR(32) NULL,
+  jp_class          ENUM('A','B','C','D','E','F') NULL,
   -- 프로필 이미지 URL
   avatar_url        VARCHAR(500) NULL,
   -- 계정 활성화 여부
@@ -61,70 +61,27 @@ CREATE TABLE users (
   updated_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   -- 사용자명 길이 제한 체크(예: 4~32)
   CONSTRAINT chk_users_username CHECK (CHAR_LENGTH(username) BETWEEN 4 AND 32)
-) ENGINE=InnoDB;
+);
 
 -- 기수/반 조회 최적화 인덱스
 CREATE INDEX idx_users_cohort_class ON users (cohort_no, it_class);
 
--- (옵션) 롤 확장: 관리자 외 향후 MODERATOR/INSTRUCTOR 등
-CREATE TABLE roles (
-  role_id   BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-  name      VARCHAR(50) NOT NULL UNIQUE
-) ENGINE=InnoDB;
+-- 탈퇴한 회원을 나타내는 고스트 유저 생성
+INSERT INTO users (
+  username, email, phone, password_hash, name_kor, birth_date, gender,
+  cohort_no, it_class, it_session, jp_class, avatar_url,
+  is_active, is_admin, last_login_at
+) VALUES (
+  '__deleted_user__',
+  '__deleted_user__@local.invalid',
+  NULL,
+  '!',                -- 실제 로그인 불가한 더미 값
+  '탈퇴한 회원',
+  NULL, 'N',
+  NULL, NULL, NULL, NULL, NULL,
+  0, 0, NULL
+);
 
-CREATE TABLE user_roles (
-  user_id   BIGINT UNSIGNED NOT NULL,
-  role_id   BIGINT UNSIGNED NOT NULL,
-  PRIMARY KEY (user_id, role_id),
-  CONSTRAINT fk_ur_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
-  CONSTRAINT fk_ur_role FOREIGN KEY (role_id) REFERENCES roles(role_id) ON DELETE CASCADE
-) ENGINE=InnoDB;
-
--- 이메일 인증 코드 (회원가입/변경) [U_008]
-CREATE TABLE email_verifications (
-  -- PK
-  verification_id   BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-  -- 대상 사용자
-  user_id           BIGINT UNSIGNED NOT NULL,
-  -- 인증번호(5자리 숫자)
-  code              CHAR(5) NOT NULL,
-  -- 용도(SIGNUP/RESET/CHANGE_EMAIL)
-  purpose           ENUM('SIGNUP','RESET','CHANGE_EMAIL') NOT NULL DEFAULT 'SIGNUP',
-  -- 활성 여부(사용자+purpose 활성 1건만 허용)
-  is_active         TINYINT(1) NOT NULL DEFAULT 1,
-  -- 만료 시각
-  expires_at        DATETIME NOT NULL,
-  -- 검증 완료 시각
-  verified_at       DATETIME NULL,
-  -- 생성 시각
-  created_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  -- 활성 1건을 강제하기 위한 생성 컬럼(활성일 때만 1)
-  active_one        TINYINT AS (IF(is_active=1, 1, NULL)) STORED,
-  -- FK
-  CONSTRAINT fk_ev_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
-  -- 코드 형식 체크(숫자 5자리)
-  CONSTRAINT chk_ev_code CHECK (code REGEXP '^[0-9]{5}$'),
-  -- 활성 1건 유니크
-  UNIQUE KEY uq_ev_active_one (user_id, purpose, active_one)
-) ENGINE=InnoDB;
-
--- 비밀번호 재설정 토큰 [U_004]
-CREATE TABLE password_resets (
-  -- PK
-  reset_id          BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-  -- 대상 사용자
-  user_id           BIGINT UNSIGNED NOT NULL,
-  -- 재설정 토큰(예: SHA-256 hex 64자)
-  token             CHAR(64) NOT NULL UNIQUE,
-  -- 만료 시각
-  expires_at        DATETIME NOT NULL,
-  -- 사용(완료) 시각
-  used_at           DATETIME NULL,
-  -- 생성 시각
-  created_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  -- FK
-  CONSTRAINT fk_pr_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
-) ENGINE=InnoDB;
 
 -- 쪽지함 [U_014]
 CREATE TABLE direct_messages (
@@ -148,13 +105,54 @@ CREATE TABLE direct_messages (
   deleted_by_sender  TINYINT(1) NOT NULL DEFAULT 0,
   deleted_by_receiver TINYINT(1) NOT NULL DEFAULT 0,
   -- FK
-  CONSTRAINT fk_dm_sender  FOREIGN KEY (sender_id)  REFERENCES users(user_id) ON DELETE CASCADE,
-  CONSTRAINT fk_dm_receiver FOREIGN KEY (receiver_id) REFERENCES users(user_id) ON DELETE CASCADE
-) ENGINE=InnoDB;
+  CONSTRAINT fk_dm_sender  FOREIGN KEY (sender_id)  REFERENCES users(user_id) ON DELETE RESTRICT,
+  CONSTRAINT fk_dm_receiver FOREIGN KEY (receiver_id) REFERENCES users(user_id) ON DELETE RESTRICT
+);
 
 -- 수신자 미읽음 정렬 인덱스 / 발신함 인덱스
 CREATE INDEX idx_dm_receiver_read  ON direct_messages (receiver_id, is_read, created_at DESC);
 CREATE INDEX idx_dm_sender_created ON direct_messages (sender_id, created_at);
+-- direct_messages에 보조 인덱스 (대량 업데이트 성능에 중요)
+CREATE INDEX idx_dm_sender_id   ON direct_messages (sender_id);
+CREATE INDEX idx_dm_receiver_id ON direct_messages (receiver_id);
+
+-- user 삭제 전 이 user가 수/발신한 쪽지의 수/발신자 id를
+-- 삭제된 유저를 나타내는 고스트 계정의 id로 바꿈
+DELIMITER //
+CREATE TRIGGER trg_users_before_delete
+BEFORE DELETE ON users
+FOR EACH ROW
+BEGIN
+  DECLARE v_ghost BIGINT UNSIGNED;
+
+  -- 고스트 계정 삭제 시도 차단
+  IF OLD.username = '__deleted_user__' THEN
+    SIGNAL SQLSTATE '45000'
+      SET MESSAGE_TEXT = 'Cannot delete ghost user';
+  END IF;
+
+  -- 고스트 user_id 조회(유니크 username 기반)
+  SELECT user_id INTO v_ghost
+  FROM users
+  WHERE username = '__deleted_user__'
+  LIMIT 1;
+
+  IF v_ghost IS NULL THEN
+    SIGNAL SQLSTATE '45000'
+      SET MESSAGE_TEXT = 'Ghost user not found';
+  END IF;
+
+  -- 발신자/수신자 FK를 고스트로 업데이트
+  UPDATE direct_messages
+    SET sender_id = v_ghost
+  WHERE sender_id = OLD.user_id;
+
+  UPDATE direct_messages
+    SET receiver_id = v_ghost
+  WHERE receiver_id = OLD.user_id;
+END;
+//
+DELIMITER;
 
 -- -------------------------------------------------------------
 -- 2) 게시판/검색/신고/북마크 (B_*, A_*)
