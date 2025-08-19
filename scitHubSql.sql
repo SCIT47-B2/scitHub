@@ -319,6 +319,7 @@ CREATE TABLE notifications (
   -- 클릭 이동 경로(URL)
   target_url        VARCHAR(500) NULL,
   -- 참조 엔티티 타입/ID (예: POST,EVENT)
+  -- 어떤 컨텐츠에 대한 알림인지를 나타냄
   ref_type          VARCHAR(50) NULL,
   ref_id            BIGINT UNSIGNED NULL,
   -- 읽음 여부/시각
@@ -327,8 +328,9 @@ CREATE TABLE notifications (
   read_at           DATETIME NULL,
   -- FK
   CONSTRAINT fk_notif_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
-) ENGINE=InnoDB;
+);
 
+-- 유저별, 기독 여부, 최신 순 정렬 인덱스
 CREATE INDEX idx_notifications_user_latest ON notifications (user_id, is_read, created_at DESC);
 
 -- -------------------------------------------------------------
