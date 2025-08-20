@@ -49,9 +49,9 @@ CREATE TABLE users (
   -- 프로필 이미지 URL
   avatar_url        VARCHAR(500) NULL,
   -- 계정 활성화 여부
-  is_active         TINYINT(1) NOT NULL DEFAULT 1,
+  is_active         TINYINT NOT NULL DEFAULT 1,
   -- 관리자 권한 여부(간편 플래그; 확장 롤은 별도 테이블)
-  is_admin          TINYINT(1) NOT NULL DEFAULT 0,
+  is_admin          TINYINT NOT NULL DEFAULT 0,
   -- 최근 로그인 시각
   last_login_at     DATETIME NULL,
   -- 가입 시각
@@ -134,7 +134,7 @@ CREATE TABLE boards (
   -- 공개 여부(비로그인 열람 허용 등 정책)
   is_public         TINYINT NOT NULL DEFAULT 1,
   -- 생성 시각
-  created_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+  created_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,  
 );
 
 -- 즐겨찾는 게시판 [B_003]
@@ -322,7 +322,7 @@ CREATE TABLE notifications (
   ref_type          VARCHAR(50) NULL,
   ref_id            BIGINT UNSIGNED NULL,
   -- 읽음 여부/시각
-  is_read           TINYINT(1) NOT NULL DEFAULT 0,
+  is_read           TINYINT NOT NULL DEFAULT 0,
   created_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   read_at           DATETIME NULL,
   -- FK
@@ -555,9 +555,11 @@ ALTER TABLE inquiries
 -- 6) 강의실 예약/신고/패널티 (R_001~R_006)
 -- -------------------------------------------------------------
 CREATE TABLE reservations (
+	-- PK
   reservation_id    BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   -- 강의실/사용자
   room_id           BIGINT UNSIGNED NOT NULL,
+	-- 사용자 삭제되었을 시 예약 자동 삭제
   user_id           BIGINT UNSIGNED NOT NULL,
   -- 예약 시작/종료 시각
   start_at          DATETIME NOT NULL,
@@ -573,29 +575,38 @@ CREATE TABLE reservations (
   -- FK
   CONSTRAINT fk_res_room FOREIGN KEY (room_id) REFERENCES rooms(room_id) ON DELETE CASCADE,
   CONSTRAINT fk_res_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
-) ENGINE=InnoDB;
+);
 
+-- 강의실/예약 시작/종료 시각 필터링 및 정렬용 인덱스
 CREATE INDEX idx_res_room_time ON reservations (room_id, start_at, end_at);
+
+-- 사용자/예약 시작/종료 시각 필터링 및 정렬용 인덱스
 CREATE INDEX idx_res_user_time ON reservations (user_id, start_at, end_at);
 
 -- 예약 미사용 신고
 CREATE TABLE reservation_reports (
+	-- PK
   report_id         BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-  -- 대상 예약/신고자
+  -- 대상 예약/신고자 (탈퇴 시 신고 보존)
   reservation_id    BIGINT UNSIGNED NOT NULL,
-  reporter_id       BIGINT UNSIGNED NULL,
+  reporter_id       BIGINT UNSIGNED NOT NULL,
   -- 사유/상태
   reason            VARCHAR(255) NULL,
+  -- 상태 -> PENDING: 검토중, CONFIRMED: 신고 인정, REJECTED: 신고 기각
   status            ENUM('PENDING','CONFIRMED','REJECTED') NOT NULL DEFAULT 'PENDING',
   -- 생성 시각
   created_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   -- FK
   CONSTRAINT fk_rr_res      FOREIGN KEY (reservation_id) REFERENCES reservations(reservation_id) ON DELETE CASCADE,
-  CONSTRAINT fk_rr_reporter FOREIGN KEY (reporter_id)     REFERENCES users(user_id)            ON DELETE SET NULL
-) ENGINE=InnoDB;
+  CONSTRAINT fk_rr_reporter FOREIGN KEY (reporter_id)     REFERENCES users(user_id)
+);
+
+-- reporter_id 갱신 / 필터링 및 정렬용 인덱스
+CREATE INDEX idx_rr_reporter ON reservation_reports (reporter_id);
 
 -- 예약 패널티/차단(누적 3회 등)
 CREATE TABLE reservation_penalties (
+	-- PK
   penalty_id        BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   -- 대상 사용자
   user_id           BIGINT UNSIGNED NOT NULL,
@@ -609,7 +620,7 @@ CREATE TABLE reservation_penalties (
   UNIQUE KEY uq_penalty_user (user_id),
   -- FK
   CONSTRAINT fk_penalty_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
-) ENGINE=InnoDB;
+);
 
 -- -------------------------------------------------------------
 -- 7) 졸업생 현황/회사/리뷰
@@ -790,7 +801,7 @@ CREATE TABLE class_schedule_blocks (
   start_time      TIME NOT NULL,
   end_time        TIME NOT NULL,
   -- 활성화 플래그
-  is_active       TINYINT(1) NOT NULL DEFAULT 1,
+  is_active       TINYINT NOT NULL DEFAULT 1,
   -- 생성 시각
   created_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   -- 시간 일관성 체크
@@ -1024,6 +1035,11 @@ BEGIN
 	UPDATE inquiry_replies
 		SET responder_id = v_ghost
 	WHERE responder_id = OLD.user_id;
+
+	-- user 삭제 전 이 user가 작성한 강의실 예약 신고의 신고자 id를 고스트 계정 id로 바꿈
+	UPDATE reservation_reports
+		SET reporter_id = v_ghost
+	WHERE reporter_id = OLD.user_id;
 
 	-- user 삭제 전 이 user가 작성한 회사 리뷰의 작성자 id를 고스트 계정 id로 바꿈
 	UPDATE company_reviews
