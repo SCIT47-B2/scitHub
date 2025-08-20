@@ -534,7 +534,7 @@ CREATE INDEX idx_sa_user ON seat_assignments (user_id);
 -- 좌석 피드백 FK 추가(문의 -> 좌석)
 ALTER TABLE inquiries
   ADD CONSTRAINT fk_inq_seat FOREIGN KEY (seat_id) REFERENCES seats(seat_id) ON DELETE SET NULL;
-  
+
 -- -------------------------------------------------------------
 -- 6) 강의실 예약/신고/패널티 (R_001~R_006)
 -- -------------------------------------------------------------
