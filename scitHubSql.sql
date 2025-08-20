@@ -193,8 +193,10 @@ CREATE TABLE qna_posts (
   post_id           INT UNSIGNED NOT NULL,
   -- Q&A 답변 상태
   answer_status     ENUM('PENDING','ANSWERED') NOT NULL DEFAULT 'PENDING',
+  -- Q&A 게시글은 하나의 답변만 가질 수 있음
+  CONSTRAINT uk_qna_posts_post UNIQUE (post_id),
   -- FK
-  CONSTRAINT fk_qna_posts_posts FOREIGN KEY (qna_posts_id) REFERENCES posts(post_id) ON DELETE CASCADE 
+  CONSTRAINT fk_qna_posts_posts FOREIGN KEY (post_id) REFERENCES posts(post_id) ON DELETE CASCADE
 );
 
 -- 태그 모음
