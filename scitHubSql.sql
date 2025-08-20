@@ -23,7 +23,7 @@ USE scithub;
 -- 사용자 기본 정보
 CREATE TABLE users (
   -- PK
-  user_id           BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  user_id           INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   -- 로그인용 아이디(중복 불가)
   username          VARCHAR(32) NOT NULL UNIQUE,
   -- 이메일(중복 불가, 인증 대상)
@@ -85,11 +85,11 @@ INSERT INTO users (
 -- 쪽지함 [U_014]
 CREATE TABLE direct_messages (
   -- PK
-  message_id        BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  message_id        INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   -- 발신자
-  sender_id         BIGINT UNSIGNED NOT NULL,
+  sender_id         INT UNSIGNED NOT NULL,
   -- 수신자
-  receiver_id       BIGINT UNSIGNED NOT NULL,
+  receiver_id       INT UNSIGNED NOT NULL,
   -- 제목(선택)
   subject           VARCHAR(200) NULL,
   -- 본문
@@ -120,7 +120,7 @@ CREATE INDEX idx_dm_receiver_id ON direct_messages (receiver_id);
 -- -------------------------------------------------------------
 -- 게시판 마스터 (예: 공지-운영/IT/일본어, 자유, Q&A 등)
 CREATE TABLE boards (
-  board_id          BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  board_id          INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   -- 프로그램에서 쓰는 키(예: NOTICE_OPS, QNA)
   board_key         VARCHAR(50) NOT NULL UNIQUE,
   -- 표시 이름
@@ -140,9 +140,9 @@ CREATE TABLE boards (
 -- 즐겨찾는 게시판 [B_003]
 CREATE TABLE board_favorites (
   -- 사용자
-  user_id           BIGINT UNSIGNED NOT NULL,
+  user_id           INT UNSIGNED NOT NULL,
   -- 게시판
-  board_id          BIGINT UNSIGNED NOT NULL,
+  board_id          INT UNSIGNED NOT NULL,
   -- 등록 시각
   created_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (user_id, board_id),
@@ -154,11 +154,11 @@ CREATE TABLE board_favorites (
 
 -- 게시글
 CREATE TABLE posts (
-  post_id           BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  post_id           INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   -- 게시판
-  board_id          BIGINT UNSIGNED NOT NULL,
+  board_id          INT UNSIGNED NOT NULL,
   -- 작성자
-  author_id         BIGINT UNSIGNED NOT NULL,
+  author_id         INT UNSIGNED NOT NULL,
   -- 제목
   title             VARCHAR(200) NOT NULL,
   -- 본문
@@ -189,8 +189,8 @@ CREATE INDEX idx_posts_author_created  ON posts (author_id, created_at);
 
 -- Q&A 게시글의 응답 여부
 CREATE TABLE qna_posts (
-  qna_posts_id      BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-  post_id           BIGINT UNSIGNED NOT NULL,
+  qna_posts_id      INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  post_id           INT UNSIGNED NOT NULL,
   -- Q&A 답변 상태
   answer_status     ENUM('PENDING','ANSWERED') NOT NULL DEFAULT 'PENDING',
   -- FK
@@ -199,14 +199,14 @@ CREATE TABLE qna_posts (
 
 -- 태그 모음
 CREATE TABLE tags (
-  tag_id            BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  tag_id            INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   name              VARCHAR(50) NOT NULL UNIQUE
 );
 
 -- 게시글-태그 매핑
 CREATE TABLE post_tags (
-  post_id           BIGINT UNSIGNED NOT NULL,
-  tag_id            BIGINT UNSIGNED NOT NULL,
+  post_id           INT UNSIGNED NOT NULL,
+  tag_id            INT UNSIGNED NOT NULL,
   PRIMARY KEY (post_id, tag_id),
   CONSTRAINT fk_pt_post FOREIGN KEY (post_id) REFERENCES posts(post_id) ON DELETE CASCADE,
   CONSTRAINT fk_pt_tag  FOREIGN KEY (tag_id)  REFERENCES tags(tag_id)  ON DELETE CASCADE
@@ -214,13 +214,13 @@ CREATE TABLE post_tags (
 
 -- 댓글
 CREATE TABLE comments (
-  comment_id        BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  comment_id        INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   -- 대상 게시글
-  post_id           BIGINT UNSIGNED NOT NULL,
+  post_id           INT UNSIGNED NOT NULL,
   -- 작성자
-  author_id         BIGINT UNSIGNED NOT NULL,
+  author_id         INT UNSIGNED NOT NULL,
   -- 부모 댓글(대댓글)
-  parent_id         BIGINT UNSIGNED NULL,
+  parent_id         INT UNSIGNED NULL,
   -- 내용
   content           MEDIUMTEXT NOT NULL,
   -- Q&A 답변 표시 여부
@@ -243,9 +243,9 @@ CREATE INDEX idx_comments_author_id   ON comments (author_id);
 
 -- 좋아요(1인 1회)
 CREATE TABLE post_likes (
-  post_like_id      BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-  post_id           BIGINT UNSIGNED NOT NULL,
-  user_id           BIGINT UNSIGNED NULL,
+  post_like_id      INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  post_id           INT UNSIGNED NOT NULL,
+  user_id           INT UNSIGNED NULL,
   created_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   UNIQUE KEY (post_id, user_id),
   CONSTRAINT fk_pl_post FOREIGN KEY (post_id) REFERENCES posts(post_id) ON DELETE CASCADE,
@@ -254,8 +254,8 @@ CREATE TABLE post_likes (
 
 -- 북마크
 CREATE TABLE post_bookmarks (
-  post_id           BIGINT UNSIGNED NOT NULL,
-  user_id           BIGINT UNSIGNED NOT NULL,
+  post_id           INT UNSIGNED NOT NULL,
+  user_id           INT UNSIGNED NOT NULL,
   created_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (post_id, user_id),
   CONSTRAINT fk_pb_post FOREIGN KEY (post_id) REFERENCES posts(post_id) ON DELETE CASCADE,
@@ -264,15 +264,15 @@ CREATE TABLE post_bookmarks (
 
 -- 첨부파일
 CREATE TABLE post_attachments (
-  attachment_id     BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  attachment_id     INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   -- 게시글
-  post_id           BIGINT UNSIGNED NOT NULL,
+  post_id           INT UNSIGNED NOT NULL,
   -- 저장 경로/URL
   file_url          VARCHAR(1024) NOT NULL,
   -- 원본 파일명
   file_name         VARCHAR(255) NOT NULL,
   -- 파일 크기(byte)
-  file_size_bytes   BIGINT UNSIGNED NULL,
+  file_size_bytes   INT UNSIGNED NULL,
   -- 업로드 시각
   created_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   -- FK
@@ -281,11 +281,11 @@ CREATE TABLE post_attachments (
 
 -- 게시글 신고
 CREATE TABLE post_reports (
-  report_id         BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  report_id         INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   -- 대상 게시글
-  post_id           BIGINT UNSIGNED NOT NULL,
+  post_id           INT UNSIGNED NOT NULL,
   -- 신고자
-  reporter_id       BIGINT UNSIGNED NULL,
+  reporter_id       INT UNSIGNED NULL,
   -- 사유(선택)
   reason            VARCHAR(255) NULL,
   -- 상태(PENDING/CONFIRMED/REJECTED)
@@ -306,9 +306,9 @@ CREATE INDEX idx_post_reports_status_created ON post_reports (status, created_at
 -- 3) 알림/토스트 (P_001~P_010)
 -- -------------------------------------------------------------
 CREATE TABLE notifications (
-  notification_id   BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  notification_id   INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   -- 수신자
-  user_id           BIGINT UNSIGNED NOT NULL,
+  user_id           INT UNSIGNED NOT NULL,
   -- 유형(공지/댓글/쪽지/조배정/일정/예약/시스템)
   type              ENUM('NOTICE','COMMENT','MESSAGE','GROUP_ASSIGN','SCHEDULE','RESERVATION','SYSTEM') NOT NULL,
   -- 제목
@@ -320,7 +320,7 @@ CREATE TABLE notifications (
   -- 참조 엔티티 타입/ID (예: POST,EVENT)
   -- 어떤 컨텐츠에 대한 알림인지를 나타냄
   ref_type          VARCHAR(50) NULL,
-  ref_id            BIGINT UNSIGNED NULL,
+  ref_id            INT UNSIGNED NULL,
   -- 읽음 여부/시각
   is_read           TINYINT NOT NULL DEFAULT 0,
   created_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -336,11 +336,11 @@ CREATE INDEX idx_notifications_user_latest ON notifications (user_id, is_read, c
 -- 4) 캘린더/일정/디데이/문의 (C_*, M_006~M_009)
 -- -------------------------------------------------------------
 CREATE TABLE events (
-  event_id          BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  event_id          INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   -- 공통/개인 일정 구분
   visibility        ENUM('GLOBAL','PERSONAL') NOT NULL DEFAULT 'GLOBAL',
   -- 개인 일정일 경우, 해당자
-  owner_user_id     BIGINT UNSIGNED NULL,
+  owner_user_id     INT UNSIGNED NULL,
   -- 대상 기수(공통 일정 필터)
   cohort_no         INT NULL,
   -- 대상 반 범위(ALL/A/B - 전체, 오전, 오후)
@@ -356,7 +356,7 @@ CREATE TABLE events (
   -- 디데이 표시 여부
   dday_enabled      TINYINT NOT NULL DEFAULT 0,
   -- 알림 작성자/시각
-  created_by        BIGINT UNSIGNED NULL,
+  created_by        INT UNSIGNED NULL,
   created_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   -- 시간 일관성 체크
@@ -372,16 +372,16 @@ CREATE INDEX idx_events_owner_time      ON events (owner_user_id, start_at);
 
 -- 문의/답변 (좌석 피드백 포함) [M_012,M_013,S_004]
 CREATE TABLE inquiries (
-  inquiry_id        BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  inquiry_id        INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   -- 작성자
-  user_id           BIGINT UNSIGNED NOT NULL,
+  user_id           INT UNSIGNED NOT NULL,
   -- 카테고리
   category          ENUM('GENERAL','SEAT','RESERVATION','OTHER') NOT NULL DEFAULT 'GENERAL',
   -- 제목/내용
   subject           VARCHAR(150) NOT NULL,
   content           MEDIUMTEXT NOT NULL,
   -- 좌석 피드백 연계 시 좌석 ID (FK는 seats 생성 후 추가)
-  seat_id           BIGINT UNSIGNED NULL,
+  seat_id           INT UNSIGNED NULL,
   -- 상태(OPEN/ANSWERED/CLOSED)
   status            ENUM('OPEN','ANSWERED','CLOSED') NOT NULL DEFAULT 'OPEN',
   -- 생성/수정 시각
@@ -395,11 +395,11 @@ CREATE TABLE inquiries (
 CREATE INDEX idx_inquiries_user_id   ON inquiries (user_id);
 
 CREATE TABLE inquiry_replies (
-  reply_id          BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  reply_id          INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   -- 문의 ID
-  inquiry_id        BIGINT UNSIGNED NOT NULL,
+  inquiry_id        INT UNSIGNED NOT NULL,
   -- 응답자 ID
-  responder_id      BIGINT UNSIGNED NOT NULL,
+  responder_id      INT UNSIGNED NOT NULL,
   -- 답변 본문
   body              MEDIUMTEXT NOT NULL,
   -- 생성 시각
@@ -418,7 +418,7 @@ CREATE INDEX idx_inquiries_replies_responder_id   ON inquiry_replies (responder_
 -- -------------------------------------------------------------
 -- 조(그룹) 마스터
 CREATE TABLE study_groups (
-  group_id          BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  group_id          INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   -- 기수
   cohort_no         INT NOT NULL,
   -- 반(A/B)
@@ -435,13 +435,13 @@ CREATE TABLE study_groups (
 
 -- 조 배정 (한 학생은 동일 기수/반에 1개 조만)
 CREATE TABLE group_assignments (
-  assignment_id     BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  assignment_id     INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   -- 기수/반/조
   cohort_no         INT NOT NULL,
   class_section     ENUM('A','B') NOT NULL,
-  group_id          BIGINT UNSIGNED NOT NULL,
+  group_id          INT UNSIGNED NOT NULL,
   -- 배정된 사용자
-  user_id           BIGINT UNSIGNED NOT NULL,
+  user_id           INT UNSIGNED NOT NULL,
   -- 배정 시각
   assigned_at       DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   -- (동일 기수/반에서 사용자 중복 배정 방지)
@@ -457,7 +457,7 @@ CREATE INDEX idx_ga_user ON group_assignments (user_id);
 
 -- 강의실/자습실 마스터
 CREATE TABLE rooms (
-  room_id           BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  room_id           INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   -- 예: 4F-401, 4F-자습1
   name              VARCHAR(100) NOT NULL,
   -- 유형(CLASSROOM/STUDY/MEETING)
@@ -474,9 +474,9 @@ CREATE TABLE rooms (
 
 -- 좌석 배치도 버전 (기수/반별)
 CREATE TABLE seat_maps (
-  seat_map_id       BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  seat_map_id       INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   -- 강의실
-  room_id           BIGINT UNSIGNED NOT NULL,
+  room_id           INT UNSIGNED NOT NULL,
   -- 기수/반
   cohort_no         INT NOT NULL,
   class_section     ENUM('A','B') NOT NULL,
@@ -496,9 +496,9 @@ CREATE TABLE seat_maps (
 
 -- 좌석 정의(배치도 내 좌표/코드)
 CREATE TABLE seats (
-  seat_id           BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  seat_id           INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   -- 배치도
-  seat_map_id       BIGINT UNSIGNED NOT NULL,
+  seat_map_id       INT UNSIGNED NOT NULL,
   -- 좌석 코드(예: A-01)
   seat_code         VARCHAR(20) NOT NULL,
   -- 행/열 좌표(선택)
@@ -512,11 +512,11 @@ CREATE TABLE seats (
 
 -- 좌석 배정(좌석당 1명, 사용자당 1좌석)
 CREATE TABLE seat_assignments (
-  seat_assignment_id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  seat_assignment_id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   -- 배치도/좌석/사용자
-  seat_map_id       BIGINT UNSIGNED NOT NULL,
-  seat_id           BIGINT UNSIGNED NOT NULL,
-  user_id           BIGINT UNSIGNED NOT NULL,
+  seat_map_id       INT UNSIGNED NOT NULL,
+  seat_id           INT UNSIGNED NOT NULL,
+  user_id           INT UNSIGNED NOT NULL,
   -- 배정 시각
   assigned_at       DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   -- 유일성 제약
@@ -540,11 +540,11 @@ ALTER TABLE inquiries
 -- -------------------------------------------------------------
 CREATE TABLE reservations (
 	-- PK
-  reservation_id    BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  reservation_id    INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   -- 강의실/사용자
-  room_id           BIGINT UNSIGNED NOT NULL,
+  room_id           INT UNSIGNED NOT NULL,
 	-- 사용자 삭제되었을 시 예약 자동 삭제
-  user_id           BIGINT UNSIGNED NOT NULL,
+  user_id           INT UNSIGNED NOT NULL,
   -- 예약 시작/종료 시각
   start_at          DATETIME NOT NULL,
   end_at            DATETIME NOT NULL,
@@ -570,10 +570,10 @@ CREATE INDEX idx_res_user_time ON reservations (user_id, start_at, end_at);
 -- 예약 미사용 신고
 CREATE TABLE reservation_reports (
 	-- PK
-  report_id         BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  report_id         INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   -- 대상 예약/신고자 (탈퇴 시 신고 보존)
-  reservation_id    BIGINT UNSIGNED NOT NULL,
-  reporter_id       BIGINT UNSIGNED NOT NULL,
+  reservation_id    INT UNSIGNED NOT NULL,
+  reporter_id       INT UNSIGNED NOT NULL,
   -- 사유/상태
   reason            VARCHAR(255) NULL,
   -- 상태 -> PENDING: 검토중, CONFIRMED: 신고 인정, REJECTED: 신고 기각
@@ -591,9 +591,9 @@ CREATE INDEX idx_rr_reporter ON reservation_reports (reporter_id);
 -- 예약 패널티/차단(누적 3회 등)
 CREATE TABLE reservation_penalties (
 	-- PK
-  penalty_id        BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  penalty_id        INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   -- 대상 사용자
-  user_id           BIGINT UNSIGNED NOT NULL,
+  user_id           INT UNSIGNED NOT NULL,
   -- 누적 신고 횟수
   strike_count      INT NOT NULL DEFAULT 0,
   -- 예약 금지 해제 시각
@@ -611,7 +611,7 @@ CREATE TABLE reservation_penalties (
 -- -------------------------------------------------------------
 CREATE TABLE companies (
 	-- PK
-  company_id        BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  company_id        INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   -- 회사명
   name              VARCHAR(150) NOT NULL UNIQUE,
   -- 로고 URL
@@ -629,10 +629,10 @@ CREATE TABLE companies (
 -- 회사 리뷰(1인 1회)
 CREATE TABLE company_reviews (
 	-- PK
-  review_id         BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  review_id         INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   -- 회사/리뷰어(탈퇴 시 리뷰 보존)
-  company_id        BIGINT UNSIGNED NOT NULL,
-  reviewer_id       BIGINT UNSIGNED NOT NULL,
+  company_id        INT UNSIGNED NOT NULL,
+  reviewer_id       INT UNSIGNED NOT NULL,
   -- 평점 1~5 / 본문
   rating            TINYINT NOT NULL,
   body              MEDIUMTEXT NULL,
@@ -655,10 +655,10 @@ CREATE INDEX idx_cr_company_created ON company_reviews (company_id, created_at);
 -- 리뷰 댓글
 CREATE TABLE company_review_comments (
   -- PK
-  comment_id        BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  comment_id        INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   -- 리뷰/작성자(탈퇴 시 댓글 보존)
-  review_id         BIGINT UNSIGNED NOT NULL,
-  author_id         BIGINT UNSIGNED NOT NULL,
+  review_id         INT UNSIGNED NOT NULL,
+  author_id         INT UNSIGNED NOT NULL,
   -- 본문/시각
   body              MEDIUMTEXT NOT NULL,
   created_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -689,11 +689,11 @@ GROUP BY c.company_id;
 -- -------------------------------------------------------------
 CREATE TABLE courses (
 	-- PK
-  course_id       BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  course_id       INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   -- 과목명
   name            VARCHAR(150) NOT NULL,
   -- 담당 강사
-  instructor_id   BIGINT UNSIGNED NULL,
+  instructor_id   INT UNSIGNED NULL,
   -- 과목 트랙(IT/JP)
   course_type     ENUM('IT','JP') NOT NULL,
   -- 대상 기수/반(선택)
@@ -716,8 +716,8 @@ CREATE INDEX idx_courses_scope_type
 -- 수강 등록(강의평가 가능 범위 결정)
 CREATE TABLE enrollments (
 	-- PK
-  course_id         BIGINT UNSIGNED NOT NULL,
-  user_id           BIGINT UNSIGNED NOT NULL,
+  course_id         INT UNSIGNED NOT NULL,
+  user_id           INT UNSIGNED NOT NULL,
   PRIMARY KEY (course_id, user_id),
   CONSTRAINT fk_enr_course FOREIGN KEY (course_id) REFERENCES courses(course_id) ON DELETE CASCADE,
   CONSTRAINT fk_enr_user   FOREIGN KEY (user_id)  REFERENCES users(user_id)      ON DELETE CASCADE
@@ -729,10 +729,10 @@ CREATE INDEX idx_enr_user ON enrollments (user_id);
 -- 강의 평가(6항목 1~5, 1인 1회)
 CREATE TABLE course_evaluations (
 	-- PK
-  evaluation_id     BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  evaluation_id     INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   -- 과목/작성자 (탈퇴 시 평가 보존)
-  course_id         BIGINT UNSIGNED NOT NULL,
-  user_id           BIGINT UNSIGNED NOT NULL,
+  course_id         INT UNSIGNED NOT NULL,
+  user_id           INT UNSIGNED NOT NULL,
   -- 항목 점수(1~5)
   score_preparedness TINYINT NOT NULL,
   score_clarity     TINYINT NOT NULL,
@@ -772,7 +772,7 @@ CREATE INDEX idx_ce_course_created ON course_evaluations (course_id, created_at)
 -- 블록(label=IT/JP)**과 매칭해서  "그 반의 해당 과목 시간"을 계산해 표시하면 됨.
 CREATE TABLE class_schedule_blocks (
 	-- PK
-  block_id        BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  block_id        INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   -- 대상 기수(선택): 특정 기수별로 바뀌면 값 세팅, 공통이면 NULL
   cohort_no       INT NULL,
   -- 반
@@ -831,9 +831,9 @@ GROUP BY c.instructor_id, c.course_id, c.name;
 -- -------------------------------------------------------------
 CREATE TABLE assignments (
 	-- PK
-  assignment_id     BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  assignment_id     INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   -- 과목/대상 기수/반(선택)
-  course_id         BIGINT UNSIGNED NULL,
+  course_id         INT UNSIGNED NULL,
   cohort_no         INT NULL,
   class_section     ENUM('A','B') NULL,
   -- 과제명/파일명 규칙/마감시각
@@ -841,7 +841,7 @@ CREATE TABLE assignments (
   filename_pattern  VARCHAR(200) NULL,
   due_at            DATETIME NULL,
   -- 생성자/시각
-  created_by        BIGINT UNSIGNED NOT NULL,
+  created_by        INT UNSIGNED NOT NULL,
   created_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   -- FK
   CONSTRAINT fk_asn_course  FOREIGN KEY (course_id)  REFERENCES courses(course_id) ON DELETE SET NULL,
@@ -857,10 +857,10 @@ CREATE INDEX idx_asn_scope_due ON assignments (cohort_no, class_section, due_at)
 -- 과제 제출(재제출 시 갱신)
 CREATE TABLE assignment_submissions (
 	-- PK
-  submission_id     BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  submission_id     INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   -- 과제/제출자
-  assignment_id     BIGINT UNSIGNED NOT NULL,
-  user_id           BIGINT UNSIGNED NOT NULL,
+  assignment_id     INT UNSIGNED NOT NULL,
+  user_id           INT UNSIGNED NOT NULL,
   -- 원본 파일명/저장 파일명/URL
   original_filename VARCHAR(255) NOT NULL,
   stored_filename   VARCHAR(255) NOT NULL,
@@ -887,13 +887,13 @@ CREATE INDEX idx_sub_assignment ON assignment_submissions (assignment_id);
 -- 앨범 테이블
 CREATE TABLE albums (
 	-- PK
-  album_id          BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  album_id          INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   -- 대상 기수(선택)
   cohort_no         INT NULL,
   -- 앨범명
   name              VARCHAR(150) NOT NULL,
   -- 생성자/시각
-  created_by        BIGINT UNSIGNED NOT NULL,
+  created_by        INT UNSIGNED NOT NULL,
   created_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   -- FK
   CONSTRAINT fk_album_user FOREIGN KEY (created_by) REFERENCES users(user_id)
@@ -905,10 +905,10 @@ CREATE INDEX idx_album_user ON albums (created_by);
 -- 사진 테이블
 CREATE TABLE photos (
 	-- PK
-  photo_id          BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  photo_id          INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   -- 앨범/업로더/파일
-  album_id          BIGINT UNSIGNED NOT NULL,
-  uploader_id       BIGINT UNSIGNED NOT NULL,
+  album_id          INT UNSIGNED NOT NULL,
+  uploader_id       INT UNSIGNED NOT NULL,
   file_url          VARCHAR(1024) NOT NULL,
   -- 캡션 (사진에 붙일 수 있는 짦은 설명이나 코멘트)
   caption           VARCHAR(255) NULL,
@@ -927,9 +927,9 @@ CREATE INDEX idx_ph_album_created ON photos (album_id, created_at);
 -- 사진 좋아요(1인 1회)
 CREATE TABLE photo_likes (
 	-- PK
-	photo_like_id     BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-  photo_id          BIGINT UNSIGNED NOT NULL,
-  user_id           BIGINT UNSIGNED NULL,
+	photo_like_id     INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  photo_id          INT UNSIGNED NOT NULL,
+  user_id           INT UNSIGNED NULL,
   created_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   UNIQUE KEY (photo_id, user_id),
   CONSTRAINT fk_pl_photo FOREIGN KEY (photo_id) REFERENCES photos(photo_id) ON DELETE CASCADE,
@@ -938,10 +938,10 @@ CREATE TABLE photo_likes (
 
 CREATE TABLE photo_comments (
 	-- PK
-  comment_id        BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  comment_id        INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   -- 사진/작성자(탈퇴 시 댓글 보존 → NULL)
-  photo_id          BIGINT UNSIGNED NOT NULL,
-  user_id           BIGINT UNSIGNED NOT NULL,
+  photo_id          INT UNSIGNED NOT NULL,
+  user_id           INT UNSIGNED NOT NULL,
   -- 내용/생성 시각
   content           MEDIUMTEXT NOT NULL,
   created_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -967,7 +967,7 @@ CREATE TRIGGER trg_users_before_delete
 BEFORE DELETE ON users
 FOR EACH ROW
 BEGIN
-  DECLARE v_ghost BIGINT UNSIGNED;
+  DECLARE v_ghost INT UNSIGNED;
 
   -- 고스트 계정 삭제 시도 차단
   IF OLD.username = '__deleted_user__' THEN
