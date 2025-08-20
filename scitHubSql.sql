@@ -17,11 +17,6 @@ CREATE DATABASE IF NOT EXISTS scithub
   DEFAULT COLLATE utf8mb4_0900_ai_ci;
 USE scithub;
 
--- 기본 문자셋/정렬 설정
-SET NAMES utf8mb4;
--- 서버 시간대 설정
-SET time_zone = '+09:00';
-
 -- -------------------------------------------------------------
 -- 1) 사용자/권한/인증 (U_001~U_014 등)
 -- -------------------------------------------------------------
@@ -54,9 +49,9 @@ CREATE TABLE users (
   -- 프로필 이미지 URL
   avatar_url        VARCHAR(500) NULL,
   -- 계정 활성화 여부
-  is_active         TINYINT NOT NULL DEFAULT 1,
+  is_active         TINYINT(1) NOT NULL DEFAULT 1,
   -- 관리자 권한 여부(간편 플래그; 확장 롤은 별도 테이블)
-  is_admin          TINYINT NOT NULL DEFAULT 0,
+  is_admin          TINYINT(1) NOT NULL DEFAULT 0,
   -- 최근 로그인 시각
   last_login_at     DATETIME NULL,
   -- 가입 시각
@@ -133,13 +128,13 @@ CREATE TABLE boards (
   -- 설명(선택)
   description       VARCHAR(255) NULL,
   -- Q&A 성격 여부
-  is_qna            TINYINT(1) NOT NULL DEFAULT 0,
+  is_qna            TINYINT NOT NULL DEFAULT 0,
   -- 공지 전용 여부
-  is_notice         TINYINT(1) NOT NULL DEFAULT 0,
+  is_notice         TINYINT NOT NULL DEFAULT 0,
   -- 공개 여부(비로그인 열람 허용 등 정책)
-  is_public         TINYINT(1) NOT NULL DEFAULT 1,
+  is_public         TINYINT NOT NULL DEFAULT 1,
   -- 생성 시각
-  created_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,  
+  created_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 -- 즐겨찾는 게시판 [B_003]
@@ -184,7 +179,7 @@ CREATE TABLE posts (
 CREATE INDEX idx_posts_author_id   ON posts (author_id);
 
 -- CJK 품질 개선: ngram 파서 FULLTEXT
--- 한국어, 중국어, 일본어 검색 성능 개선
+-- 한국어, 중국어, 일본어 검색 성능 개선을 위한 인덱스
 CREATE FULLTEXT INDEX ftx_posts_title_content
 ON posts (title, content) WITH PARSER ngram;
 
@@ -194,9 +189,9 @@ CREATE INDEX idx_posts_author_created  ON posts (author_id, created_at);
 
 -- Q&A 게시글의 응답 여부
 CREATE TABLE qna_posts (
-	qna_posts_id      BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT
-	post_id           BIGINT UNSIGNED NOT NULL
-	-- Q&A 답변 상태
+  qna_posts_id      BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  post_id           BIGINT UNSIGNED NOT NULL,
+  -- Q&A 답변 상태
   answer_status     ENUM('PENDING','ANSWERED') NOT NULL DEFAULT 'PENDING',
   -- FK
   CONSTRAINT fk_qna_posts_posts FOREIGN KEY (qna_posts_id) REFERENCES posts(post_id) ON DELETE CASCADE 
@@ -229,13 +224,13 @@ CREATE TABLE comments (
   -- 내용
   content           MEDIUMTEXT NOT NULL,
   -- Q&A 답변 표시 여부
-  is_answer         TINYINT(1) NOT NULL DEFAULT 0,
+  is_answer         TINYINT NOT NULL DEFAULT 0,
   -- 생성/수정 시각
   created_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   -- FK
   CONSTRAINT fk_comments_post   FOREIGN KEY (post_id)  REFERENCES posts(post_id)     ON DELETE CASCADE,
-  CONSTRAINT fk_comments_author FOREIGN KEY (author_id) REFERENCES users(user_id)    ON DELETE SET RESTRICT,
+  CONSTRAINT fk_comments_author FOREIGN KEY (author_id) REFERENCES users(user_id)    ON DELETE RESTRICT,
   CONSTRAINT fk_comments_parent FOREIGN KEY (parent_id) REFERENCES comments(comment_id) ON DELETE CASCADE
 );
 
@@ -357,9 +352,9 @@ CREATE TABLE events (
   start_at          DATETIME NOT NULL,
   end_at            DATETIME NOT NULL,
   -- 종일 여부
-  is_all_day        TINYINT(1) NOT NULL DEFAULT 0,
+  is_all_day        TINYINT NOT NULL DEFAULT 0,
   -- 디데이 표시 여부
-  dday_enabled      TINYINT(1) NOT NULL DEFAULT 0,
+  dday_enabled      TINYINT NOT NULL DEFAULT 0,
   -- 알림 작성자/시각
   created_by        BIGINT UNSIGNED NULL,
   created_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -435,7 +430,7 @@ CREATE TABLE study_groups (
   created_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   -- (동일 기수/반 내 조 이름 중복 방지)
   UNIQUE KEY uq_group_name (cohort_no, class_section, name)
-) ENGINE=InnoDB;
+);
 
 -- 조 배정 (한 학생은 동일 기수/반에 1개 조만)
 CREATE TABLE group_assignments (
@@ -454,8 +449,9 @@ CREATE TABLE group_assignments (
   -- FK
   CONSTRAINT fk_ga_group FOREIGN KEY (group_id) REFERENCES study_groups(group_id) ON DELETE CASCADE,
   CONSTRAINT fk_ga_user  FOREIGN KEY (user_id)  REFERENCES users(user_id)         ON DELETE CASCADE
-) ENGINE=InnoDB;
+);
 
+-- 조 배정 사용자별 인덱스
 CREATE INDEX idx_ga_user ON group_assignments (user_id);
 
 -- 강의실/자습실 마스터
@@ -470,10 +466,10 @@ CREATE TABLE rooms (
   -- 수용 인원
   capacity          INT NULL,
   -- 사용 여부
-  is_active         TINYINT(1) NOT NULL DEFAULT 1,
+  is_active         TINYINT NOT NULL DEFAULT 1,
   -- 생성 시각
   created_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB;
+);
 
 -- 좌석 배치도 버전 (기수/반별)
 CREATE TABLE seat_maps (
@@ -485,7 +481,7 @@ CREATE TABLE seat_maps (
   class_section     ENUM('A','B') NOT NULL,
   -- 버전 번호/활성 플래그
   version_no        INT NOT NULL DEFAULT 1,
-  is_active         TINYINT(1) NOT NULL DEFAULT 1,
+  is_active         TINYINT NOT NULL DEFAULT 1,
   -- 활성 1개 강제용 생성 컬럼
   active_one        TINYINT AS (IF(is_active=1, 1, NULL)) STORED,
   -- 생성 시각
@@ -495,7 +491,7 @@ CREATE TABLE seat_maps (
   UNIQUE KEY uq_sm_active_one (room_id, cohort_no, class_section, active_one),
   -- FK
   CONSTRAINT fk_sm_room FOREIGN KEY (room_id) REFERENCES rooms(room_id) ON DELETE CASCADE
-) ENGINE=InnoDB;
+);
 
 -- 좌석 정의(배치도 내 좌표/코드)
 CREATE TABLE seats (
@@ -1049,7 +1045,7 @@ BEGIN
 		SET created_by = v_ghost
 	WHERE created_by = OLD.user_id;
 
-		-- user 삭제 전 이 user가 제출한 과제의 제출자 id를 고스트 계정 id로 바꿈
+	-- user 삭제 전 이 user가 제출한 과제의 제출자 id를 고스트 계정 id로 바꿈
 	UPDATE assignment_submissions
 		SET user_id = v_ghost
 	WHERE user_id = OLD.user_id;
