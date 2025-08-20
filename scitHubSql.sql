@@ -49,9 +49,9 @@ CREATE TABLE users (
   -- 프로필 이미지 URL
   avatar_url        VARCHAR(500) NULL,
   -- 계정 활성화 여부
-  is_active         TINYINT NOT NULL DEFAULT 1,
+  is_active         TINYINT(1) NOT NULL DEFAULT 1,
   -- 관리자 권한 여부(간편 플래그; 확장 롤은 별도 테이블)
-  is_admin          TINYINT NOT NULL DEFAULT 0,
+  is_admin          TINYINT(1) NOT NULL DEFAULT 0,
   -- 최근 로그인 시각
   last_login_at     DATETIME NULL,
   -- 가입 시각
@@ -407,10 +407,11 @@ CREATE TABLE inquiry_replies (
   -- FK
   CONSTRAINT fk_ir_inq  FOREIGN KEY (inquiry_id)  REFERENCES inquiries(inquiry_id) ON DELETE CASCADE,
   CONSTRAINT fk_ir_user FOREIGN KEY (responder_id) REFERENCES users(user_id)       ON DELETE RESTRICT
-)
+);
 
 -- 응답자 ID 갱신 시를 위한 보조 인덱스
 CREATE INDEX idx_inquiries_replies_responder_id   ON inquiry_replies (responder_id);
+
 
 -- -------------------------------------------------------------
 -- 5) 조편성/좌석 배치 (M_017~M_028, S_001~S_004)
@@ -533,7 +534,7 @@ CREATE INDEX idx_sa_user ON seat_assignments (user_id);
 -- 좌석 피드백 FK 추가(문의 -> 좌석)
 ALTER TABLE inquiries
   ADD CONSTRAINT fk_inq_seat FOREIGN KEY (seat_id) REFERENCES seats(seat_id) ON DELETE SET NULL;
-
+  
 -- -------------------------------------------------------------
 -- 6) 강의실 예약/신고/패널티 (R_001~R_006)
 -- -------------------------------------------------------------
@@ -653,7 +654,7 @@ CREATE INDEX idx_cr_company_created ON company_reviews (company_id, created_at);
 
 -- 리뷰 댓글
 CREATE TABLE company_review_comments (
-	-- PK
+  -- PK
   comment_id        BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   -- 리뷰/작성자(탈퇴 시 댓글 보존)
   review_id         BIGINT UNSIGNED NOT NULL,
@@ -885,7 +886,7 @@ CREATE INDEX idx_sub_assignment ON assignment_submissions (assignment_id);
 -- -------------------------------------------------------------
 -- 앨범 테이블
 CREATE TABLE albums (
-  -- PK
+	-- PK
   album_id          BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   -- 대상 기수(선택)
   cohort_no         INT NULL,
@@ -925,8 +926,8 @@ CREATE INDEX idx_ph_album_created ON photos (album_id, created_at);
 
 -- 사진 좋아요(1인 1회)
 CREATE TABLE photo_likes (
-  -- PK
-  photo_like_id     BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+	-- PK
+	photo_like_id     BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   photo_id          BIGINT UNSIGNED NOT NULL,
   user_id           BIGINT UNSIGNED NULL,
   created_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -936,7 +937,7 @@ CREATE TABLE photo_likes (
 );
 
 CREATE TABLE photo_comments (
-  -- PK
+	-- PK
   comment_id        BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   -- 사진/작성자(탈퇴 시 댓글 보존 → NULL)
   photo_id          BIGINT UNSIGNED NOT NULL,
@@ -1104,7 +1105,3 @@ BEGIN
 END//
 
 DELIMITER ;
-
--- =============================================================
--- 끝. (ENGINE=InnoDB: 트랜잭션, FK, Row Lock, Crash Recovery 지원)
--- =============================================================
