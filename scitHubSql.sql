@@ -334,17 +334,17 @@ CREATE TABLE notifications (
 CREATE INDEX idx_notifications_user_latest ON notifications (user_id, is_read, created_at DESC);
 
 -- -------------------------------------------------------------
--- 4) 캘린더/일정/디데이 (C_*, M_006~M_009)
+-- 4) 캘린더/일정/디데이/문의 (C_*, M_006~M_009)
 -- -------------------------------------------------------------
 CREATE TABLE events (
   event_id          BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   -- 공통/개인 일정 구분
   visibility        ENUM('GLOBAL','PERSONAL') NOT NULL DEFAULT 'GLOBAL',
-  -- PERSONAL 작성자
+  -- 개인 일정일 경우, 해당자
   owner_user_id     BIGINT UNSIGNED NULL,
   -- 대상 기수(공통 일정 필터)
   cohort_no         INT NULL,
-  -- 대상 반 범위(ALL/A/B)
+  -- 대상 반 범위(ALL/A/B - 전체, 오전, 오후)
   it_class_scope    ENUM('ALL','A','B') NOT NULL DEFAULT 'ALL',
   -- 제목/설명
   title             VARCHAR(150) NOT NULL,
@@ -356,25 +356,26 @@ CREATE TABLE events (
   is_all_day        TINYINT(1) NOT NULL DEFAULT 0,
   -- 디데이 표시 여부
   dday_enabled      TINYINT(1) NOT NULL DEFAULT 0,
-  -- 작성자/시각
+  -- 알림 작성자/시각
   created_by        BIGINT UNSIGNED NULL,
   created_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   -- 시간 일관성 체크
   CONSTRAINT chk_events_time CHECK (end_at > start_at),
   -- FK
-  CONSTRAINT fk_events_owner   FOREIGN KEY (owner_user_id) REFERENCES users(user_id) ON DELETE SET NULL,
-  CONSTRAINT fk_events_creator FOREIGN KEY (created_by)     REFERENCES users(user_id) ON DELETE SET NULL
-) ENGINE=InnoDB;
+  CONSTRAINT fk_events_owner   FOREIGN KEY (owner_user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+  CONSTRAINT fk_events_creator FOREIGN KEY (created_by)    REFERENCES users(user_id) ON DELETE SET NULL
+);
 
+-- 알림 개인/단체 여부, 일정 해당자별 인덱스
 CREATE INDEX idx_events_visibility_time ON events (visibility, start_at, end_at);
 CREATE INDEX idx_events_owner_time      ON events (owner_user_id, start_at);
 
 -- 문의/답변 (좌석 피드백 포함) [M_012,M_013,S_004]
 CREATE TABLE inquiries (
   inquiry_id        BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-  -- 작성자 (탈퇴 시 문의 보존 → NULL 허용)
-  user_id           BIGINT UNSIGNED NULL,
+  -- 작성자
+  user_id           BIGINT UNSIGNED NOT NULL,
   -- 카테고리
   category          ENUM('GENERAL','SEAT','RESERVATION','OTHER') NOT NULL DEFAULT 'GENERAL',
   -- 제목/내용
@@ -388,23 +389,29 @@ CREATE TABLE inquiries (
   created_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   -- FK (user)
-  CONSTRAINT fk_inq_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE SET NULL
-) ENGINE=InnoDB;
+  CONSTRAINT fk_inq_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE RESTRICT
+);
+
+-- inquiries의 user_id 갱신 시를 위한 보조 인덱스
+CREATE INDEX idx_inquiries_user_id   ON inquiries (user_id);
 
 CREATE TABLE inquiry_replies (
   reply_id          BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   -- 문의 ID
   inquiry_id        BIGINT UNSIGNED NOT NULL,
-  -- 응답자(관리자 등; 탈퇴 시 답변 보존 → NULL)
-  responder_id      BIGINT UNSIGNED NULL,
+  -- 응답자 ID
+  responder_id      BIGINT UNSIGNED NOT NULL,
   -- 답변 본문
   body              MEDIUMTEXT NOT NULL,
   -- 생성 시각
   created_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   -- FK
   CONSTRAINT fk_ir_inq  FOREIGN KEY (inquiry_id)  REFERENCES inquiries(inquiry_id) ON DELETE CASCADE,
-  CONSTRAINT fk_ir_user FOREIGN KEY (responder_id) REFERENCES users(user_id)     ON DELETE SET NULL
-) ENGINE=InnoDB;
+  CONSTRAINT fk_ir_user FOREIGN KEY (responder_id) REFERENCES users(user_id)       ON DELETE RESTRICT
+)
+
+-- 응답자 ID 갱신 시를 위한 보조 인덱스
+CREATE INDEX idx_inquiries_replies_responder_id   ON inquiry_replies (responder_id);
 
 -- -------------------------------------------------------------
 -- 5) 조편성/좌석 배치 (M_017~M_028, S_001~S_004)
@@ -901,6 +908,17 @@ BEGIN
 	UPDATE comments
 		SET author_id = v_ghost
 	WHERE author_id = OLD.user_id;
+
+    -- user 삭제 전 이 user가 작성한 문의의 작성자 id를 고스트 계정 id로 바꿈
+	UPDATE inquiries
+		SET user_id = v_ghost
+	WHERE user_id = OLD.user_id;
+
+    -- user 삭제 전 이 user가 작성한 문의의 작성자 id를 고스트 계정 id로 바꿈
+	UPDATE inquiry_replies
+		SET responder_id = v_ghost
+	WHERE responder_id = OLD.user_id;
+
 END//
 
 -- Q&A 동기화: 정답 댓글 생성 시 → 게시글 ANSWERED
