@@ -615,6 +615,7 @@ CREATE TABLE reservation_penalties (
 -- 7) 졸업생 현황/회사/리뷰
 -- -------------------------------------------------------------
 CREATE TABLE companies (
+	-- PK
   company_id        BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   -- 회사명
   name              VARCHAR(150) NOT NULL UNIQUE,
@@ -628,14 +629,15 @@ CREATE TABLE companies (
   headcount         INT NULL,
   -- 생성 시각
   created_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB;
+);
 
 -- 회사 리뷰(1인 1회)
 CREATE TABLE company_reviews (
+	-- PK
   review_id         BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-  -- 회사/리뷰어(탈퇴 시 리뷰 보존 → NULL)
+  -- 회사/리뷰어(탈퇴 시 리뷰 보존)
   company_id        BIGINT UNSIGNED NOT NULL,
-  reviewer_id       BIGINT UNSIGNED NULL,
+  reviewer_id       BIGINT UNSIGNED NOT NULL,
   -- 평점 1~5 / 본문
   rating            TINYINT NOT NULL,
   body              MEDIUMTEXT NULL,
@@ -646,34 +648,43 @@ CREATE TABLE company_reviews (
   UNIQUE KEY uq_review_once (company_id, reviewer_id),
   -- FK
   CONSTRAINT fk_cr_company FOREIGN KEY (company_id) REFERENCES companies(company_id) ON DELETE CASCADE,
-  CONSTRAINT fk_cr_user    FOREIGN KEY (reviewer_id) REFERENCES users(user_id)     ON DELETE SET NULL
-) ENGINE=InnoDB;
+  CONSTRAINT fk_cr_user    FOREIGN KEY (reviewer_id) REFERENCES users(user_id)
+);
 
+-- reviewer_id 갱신 / 필터링 및 정렬용 인덱스
+CREATE INDEX idx_cr_user ON company_reviews (reviewer_id);
+
+-- 회사/생성 시각 필터링 및 정렬용 인덱스
 CREATE INDEX idx_cr_company_created ON company_reviews (company_id, created_at);
 
 -- 리뷰 댓글
 CREATE TABLE company_review_comments (
+	-- PK
   comment_id        BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-  -- 리뷰/작성자(탈퇴 시 댓글 보존 → NULL)
+  -- 리뷰/작성자(탈퇴 시 댓글 보존)
   review_id         BIGINT UNSIGNED NOT NULL,
-  author_id         BIGINT UNSIGNED NULL,
+  author_id         BIGINT UNSIGNED NOT NULL,
   -- 본문/시각
   body              MEDIUMTEXT NOT NULL,
   created_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   -- FK
   CONSTRAINT fk_crc_review FOREIGN KEY (review_id) REFERENCES company_reviews(review_id) ON DELETE CASCADE,
   CONSTRAINT fk_crc_user   FOREIGN KEY (author_id)  REFERENCES users(user_id)            ON DELETE SET NULL
-) ENGINE=InnoDB;
+);
+
+-- author_id 갱신 / 필터링 및 정렬용 인덱스
+CREATE INDEX idx_crc_user ON company_review_comments (author_id);
 
 -- 평균 평점 뷰(정렬용)
-CREATE OR REPLACE VIEW v_company_ratings AS
-SELECT c.company_id,
-       c.name,
-       c.sector,
-       c.location_text,
-       c.headcount,
-       AVG(r.rating)  AS avg_rating,
-       COUNT(r.review_id) AS review_count
+CREATE VIEW v_company_ratings AS
+SELECT
+  c.company_id,
+  c.name,
+  c.sector,
+  c.location_text,
+  c.headcount,
+  AVG(r.rating)  AS avg_rating,
+  COUNT(r.review_id) AS review_count
 FROM companies c
 LEFT JOIN company_reviews r ON r.company_id = c.company_id
 GROUP BY c.company_id;
@@ -682,36 +693,51 @@ GROUP BY c.company_id;
 -- 8) 강의/강의평가 (E_001,E_002)
 -- -------------------------------------------------------------
 CREATE TABLE courses (
-  course_id         BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-  -- 과목명/강사명
-  name              VARCHAR(150) NOT NULL,
-  instructor_name   VARCHAR(100) NULL,
-  -- 기수/반(선택)
-  cohort_no         INT NULL,
-  class_section     ENUM('A','B') NULL,
-  -- 시간표 표기(예: 월/수 10:00-12:00)
-  schedule_text     VARCHAR(200) NULL,
+	-- PK
+  course_id       BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  -- 과목명
+  name            VARCHAR(150) NOT NULL,
+  -- 담당 강사
+  instructor_id   BIGINT UNSIGNED NULL,
+  -- 과목 트랙(IT/JP)
+  course_type     ENUM('IT','JP') NOT NULL,
+  -- 대상 기수/반(선택)
+  cohort_no       INT NULL,
+  class_section   ENUM('A','B') NULL,
   -- 생성 시각
-  created_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB;
+  created_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  -- FK
+  CONSTRAINT fk_courses_instructor
+    FOREIGN KEY (instructor_id) REFERENCES users(user_id) ON DELETE SET NULL
+);
 
--- 수강 등록(강의평가 범위 결정)
+-- 강사/기수/반 필터링 및 정렬용 인덱스
+CREATE INDEX idx_courses_instructor
+	ON courses (instructor_id, cohort_no, class_section);
+-- 기수/반/과목 트랙 필터링 및 정렬용 인덱스
+CREATE INDEX idx_courses_scope_type
+	ON courses (cohort_no, class_section, course_type);
+
+-- 수강 등록(강의평가 가능 범위 결정)
 CREATE TABLE enrollments (
+	-- PK
   course_id         BIGINT UNSIGNED NOT NULL,
   user_id           BIGINT UNSIGNED NOT NULL,
   PRIMARY KEY (course_id, user_id),
   CONSTRAINT fk_enr_course FOREIGN KEY (course_id) REFERENCES courses(course_id) ON DELETE CASCADE,
-  CONSTRAINT fk_enr_user   FOREIGN KEY (user_id)  REFERENCES users(user_id)     ON DELETE CASCADE
-) ENGINE=InnoDB;
+  CONSTRAINT fk_enr_user   FOREIGN KEY (user_id)  REFERENCES users(user_id)      ON DELETE CASCADE
+);
 
+-- user_id 필터링 및 정렬용 인덱스
 CREATE INDEX idx_enr_user ON enrollments (user_id);
 
 -- 강의 평가(6항목 1~5, 1인 1회)
 CREATE TABLE course_evaluations (
+	-- PK
   evaluation_id     BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-  -- 과목/작성자 (탈퇴 시 평가 보존 → NULL)
+  -- 과목/작성자 (탈퇴 시 평가 보존)
   course_id         BIGINT UNSIGNED NOT NULL,
-  user_id           BIGINT UNSIGNED NULL,
+  user_id           BIGINT UNSIGNED NOT NULL,
   -- 항목 점수(1~5)
   score_preparedness TINYINT NOT NULL,
   score_clarity     TINYINT NOT NULL,
@@ -735,28 +761,81 @@ CREATE TABLE course_evaluations (
   UNIQUE KEY uq_ce_once (course_id, user_id),
   -- FK
   CONSTRAINT fk_ce_course FOREIGN KEY (course_id) REFERENCES courses(course_id) ON DELETE CASCADE,
-  CONSTRAINT fk_ce_user   FOREIGN KEY (user_id)  REFERENCES users(user_id)     ON DELETE SET NULL
-) ENGINE=InnoDB;
+  CONSTRAINT fk_ce_user   FOREIGN KEY (user_id)  REFERENCES users(user_id)
+);
 
+-- user_id 갱신 / 필터링 및 정렬용 인덱스
+CREATE INDEX idx_ce_user ON course_evaluations (user_id);
+
+-- 강좌/작성 시각 필터링 및 정렬용 인덱스
 CREATE INDEX idx_ce_course_created ON course_evaluations (course_id, created_at);
 
--- 과목별 평균 뷰
-CREATE OR REPLACE VIEW v_course_eval_avg AS
-SELECT course_id,
-       AVG(score_preparedness) AS avg_prepared,
-       AVG(score_clarity)      AS avg_clarity,
-       AVG(score_fairness)     AS avg_fairness,
-       AVG(score_respond)      AS avg_respond,
-       AVG(score_engagement)   AS avg_engagement,
-       AVG(score_passion)      AS avg_passion,
-       COUNT(*)                AS eval_count
+-- 반별 고정 시간표(템플릿) — 주중/주말 & 세션 타입 저장
+-- 주의: ‘과목’이 아닌 고정 블록(IT/JP/LUNCH/REVIEW/SELF_STUDY)을 정의
+--       과목(courses)은 course_type(IT/JP)만 알려주고, 실제 시간은 여기서 매핑됨
+-- UI/캘린더는 courses.course_type와 class_section을 기반으로
+-- 블록(label=IT/JP)**과 매칭해서  "그 반의 해당 과목 시간"을 계산해 표시하면 됨.
+CREATE TABLE class_schedule_blocks (
+	-- PK
+  block_id        BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  -- 대상 기수(선택): 특정 기수별로 바뀌면 값 세팅, 공통이면 NULL
+  cohort_no       INT NULL,
+  -- 반
+  class_section   ENUM('A','B') NOT NULL,
+  -- 블록 종류
+  label           ENUM('IT','JP','LUNCH','REVIEW','SELF_STUDY') NOT NULL,
+  -- 적용 요일(SET): 예 'MON,TUE,WED,THU,FRI'
+  days            SET('MON','TUE','WED','THU','FRI','SAT','SUN') NOT NULL,
+  -- 시간(고정)
+  start_time      TIME NOT NULL,
+  end_time        TIME NOT NULL,
+  -- 활성화 플래그
+  is_active       TINYINT(1) NOT NULL DEFAULT 1,
+  -- 생성 시각
+  created_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  -- 시간 일관성 체크
+  CONSTRAINT chk_csb_time CHECK (end_time > start_time)
+);
+
+-- 대상 기수/ 반/블록 종류/활성화 플래그 필터링 및 정렬용 인덱스
+CREATE INDEX idx_csb_scope ON class_schedule_blocks (cohort_no, class_section, label, is_active);
+
+-- 과목별 평가 요약 뷰
+CREATE VIEW v_course_eval_avg AS
+SELECT
+	course_id,
+	AVG(score_preparedness) AS avg_prepared,
+  AVG(score_clarity)      AS avg_clarity,
+  AVG(score_fairness)     AS avg_fairness,
+  AVG(score_respond)      AS avg_respond,
+  AVG(score_engagement)   AS avg_engagement,
+  AVG(score_passion)      AS avg_passion,
+  COUNT(*)                AS eval_count
 FROM course_evaluations
 GROUP BY course_id;
+
+-- 강사별 과목 평가 요약 뷰
+CREATE v_instructor_eval_avg AS
+SELECT
+  c.instructor_id,
+  c.course_id,
+  c.name AS course_name,
+  AVG(e.score_preparedness) AS avg_prepared,
+  AVG(e.score_clarity)      AS avg_clarity,
+  AVG(e.score_fairness)     AS avg_fairness,
+  AVG(e.score_respond)      AS avg_respond,
+  AVG(e.score_engagement)   AS avg_engagement,
+  AVG(e.score_passion)      AS avg_passion,
+  COUNT(e.evaluation_id)    AS eval_count
+FROM courses c
+LEFT JOIN course_evaluations e ON e.course_id = c.course_id
+GROUP BY c.instructor_id, c.course_id, c.name;
 
 -- -------------------------------------------------------------
 -- 9) 과제 제출 (T_001~T_006)
 -- -------------------------------------------------------------
 CREATE TABLE assignments (
+	-- PK
   assignment_id     BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   -- 과목/대상 기수/반(선택)
   course_id         BIGINT UNSIGNED NULL,
@@ -767,24 +846,26 @@ CREATE TABLE assignments (
   filename_pattern  VARCHAR(200) NULL,
   due_at            DATETIME NULL,
   -- 생성자/시각
-  created_by        BIGINT UNSIGNED NULL,
+  created_by        BIGINT UNSIGNED NOT NULL,
   created_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   -- FK
   CONSTRAINT fk_asn_course  FOREIGN KEY (course_id)  REFERENCES courses(course_id) ON DELETE SET NULL,
-  CONSTRAINT fk_asn_creator FOREIGN KEY (created_by) REFERENCES users(user_id)     ON DELETE SET NULL
-) ENGINE=InnoDB;
+  CONSTRAINT fk_asn_creator FOREIGN KEY (created_by) REFERENCES users(user_id)
+);
 
+-- created_by 갱신 / 필터링 및 정렬용 인덱스
+CREATE INDEX idx_asn_creator ON assignments (created_by);
+
+-- 기수/반/마감시각 필터링 및 정렬용 인덱스
 CREATE INDEX idx_asn_scope_due ON assignments (cohort_no, class_section, due_at);
 
 -- 과제 제출(재제출 시 갱신)
 CREATE TABLE assignment_submissions (
+	-- PK
   submission_id     BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   -- 과제/제출자
   assignment_id     BIGINT UNSIGNED NOT NULL,
   user_id           BIGINT UNSIGNED NOT NULL,
-  -- 제출 경로(업로드/이메일) 및 이메일 메타(선택)
-  delivery_method   ENUM('UPLOAD','EMAIL') NOT NULL DEFAULT 'UPLOAD',
-  email_meta        JSON NULL,
   -- 원본 파일명/저장 파일명/URL
   original_filename VARCHAR(255) NOT NULL,
   stored_filename   VARCHAR(255) NOT NULL,
@@ -796,66 +877,91 @@ CREATE TABLE assignment_submissions (
   UNIQUE KEY uq_submission_once (assignment_id, user_id),
   -- FK
   CONSTRAINT fk_sub_assignment FOREIGN KEY (assignment_id) REFERENCES assignments(assignment_id) ON DELETE CASCADE,
-  CONSTRAINT fk_sub_user       FOREIGN KEY (user_id)       REFERENCES users(user_id)            ON DELETE CASCADE
-) ENGINE=InnoDB;
+  CONSTRAINT fk_sub_user       FOREIGN KEY (user_id)       REFERENCES users(user_id)
+);
 
+-- user_id 갱신 / 필터링 및 정렬용 인덱스
+CREATE INDEX idx_sub_user ON assignment_submissions (user_id);
+
+-- 과제 필터링 및 정렬용 인덱스
 CREATE INDEX idx_sub_assignment ON assignment_submissions (assignment_id);
 
 -- -------------------------------------------------------------
 -- 10) 사진 앨범
 -- -------------------------------------------------------------
+-- 앨범 테이블
 CREATE TABLE albums (
+	-- PK
   album_id          BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   -- 대상 기수(선택)
   cohort_no         INT NULL,
   -- 앨범명
   name              VARCHAR(150) NOT NULL,
   -- 생성자/시각
-  created_by        BIGINT UNSIGNED NULL,
+  created_by        BIGINT UNSIGNED NOT NULL,
   created_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   -- FK
-  CONSTRAINT fk_album_user FOREIGN KEY (created_by) REFERENCES users(user_id) ON DELETE SET NULL
-) ENGINE=InnoDB;
+  CONSTRAINT fk_album_user FOREIGN KEY (created_by) REFERENCES users(user_id)
+);
 
+-- created_by 갱신 / 필터링 및 정렬용 인덱스
+CREATE INDEX idx_album_user ON albums (created_by);
+
+-- 사진 테이블
 CREATE TABLE photos (
+	-- PK
   photo_id          BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   -- 앨범/업로더/파일
   album_id          BIGINT UNSIGNED NOT NULL,
-  uploader_id       BIGINT UNSIGNED NULL,
+  uploader_id       BIGINT UNSIGNED NOT NULL,
   file_url          VARCHAR(1024) NOT NULL,
-  -- 캡션/시각
+  -- 캡션 (사진에 붙일 수 있는 짦은 설명이나 코멘트)
   caption           VARCHAR(255) NULL,
+  -- 생성 시각
   created_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   -- FK
+  -- ***앨범의 생성자와 사진의 업로더의 권한 문제로 보류***
   CONSTRAINT fk_ph_album    FOREIGN KEY (album_id)    REFERENCES albums(album_id) ON DELETE CASCADE,
-  CONSTRAINT fk_ph_uploader FOREIGN KEY (uploader_id) REFERENCES users(user_id)  ON DELETE SET NULL
-) ENGINE=InnoDB;
 
+  CONSTRAINT fk_ph_uploader FOREIGN KEY (uploader_id) REFERENCES users(user_id)
+);
+
+-- uploader_id 갱신 / 필터링 및 정렬용 인덱스
+CREATE INDEX idx_ph_uploader ON albums (uploader_id);
+
+-- 앨범/생성 시각 필터링 및 정렬용 인덱스
 CREATE INDEX idx_ph_album_created ON photos (album_id, created_at);
 
+-- 사진 좋아요(1인 1회)
 CREATE TABLE photo_likes (
-  -- 사진/사용자 PK
+	-- PK
+	photo_like_id     BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   photo_id          BIGINT UNSIGNED NOT NULL,
-  user_id           BIGINT UNSIGNED NOT NULL,
+  user_id           BIGINT UNSIGNED NULL,
   created_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (photo_id, user_id),
+  UNIQUE KEY (photo_id, user_id),
   CONSTRAINT fk_pl_photo FOREIGN KEY (photo_id) REFERENCES photos(photo_id) ON DELETE CASCADE,
-  CONSTRAINT fk_pl_user2 FOREIGN KEY (user_id)  REFERENCES users(user_id)  ON DELETE CASCADE
-) ENGINE=InnoDB;
+  CONSTRAINT fk_pl_user2 FOREIGN KEY (user_id)  REFERENCES users(user_id)  ON DELETE SET NULL
+);
 
 CREATE TABLE photo_comments (
+	-- PK
   comment_id        BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   -- 사진/작성자(탈퇴 시 댓글 보존 → NULL)
   photo_id          BIGINT UNSIGNED NOT NULL,
-  user_id           BIGINT UNSIGNED NULL,
-  -- 내용/시각
+  user_id           BIGINT UNSIGNED NOT NULL,
+  -- 내용/생성 시각
   content           MEDIUMTEXT NOT NULL,
   created_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   -- FK
   CONSTRAINT fk_pc_photo FOREIGN KEY (photo_id) REFERENCES photos(photo_id) ON DELETE CASCADE,
-  CONSTRAINT fk_pc_user  FOREIGN KEY (user_id)  REFERENCES users(user_id)  ON DELETE SET NULL
-) ENGINE=InnoDB;
+  CONSTRAINT fk_pc_user  FOREIGN KEY (user_id)  REFERENCES users(user_id)
+);
 
+-- user_id 갱신 / 필터링 및 정렬용 인덱스
+CREATE INDEX idx_pc_user ON photo_comments (user_id);
+
+-- 사진/생성 시각 필터링 및 정렬용 인덱스
 CREATE INDEX idx_pc_photo_created ON photo_comments (photo_id, created_at);
 
 -- =============================================================
@@ -898,12 +1004,12 @@ BEGIN
   UPDATE direct_messages
     SET receiver_id = v_ghost
   WHERE receiver_id = OLD.user_id;
-  
+
   -- user 삭제 전 이 user가 작성한 게시글의 작성자 id를 고스트 계정 id로 바꿈
 	UPDATE posts
 		SET author_id = v_ghost
 	WHERE author_id = OLD.user_id;
-	
+
 	-- user 삭제 전 이 user가 작성한 게시글 댓글의 작성자 id를 고스트 계정 id로 바꿈
 	UPDATE comments
 		SET author_id = v_ghost
@@ -914,11 +1020,45 @@ BEGIN
 		SET user_id = v_ghost
 	WHERE user_id = OLD.user_id;
 
-    -- user 삭제 전 이 user가 작성한 문의의 작성자 id를 고스트 계정 id로 바꿈
+    -- user 삭제 전 이 user가 작성한 답변의 작성자 id를 고스트 계정 id로 바꿈
 	UPDATE inquiry_replies
 		SET responder_id = v_ghost
 	WHERE responder_id = OLD.user_id;
 
+	-- user 삭제 전 이 user가 작성한 회사 리뷰의 작성자 id를 고스트 계정 id로 바꿈
+	UPDATE company_reviews
+		SET reviewer_id = v_ghost
+	WHERE reviewer_id = OLD.user_id;
+
+	-- user 삭제 전 이 user가 작성한 회사 리뷰 댓글의 작성자 id를 고스트 계정 id로 바꿈
+	UPDATE company_review_comments
+		SET author_id = v_ghost
+	WHERE author_id = OLD.user_id;
+
+	-- user 삭제 전 이 user가 작성한 강의 평가의 작성자 id를 고스트 계정 id로 바꿈
+	UPDATE course_evaluations
+		SET user_id = v_ghost
+	WHERE user_id = OLD.user_id;
+
+	-- user 삭제 전 이 user가 만든 과제의 생성자 id를 고스트 계정 id로 바꿈
+	UPDATE assignments
+		SET created_by = v_ghost
+	WHERE created_by = OLD.user_id;
+
+		-- user 삭제 전 이 user가 제출한 과제의 제출자 id를 고스트 계정 id로 바꿈
+	UPDATE assignment_submissions
+		SET user_id = v_ghost
+	WHERE user_id = OLD.user_id;
+
+	-- user 삭제 전 이 user가 만든 앨범의 생성자 id를 고스트 계정 id로 바꿈
+	UPDATE albums
+		SET created_by = v_ghost
+	WHERE created_by = OLD.user_id;
+
+	-- user 삭제 전 이 user가 작성한 사진 댓글의 작성자 id를 고스트 계정 id로 바꿈
+	UPDATE photo_comments
+		SET user_id = v_ghost
+	WHERE user_id = OLD.user_id;
 END//
 
 -- Q&A 동기화: 정답 댓글 생성 시 → 게시글 ANSWERED
@@ -944,7 +1084,7 @@ BEGIN
     DECLARE cnt INT DEFAULT 0;
     SELECT COUNT(*) INTO cnt
       FROM comments
-     WHERE post_id = NEW.post_id AND is_answer = 1;
+    WHERE post_id = NEW.post_id AND is_answer = 1;
     IF cnt = 0 THEN
       UPDATE posts SET answer_status='PENDING' WHERE post_id = NEW.post_id;
     END IF;
@@ -960,7 +1100,7 @@ BEGIN
     DECLARE cnt INT DEFAULT 0;
     SELECT COUNT(*) INTO cnt
       FROM comments
-     WHERE post_id = OLD.post_id AND is_answer = 1;
+    WHERE post_id = OLD.post_id AND is_answer = 1;
     IF cnt = 0 THEN
       UPDATE posts SET answer_status='PENDING' WHERE post_id = OLD.post_id;
     END IF;
