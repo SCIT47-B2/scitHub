@@ -11,11 +11,15 @@
 -- 0) 기본 설정
 -- -------------------------------------------------------------
 CREATE DATABASE IF NOT EXISTS scithub
+  -- 문자 인코딩 설정
   DEFAULT CHARACTER SET utf8mb4
+  -- 문자열 비교 규칙 설정(악센트와 대소문자 구분하지 않음)
   DEFAULT COLLATE utf8mb4_0900_ai_ci;
 USE scithub;
 
+-- 기본 문자셋/정렬 설정
 SET NAMES utf8mb4;
+-- 서버 시간대 설정
 SET time_zone = '+09:00';
 
 -- -------------------------------------------------------------
@@ -50,9 +54,9 @@ CREATE TABLE users (
   -- 프로필 이미지 URL
   avatar_url        VARCHAR(500) NULL,
   -- 계정 활성화 여부
-  is_active         TINYINT(1) NOT NULL DEFAULT 1,
+  is_active         TINYINT NOT NULL DEFAULT 1,
   -- 관리자 권한 여부(간편 플래그; 확장 롤은 별도 테이블)
-  is_admin          TINYINT(1) NOT NULL DEFAULT 0,
+  is_admin          TINYINT NOT NULL DEFAULT 0,
   -- 최근 로그인 시각
   last_login_at     DATETIME NULL,
   -- 가입 시각
@@ -96,14 +100,14 @@ CREATE TABLE direct_messages (
   -- 본문
   body              MEDIUMTEXT NOT NULL,
   -- 수신자 열람 여부
-  is_read           TINYINT(1) NOT NULL DEFAULT 0,
+  is_read           TINYINT NOT NULL DEFAULT 0,
   -- 열람 시각
   read_at           DATETIME NULL,
   -- 발송 시각
   created_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   -- 발신자/수신자 측 삭제 플래그(소프트 삭제)
-  deleted_by_sender  TINYINT(1) NOT NULL DEFAULT 0,
-  deleted_by_receiver TINYINT(1) NOT NULL DEFAULT 0,
+  deleted_by_sender  TINYINT NOT NULL DEFAULT 0,
+  deleted_by_receiver TINYINT NOT NULL DEFAULT 0,
   -- FK
   CONSTRAINT fk_dm_sender  FOREIGN KEY (sender_id)  REFERENCES users(user_id) ON DELETE RESTRICT,
   CONSTRAINT fk_dm_receiver FOREIGN KEY (receiver_id) REFERENCES users(user_id) ON DELETE RESTRICT
