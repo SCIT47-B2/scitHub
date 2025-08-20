@@ -414,7 +414,6 @@ CREATE TABLE inquiry_replies (
 -- 응답자 ID 갱신 시를 위한 보조 인덱스
 CREATE INDEX idx_inquiries_replies_responder_id   ON inquiry_replies (responder_id);
 
-
 -- -------------------------------------------------------------
 -- 5) 조편성/좌석 배치 (M_017~M_028, S_001~S_004)
 -- -------------------------------------------------------------

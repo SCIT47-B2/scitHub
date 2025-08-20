@@ -1,0 +1,87 @@
+package net.dsa.scitHub.entity.community;
+
+import java.time.LocalDateTime;
+
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
+import lombok.*;
+import java.util.List;
+import java.util.ArrayList;
+
+/**
+ * 게시판 마스터 (TABLE: boards)
+ * - 프로그램 키(board_key)로 식별/라우팅
+ * - 공지/공개/Q&A 플래그 보유
+ */
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(
+    name = "boards",
+    uniqueConstraints = {
+        @UniqueConstraint(name = "uk_boards_board_key", columnNames = "board_key")
+    },
+    indexes = {
+        // 라우팅/조회 최적화(선택)
+        @Index(name = "idx_boards_is_flags", columnList = "is_qna,is_notice,is_public,created_at")
+    }
+)
+public class BoardsEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "board_id", columnDefinition = "int unsigned")
+    private Integer boardId;
+
+    // 프로그램에서 사용하는 키 (예: NOTICE_OPS, QNA)
+    @Size(max = 50)
+    @Column(name = "board_key", nullable = false, length = 50)
+    private String boardKey;
+
+    // 표시 이름
+    @Size(max = 100)
+    @Column(name = "name", nullable = false, length = 100)
+    private String name;
+
+    // 설명(선택)
+    @Size(max = 255)
+    @Column(name = "description", length = 255)
+    private String description;
+
+    // Q&A 성격 여부
+    @Column(name = "is_qna", nullable = false, columnDefinition = "tinyint default 0")
+    private Boolean isQna;
+
+    // 공지 전용 여부
+    @Column(name = "is_notice", nullable = false, columnDefinition = "tinyint default 0")
+    private Boolean isNotice;
+
+    // 공개 여부
+    @Column(name = "is_public", nullable = false, columnDefinition = "tinyint default 1")
+    private Boolean isPublic;
+
+    // 생성 시각
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
+
+    // ====== 라이프사이클 ======
+    @PrePersist
+    void onCreate() {
+        if (this.isQna == null) this.isQna = false;
+        if (this.isNotice == null) this.isNotice = false;
+        if (this.isPublic == null) this.isPublic = true;
+        if (this.createdAt == null) this.createdAt = LocalDateTime.now();
+    }
+
+    // 이 게시판의 게시글들
+    @Builder.Default
+    @OneToMany(mappedBy = "board", fetch = FetchType.LAZY)
+    private List<PostsEntity> posts = new ArrayList<>();
+
+    // 이 게시판을 즐겨찾기한 레코드
+    @Builder.Default
+    @OneToMany(mappedBy = "board", fetch = FetchType.LAZY)
+    private List<BoardFavoritesEntity> favorites = new ArrayList<>();
+}
