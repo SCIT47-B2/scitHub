@@ -135,7 +135,7 @@ CREATE TABLE boards (
   -- 공개 여부(비로그인 열람 허용 등 정책)
   is_public         TINYINT(1) NOT NULL DEFAULT 1,
   -- 생성 시각
-  created_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,  
+  created_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 );
 
 -- 즐겨찾는 게시판 [B_003]
