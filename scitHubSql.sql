@@ -49,9 +49,9 @@ CREATE TABLE users (
   -- 프로필 이미지 URL
   avatar_url        VARCHAR(500) NULL,
   -- 계정 활성화 여부
-  is_active         TINYINT(1) NOT NULL DEFAULT 1,
+  is_active         TINYINT NOT NULL DEFAULT 1,
   -- 관리자 권한 여부(간편 플래그; 확장 롤은 별도 테이블)
-  is_admin          TINYINT(1) NOT NULL DEFAULT 0,
+  is_admin          TINYINT NOT NULL DEFAULT 0,
   -- 최근 로그인 시각
   last_login_at     DATETIME NULL,
   -- 가입 시각
