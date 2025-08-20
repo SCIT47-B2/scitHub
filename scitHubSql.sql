@@ -507,7 +507,7 @@ CREATE TABLE seats (
   UNIQUE KEY uq_seat_code (seat_map_id, seat_code),
   -- FK
   CONSTRAINT fk_seat_map FOREIGN KEY (seat_map_id) REFERENCES seat_maps(seat_map_id) ON DELETE CASCADE
-) ENGINE=InnoDB;
+);
 
 -- 좌석 배정(좌석당 1명, 사용자당 1좌석)
 CREATE TABLE seat_assignments (
@@ -525,27 +525,10 @@ CREATE TABLE seat_assignments (
   CONSTRAINT fk_sa_map  FOREIGN KEY (seat_map_id) REFERENCES seat_maps(seat_map_id) ON DELETE CASCADE,
   CONSTRAINT fk_sa_seat FOREIGN KEY (seat_id)     REFERENCES seats(seat_id)         ON DELETE CASCADE,
   CONSTRAINT fk_sa_user FOREIGN KEY (user_id)     REFERENCES users(user_id)        ON DELETE CASCADE
-) ENGINE=InnoDB;
+);
 
+-- 좌석 배정 사용자별 인덱스
 CREATE INDEX idx_sa_user ON seat_assignments (user_id);
-
--- 좌석 브로드캐스트 로그(관리자 메시지)
-CREATE TABLE seat_broadcasts (
-  broadcast_id      BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-  -- 배치도/좌석(NULL이면 전체)
-  seat_map_id       BIGINT UNSIGNED NOT NULL,
-  seat_id           BIGINT UNSIGNED NULL,
-  -- 메시지(예: 일어나세요)
-  message           VARCHAR(200) NOT NULL,
-  -- 발신 관리자 (탈퇴 시 기록 보존 → NULL 허용)
-  sent_by           BIGINT UNSIGNED NULL,
-  -- 시각
-  created_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  -- FK
-  CONSTRAINT fk_sb_map  FOREIGN KEY (seat_map_id) REFERENCES seat_maps(seat_map_id) ON DELETE CASCADE,
-  CONSTRAINT fk_sb_seat FOREIGN KEY (seat_id)     REFERENCES seats(seat_id)         ON DELETE SET NULL,
-  CONSTRAINT fk_sb_user FOREIGN KEY (sent_by)     REFERENCES users(user_id)         ON DELETE SET NULL
-) ENGINE=InnoDB;
 
 -- 좌석 피드백 FK 추가(문의 -> 좌석)
 ALTER TABLE inquiries
@@ -680,7 +663,7 @@ CREATE TABLE company_review_comments (
   created_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   -- FK
   CONSTRAINT fk_crc_review FOREIGN KEY (review_id) REFERENCES company_reviews(review_id) ON DELETE CASCADE,
-  CONSTRAINT fk_crc_user   FOREIGN KEY (author_id)  REFERENCES users(user_id)            ON DELETE SET NULL
+  CONSTRAINT fk_crc_user   FOREIGN KEY (author_id) REFERENCES users(user_id)             ON DELETE RESTRICT
 );
 
 -- author_id 갱신 / 필터링 및 정렬용 인덱스
@@ -814,8 +797,8 @@ CREATE INDEX idx_csb_scope ON class_schedule_blocks (cohort_no, class_section, l
 -- 과목별 평가 요약 뷰
 CREATE VIEW v_course_eval_avg AS
 SELECT
-	course_id,
-	AVG(score_preparedness) AS avg_prepared,
+  course_id,
+  AVG(score_preparedness) AS avg_prepared,
   AVG(score_clarity)      AS avg_clarity,
   AVG(score_fairness)     AS avg_fairness,
   AVG(score_respond)      AS avg_respond,
@@ -826,7 +809,7 @@ FROM course_evaluations
 GROUP BY course_id;
 
 -- 강사별 과목 평가 요약 뷰
-CREATE v_instructor_eval_avg AS
+CREATE VIEW v_instructor_eval_avg AS
 SELECT
   c.instructor_id,
   c.course_id,
@@ -902,7 +885,7 @@ CREATE INDEX idx_sub_assignment ON assignment_submissions (assignment_id);
 -- -------------------------------------------------------------
 -- 앨범 테이블
 CREATE TABLE albums (
-	-- PK
+  -- PK
   album_id          BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   -- 대상 기수(선택)
   cohort_no         INT NULL,
@@ -937,16 +920,13 @@ CREATE TABLE photos (
   CONSTRAINT fk_ph_uploader FOREIGN KEY (uploader_id) REFERENCES users(user_id)
 );
 
--- uploader_id 갱신 / 필터링 및 정렬용 인덱스
-CREATE INDEX idx_ph_uploader ON albums (uploader_id);
-
 -- 앨범/생성 시각 필터링 및 정렬용 인덱스
 CREATE INDEX idx_ph_album_created ON photos (album_id, created_at);
 
 -- 사진 좋아요(1인 1회)
 CREATE TABLE photo_likes (
-	-- PK
-	photo_like_id     BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  -- PK
+  photo_like_id     BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   photo_id          BIGINT UNSIGNED NOT NULL,
   user_id           BIGINT UNSIGNED NULL,
   created_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -956,7 +936,7 @@ CREATE TABLE photo_likes (
 );
 
 CREATE TABLE photo_comments (
-	-- PK
+  -- PK
   comment_id        BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
   -- 사진/작성자(탈퇴 시 댓글 보존 → NULL)
   photo_id          BIGINT UNSIGNED NOT NULL,
@@ -1008,15 +988,15 @@ BEGIN
   -- 발신자/수신자 FK를 고스트로 업데이트
 	-- user 삭제 전 이 user가 수/발신한 쪽지의 수/발신자 id를
 	-- 삭제된 유저를 나타내는 고스트 계정 id로 바꿈
-  UPDATE direct_messages
-    SET sender_id = v_ghost
-  WHERE sender_id = OLD.user_id;
+    UPDATE direct_messages
+        SET sender_id = v_ghost
+    WHERE sender_id = OLD.user_id;
 
-  UPDATE direct_messages
-    SET receiver_id = v_ghost
-  WHERE receiver_id = OLD.user_id;
+    UPDATE direct_messages
+        SET receiver_id = v_ghost
+    WHERE receiver_id = OLD.user_id;
 
-  -- user 삭제 전 이 user가 작성한 게시글의 작성자 id를 고스트 계정 id로 바꿈
+    -- user 삭제 전 이 user가 작성한 게시글의 작성자 id를 고스트 계정 id로 바꿈
 	UPDATE posts
 		SET author_id = v_ghost
 	WHERE author_id = OLD.user_id;
@@ -1092,12 +1072,12 @@ CREATE TRIGGER trg_comments_au_answer
 AFTER UPDATE ON comments
 FOR EACH ROW
 BEGIN
+  DECLARE cnt INT DEFAULT 0;
   IF NEW.is_answer = 1 AND (OLD.is_answer IS NULL OR OLD.is_answer = 0) THEN
     UPDATE posts SET answer_status='ANSWERED' WHERE post_id = NEW.post_id;
   END IF;
 
   IF OLD.is_answer = 1 AND NEW.is_answer = 0 THEN
-    DECLARE cnt INT DEFAULT 0;
     SELECT COUNT(*) INTO cnt
       FROM comments
     WHERE post_id = NEW.post_id AND is_answer = 1;
@@ -1112,8 +1092,8 @@ CREATE TRIGGER trg_comments_ad_answer
 AFTER DELETE ON comments
 FOR EACH ROW
 BEGIN
+  DECLARE cnt INT DEFAULT 0;
   IF OLD.is_answer = 1 THEN
-    DECLARE cnt INT DEFAULT 0;
     SELECT COUNT(*) INTO cnt
       FROM comments
     WHERE post_id = OLD.post_id AND is_answer = 1;
