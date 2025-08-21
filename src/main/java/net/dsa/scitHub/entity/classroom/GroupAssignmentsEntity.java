@@ -11,7 +11,7 @@ import net.dsa.scitHub.entity.user.UsersEntity;
 
 @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
 @Entity
-@EntityListeners({AuditingEntityListener.class})
+@EntityListeners(AuditingEntityListener.class)
 @Table(
     name = "group_assignments",
     uniqueConstraints = @UniqueConstraint(name = "uq_ga_unique", columnNames = {"cohort_no","class_section","user_id"}),

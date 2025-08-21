@@ -17,7 +17,7 @@ import net.dsa.scitHub.entity.user.UsersEntity;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@EntityListeners({AuditingEntityListener.class})
+@EntityListeners(AuditingEntityListener.class)
 @Table(
     name = "course_evaluations",
     uniqueConstraints = @UniqueConstraint(name = "uq_ce_once", columnNames = {"course_id","user_id"}),

@@ -11,7 +11,7 @@ import net.dsa.scitHub.entity.user.UsersEntity;
 
 @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
 @Entity
-@EntityListeners({AuditingEntityListener.class})
+@EntityListeners(AuditingEntityListener.class)
 @Table(
     name = "seat_assignments",
     uniqueConstraints = {

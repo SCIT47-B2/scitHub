@@ -16,7 +16,7 @@ import java.util.ArrayList;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@EntityListeners({AuditingEntityListener.class})
+@EntityListeners(AuditingEntityListener.class)
 @Table(
     name = "companies",
     uniqueConstraints = @UniqueConstraint(name = "uk_companies_name", columnNames = "name")

@@ -15,7 +15,7 @@ import net.dsa.scitHub.entity.user.UsersEntity;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@EntityListeners({AuditingEntityListener.class})
+@EntityListeners(AuditingEntityListener.class)
 @Table(
     name = "company_review_comments",
     indexes = @Index(name = "idx_crc_review_created", columnList = "review_id, created_at")

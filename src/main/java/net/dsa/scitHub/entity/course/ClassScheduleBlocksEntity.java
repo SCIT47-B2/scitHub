@@ -16,7 +16,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@EntityListeners({AuditingEntityListener.class})
+@EntityListeners(AuditingEntityListener.class)
 @Table(
     name = "class_schedule_blocks",
     indexes = @Index(name = "idx_csb_scope", columnList = "cohort_no, class_section, label, is_active")

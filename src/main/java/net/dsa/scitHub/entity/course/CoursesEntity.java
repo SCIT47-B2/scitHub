@@ -20,7 +20,7 @@ import net.dsa.scitHub.entity.assignment.AssignmentsEntity;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@EntityListeners({AuditingEntityListener.class})
+@EntityListeners(AuditingEntityListener.class)
 @Table(
     name = "courses",
     indexes = {

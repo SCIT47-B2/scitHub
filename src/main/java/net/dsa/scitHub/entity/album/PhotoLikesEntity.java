@@ -15,7 +15,7 @@ import net.dsa.scitHub.entity.user.UsersEntity;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@EntityListeners({AuditingEntityListener.class})
+@EntityListeners(AuditingEntityListener.class)
 @Table(
     name = "photo_likes",
     uniqueConstraints = @UniqueConstraint(name = "uk_photo_likes_once", columnNames = {"photo_id","user_id"}),

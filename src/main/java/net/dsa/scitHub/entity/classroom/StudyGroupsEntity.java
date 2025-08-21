@@ -13,7 +13,7 @@ import java.util.ArrayList;
 
 @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
 @Entity
-@EntityListeners({AuditingEntityListener.class})
+@EntityListeners(AuditingEntityListener.class)
 @Table(
     name = "study_groups",
     uniqueConstraints = @UniqueConstraint(name = "uq_group_name", columnNames = {"cohort_no","class_section","name"})

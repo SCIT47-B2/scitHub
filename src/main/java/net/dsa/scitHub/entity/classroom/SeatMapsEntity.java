@@ -12,7 +12,7 @@ import java.util.ArrayList;
 
 @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
 @Entity
-@EntityListeners({AuditingEntityListener.class})
+@EntityListeners(AuditingEntityListener.class)
 @Table(
     name = "seat_maps",
     uniqueConstraints = {

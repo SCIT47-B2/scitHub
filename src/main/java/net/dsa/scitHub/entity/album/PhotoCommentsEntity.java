@@ -15,7 +15,7 @@ import net.dsa.scitHub.entity.user.UsersEntity;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@EntityListeners({AuditingEntityListener.class})
+@EntityListeners(AuditingEntityListener.class)
 @Table(
     name = "photo_comments",
     indexes = @Index(name = "idx_pc_photo_created", columnList = "photo_id, created_at")

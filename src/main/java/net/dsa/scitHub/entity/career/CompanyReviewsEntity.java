@@ -19,7 +19,7 @@ import net.dsa.scitHub.entity.user.UsersEntity;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@EntityListeners({AuditingEntityListener.class})
+@EntityListeners(AuditingEntityListener.class)
 @Table(
     name = "company_reviews",
     uniqueConstraints = @UniqueConstraint(name = "uq_review_once", columnNames = {"company_id", "reviewer_id"}),
