@@ -3,22 +3,27 @@ package net.dsa.scitHub.entity.community;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Data
+@Getter @Setter
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(onlyExplicitlyIncluded = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Table(
-    name = "qna_posts",
-    uniqueConstraints = {
-        @UniqueConstraint(name = "uk_qna_posts_post", columnNames = "post_id")
-    }
+    name = "qna_posts"
+    // JoinColumn에서 이미 unique 제약조건을 걸었으므로 필요없음
+    // uniqueConstraints = {
+    //     @UniqueConstraint(name = "uk_qna_posts_post", columnNames = "post_id")
+    // }
 )
 public class QnaPostsEntity {
 
     public enum AnswerStatus { PENDING, ANSWERED }
 
     @Id
+    @EqualsAndHashCode.Include // 이 항목만 기준으로 equals/hashCode의 비교 수행
+    @ToString.Include
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "qna_posts_id", columnDefinition = "int unsigned")
     private Integer qnaPostsId;

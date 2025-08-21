@@ -4,7 +4,9 @@ import java.io.Serializable;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Data
+@Getter @Setter
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(onlyExplicitlyIncluded = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -13,6 +15,8 @@ import lombok.*;
 public class PostTagsEntity {
 
     @EmbeddedId
+    @EqualsAndHashCode.Include // 이 항목만 기준으로 equals/hashCode의 비교 수행
+    @ToString.Include
     private PostTagsId id;
 
     @MapsId("postId")

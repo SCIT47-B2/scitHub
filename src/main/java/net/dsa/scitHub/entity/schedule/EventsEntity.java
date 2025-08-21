@@ -41,6 +41,8 @@ public class EventsEntity {
     private Visibility visibility;
 
     // 개인 일정 소유자 (NULL 가능, 삭제 시 CASCADE)
+    // 추후 DB에서 cascade 동작이 제대로 실행되지 않을 경우, 엔티티 쪽에
+    // @OnDelete(action = OnDeleteAction.CASCADE) 추가
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
         name = "owner_user_id",
@@ -69,13 +71,15 @@ public class EventsEntity {
     @Column(name = "end_at", nullable = false)
     private LocalDateTime endAt;
 
-    @Column(name = "is_all_day", nullable = false, columnDefinition = "tinyint default 0")
+    @Column(name = "is_all_day", nullable = false)
     private Boolean isAllDay;
 
-    @Column(name = "dday_enabled", nullable = false, columnDefinition = "tinyint default 0")
+    @Column(name = "dday_enabled", nullable = false)
     private Boolean ddayEnabled;
 
     // 생성자 (NULL 가능, 삭제 시 SET NULL)
+    // 추후 DB에서 set null 동작이 제대로 실행되지 않을 경우, 엔티티 쪽에
+    // @OnDelete(action = OnDeleteAction.SET_NULL) 추가
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
         name = "created_by",
@@ -99,4 +103,12 @@ public class EventsEntity {
         if (itClassScope == null) itClassScope = ItClassScope.ALL;
     }
 
+    // 시간 정합성 검증 코드
+    @PrePersist
+    @PreUpdate
+    void validateTimeRange() {
+        if (endAt != null && startAt != null && endAt.isBefore(startAt)) {
+            throw new IllegalArgumentException("endAt must be after startAt");
+        }
+    }
 }

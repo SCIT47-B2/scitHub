@@ -16,7 +16,9 @@ import net.dsa.scitHub.entity.user.UsersEntity;
  * - 복합 PK(user_id, board_id)
  * - 유저/게시판 삭제 시 CASCADE로 행 삭제 (DB 레벨)
  */
-@Data
+@Getter @Setter
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(onlyExplicitlyIncluded = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -27,6 +29,8 @@ public class BoardFavoritesEntity {
 
     // ==== 복합키 정의 ====
     @EmbeddedId
+    @EqualsAndHashCode.Include // 이 항목만 기준으로 equals/hashCode의 비교 수행
+    @ToString.Include // ToString에 포함
     private BoardFavoritesId id;
 
     // 사용자 FK → users.user_id

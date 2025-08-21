@@ -36,14 +36,13 @@ public class DirectMessagesEntity {
     @Column(name = "message_id", columnDefinition = "int unsigned")
     private Integer messageId;
 
+    // 컬렉션을 통한 양방향 매핑 대신, 쿼리로 수/발신자 기준 쪽지 검색하는 쪽으로
     // 발신자 FK → users.user_id
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(
         name = "sender_id",
         nullable = false,
         foreignKey = @ForeignKey(name = "fk_dm_sender")
-        // columnDefinition은 스키마 자동생성 시에만 필요. 운영 DDL 고정이면 생략 가능
-        // , columnDefinition = "int unsigned"  // (아래 주의사항 참고)
     )
     private UsersEntity sender;
 
@@ -53,7 +52,6 @@ public class DirectMessagesEntity {
         name = "receiver_id",
         nullable = false,
         foreignKey = @ForeignKey(name = "fk_dm_receiver")
-        // , columnDefinition = "bigint unsigned"  // (아래 주의사항 참고)
     )
     private UsersEntity receiver;
 

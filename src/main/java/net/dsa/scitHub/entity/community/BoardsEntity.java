@@ -17,7 +17,9 @@ import java.util.ArrayList;
  * - 프로그램 키(board_key)로 식별/라우팅
  * - 공지/공개/Q&A 플래그 보유
  */
-@Data
+@Getter @Setter
+@ToString(exclude = {"posts"}) // ToString에서 연관관계 필드는 제외
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -36,6 +38,7 @@ import java.util.ArrayList;
 public class BoardsEntity {
 
     @Id
+    @EqualsAndHashCode.Include // 이 항목만 기준으로 equals/hashCode의 비교 수행
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "board_id", columnDefinition = "int unsigned")
     private Integer boardId;
@@ -56,15 +59,15 @@ public class BoardsEntity {
     private String description;
 
     // Q&A 성격 여부
-    @Column(name = "is_qna", nullable = false, columnDefinition = "tinyint default 0")
+    @Column(name = "is_qna", nullable = false)
     private Boolean isQna;
 
     // 공지 전용 여부
-    @Column(name = "is_notice", nullable = false, columnDefinition = "tinyint default 0")
+    @Column(name = "is_notice", nullable = false)
     private Boolean isNotice;
 
     // 공개 여부
-    @Column(name = "is_public", nullable = false, columnDefinition = "tinyint default 1")
+    @Column(name = "is_public", nullable = false)
     private Boolean isPublic;
 
     // 생성 시각
@@ -91,9 +94,4 @@ public class BoardsEntity {
     @Builder.Default
     @OneToMany(mappedBy = "board", fetch = FetchType.LAZY)
     private List<PostsEntity> posts = new ArrayList<>();
-
-    // 이 게시판을 즐겨찾기한 레코드
-    @Builder.Default
-    @OneToMany(mappedBy = "board", fetch = FetchType.LAZY)
-    private List<BoardFavoritesEntity> favorites = new ArrayList<>();
 }

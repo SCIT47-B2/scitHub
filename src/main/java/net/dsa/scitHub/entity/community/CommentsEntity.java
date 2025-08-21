@@ -13,7 +13,9 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.ArrayList;
 
-@Data
+@Getter @Setter
+@ToString(exclude = {"children"}) // ToString에서 연관관계 필드는 제외
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -28,6 +30,7 @@ import java.util.ArrayList;
 public class CommentsEntity {
 
     @Id
+    @EqualsAndHashCode.Include // 이 항목만 기준으로 equals/hashCode의 비교 수행
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "comment_id", columnDefinition = "int unsigned")
     private Integer commentId;
@@ -52,7 +55,7 @@ public class CommentsEntity {
     @Column(name = "content", nullable = false, columnDefinition = "MEDIUMTEXT")
     private String content;
 
-    @Column(name = "is_answer", nullable = false, columnDefinition = "tinyint default 0")
+    @Column(name = "is_answer", nullable = false)
     private Boolean isAnswer;
 
     @CreatedDate

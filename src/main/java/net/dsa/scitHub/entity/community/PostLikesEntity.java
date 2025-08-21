@@ -10,7 +10,8 @@ import lombok.*;
 
 import net.dsa.scitHub.entity.user.UsersEntity;
 
-@Data
+@Getter @Setter
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -28,6 +29,7 @@ import net.dsa.scitHub.entity.user.UsersEntity;
 public class PostLikesEntity {
 
     @Id
+    @EqualsAndHashCode.Include // 이 항목만 기준으로 equals/hashCode의 비교 수행
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "post_like_id", columnDefinition = "int unsigned")
     private Integer postLikeId;

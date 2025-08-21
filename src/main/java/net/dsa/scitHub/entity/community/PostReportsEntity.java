@@ -11,7 +11,8 @@ import lombok.*;
 
 import net.dsa.scitHub.entity.user.UsersEntity;
 
-@Data
+@Getter @Setter
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -27,6 +28,7 @@ public class PostReportsEntity {
     public enum Status { PENDING, CONFIRMED, REJECTED }
 
     @Id
+    @EqualsAndHashCode.Include // 이 항목만 기준으로 equals/hashCode의 비교 수행
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "report_id", columnDefinition = "int unsigned")
     private Integer reportId;
@@ -38,7 +40,7 @@ public class PostReportsEntity {
 
     // 신고자 NULL 허용, 삭제 시 CASCADE
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "reporter_id",
+    @JoinColumn(name = "reporter_id", nullable = true,
         foreignKey = @ForeignKey(name = "fk_rep_user"))
     private UsersEntity reporter;
 
@@ -47,7 +49,7 @@ public class PostReportsEntity {
     private String reason;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false, length = 10)
+    @Column(name = "status", nullable = false)
     private Status status; // default PENDING
 
     @CreatedDate

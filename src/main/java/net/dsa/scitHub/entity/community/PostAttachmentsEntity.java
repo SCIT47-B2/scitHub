@@ -9,7 +9,9 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
-@Data
+@Getter @Setter
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(exclude = "post")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -22,6 +24,7 @@ import lombok.*;
 public class PostAttachmentsEntity {
 
     @Id
+    @EqualsAndHashCode.Include // 이 항목만 기준으로 equals/hashCode의 비교 수행
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "attachment_id", columnDefinition = "int unsigned")
     private Integer attachmentId;
@@ -40,7 +43,7 @@ public class PostAttachmentsEntity {
     private String fileName;
 
     @Column(name = "file_size_bytes", columnDefinition = "int unsigned")
-    private Integer fileSizeBytes;
+    private Long fileSizeBytes;
 
     @CreatedDate
     @Column(name = "created_at", nullable = false)

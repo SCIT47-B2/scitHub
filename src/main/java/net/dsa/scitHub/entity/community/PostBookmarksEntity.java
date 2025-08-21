@@ -11,7 +11,8 @@ import lombok.*;
 
 import net.dsa.scitHub.entity.user.UsersEntity;
 
-@Data
+@Getter @Setter
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -21,6 +22,7 @@ import net.dsa.scitHub.entity.user.UsersEntity;
 public class PostBookmarksEntity {
 
     @EmbeddedId
+    @EqualsAndHashCode.Include // 이 항목만 기준으로 equals/hashCode의 비교 수행
     private PostBookmarksId id;
 
     @MapsId("postId")

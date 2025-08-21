@@ -14,7 +14,8 @@ import java.util.ArrayList;
 
 import net.dsa.scitHub.entity.user.UsersEntity;
 
-@Data
+@Getter @Setter
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -32,6 +33,7 @@ public class PostsEntity {
     public enum Status { ACTIVE, DELETED, BLOCKED }
 
     @Id
+    @EqualsAndHashCode.Include // 이 항목만 기준으로 equals/hashCode의 비교 수행
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "post_id", columnDefinition = "int unsigned")
     private Integer postId;
@@ -75,7 +77,7 @@ public class PostsEntity {
         if (viewCount == null) viewCount = 0;
     }
 
-
+    // 조회수 증가 메서드
     public void increaseViewCount() {
         this.viewCount = (this.viewCount == null ? 1 : this.viewCount + 1);
     }
@@ -86,6 +88,7 @@ public class PostsEntity {
      * 쿼리로 불러오는 것이 좋음
      */
 
+    // 요거 뭐하는건지, 가져와야 하는지 검토 필요
     // Q&A 1:1 역방향
     @OneToOne(mappedBy = "post", fetch = FetchType.LAZY)
     private QnaPostsEntity qna;
@@ -100,20 +103,10 @@ public class PostsEntity {
     @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
     private List<PostLikesEntity> likes = new ArrayList<>();
 
-    // 북마크 목록
-    @Builder.Default
-    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
-    private List<PostBookmarksEntity> bookmarks = new ArrayList<>();
-
     // 첨부파일 목록
     @Builder.Default
     @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
     private List<PostAttachmentsEntity> attachments = new ArrayList<>();
-
-    // 신고 목록
-    @Builder.Default
-    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
-    private List<PostReportsEntity> reports = new ArrayList<>();
 
     // 태그 매핑(조인 엔티티 방식 권장)
     @Builder.Default

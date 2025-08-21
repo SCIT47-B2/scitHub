@@ -7,23 +7,10 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
 import lombok.*;
-import net.dsa.scitHub.entity.community.*;
-import net.dsa.scitHub.entity.notification.NotificationsEntity;
-import net.dsa.scitHub.entity.schedule.EventsEntity;
-import net.dsa.scitHub.entity.inquiry.*;
-import net.dsa.scitHub.entity.classroom.*;
-import net.dsa.scitHub.entity.career.*;
-import net.dsa.scitHub.entity.reservation.*;
-import net.dsa.scitHub.entity.course.*;
-import net.dsa.scitHub.entity.assignment.*;
-import net.dsa.scitHub.entity.album.*;
-import java.util.List;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import java.util.ArrayList;
 
 /**
  * 사용자 기본 정보 (TABLE: users)
@@ -31,7 +18,8 @@ import java.util.ArrayList;
  * - TINYINT → Boolean
  * - DATE → LocalDate, DATETIME → LocalDateTime
  */
-@Data
+@Getter @Setter
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -57,6 +45,7 @@ public class UsersEntity {
 
     // ====== 컬럼 매핑 ======
     @Id
+    @EqualsAndHashCode.Include // 이 항목만 기준으로 equals/hashCode의 비교 수행
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id", columnDefinition = "int unsigned")
     private Integer userId;
@@ -83,22 +72,22 @@ public class UsersEntity {
     private LocalDate birthDate;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "gender", nullable = false, length = 1)
+    @Column(name = "gender", nullable = false)
     private Gender gender; // DB 기본값 'N'
 
     @Column(name = "cohort_no")
     private Integer cohortNo;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "it_class", length = 1)
+    @Column(name = "it_class")
     private ITClass itClass;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "it_session", length = 2)
+    @Column(name = "it_session")
     private ITSession itSession;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "jp_class", length = 1)
+    @Column(name = "jp_class")
     private JPClass jpClass;
 
     @Column(name = "avatar_url", length = 500)
@@ -138,154 +127,10 @@ public class UsersEntity {
         if (this.gender == null) this.gender = Gender.N;
     }
 
-
     /*
      * 연관관계 매핑
      * 자주 호출할 것 같은 것만 리스트로 매핑하고, 나머지는 그때그때
      * 쿼리로 불러오는 것이 좋음
      */
 
-    // 내가 작성한 게시글
-    @Builder.Default
-    @OneToMany(mappedBy = "author", fetch = FetchType.LAZY)
-    private List<PostsEntity> posts = new ArrayList<>();
-
-    // 내가 작성한 댓글
-    @Builder.Default
-    @OneToMany(mappedBy = "author", fetch = FetchType.LAZY)
-    private List<CommentsEntity> comments = new ArrayList<>();
-
-    // 내가 보낸 쪽지
-    @Builder.Default
-    @OneToMany(mappedBy = "sender", fetch = FetchType.LAZY)
-    private List<DirectMessagesEntity> sentMessages = new ArrayList<>();
-
-    // 내가 받은 쪽지
-    @Builder.Default
-    @OneToMany(mappedBy = "receiver", fetch = FetchType.LAZY)
-    private List<DirectMessagesEntity> receivedMessages = new ArrayList<>();
-
-    // 내가 누른 좋아요 (user_id NULL인 행은 여기 포함되지 않음)
-    @Builder.Default
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private List<PostLikesEntity> likes = new ArrayList<>();
-
-    // 내가 한 북마크
-    @Builder.Default
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private List<PostBookmarksEntity> bookmarks = new ArrayList<>();
-
-    // 내가 접수한 신고 (reporter_id NULL 허용)
-    @Builder.Default
-    @OneToMany(mappedBy = "reporter", fetch = FetchType.LAZY)
-    private List<PostReportsEntity> reports = new ArrayList<>();
-
-    // 내가 즐겨찾기한 게시판 레코드
-    @Builder.Default
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private List<BoardFavoritesEntity> boardFavorites = new ArrayList<>();
-
-    // 내가 받은 알림
-    @Builder.Default
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private List<NotificationsEntity> notifications = new ArrayList<>();
-
-    // 내 개인일정 소유 (owner_user_id)
-    @Builder.Default
-    @OneToMany(mappedBy = "owner", fetch = FetchType.LAZY)
-    private List<EventsEntity> ownedEvents = new ArrayList<>();
-
-    // 내가 생성한 일정 (created_by)
-    @Builder.Default
-    @OneToMany(mappedBy = "createdBy", fetch = FetchType.LAZY)
-    private List<EventsEntity> createdEvents = new ArrayList<>();
-
-    // 내가 작성한 문의
-    @Builder.Default
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private List<InquiriesEntity> inquiries = new ArrayList<>();
-
-    // 내가 단 문의 답변
-    @Builder.Default
-    @OneToMany(mappedBy = "responder", fetch = FetchType.LAZY)
-    private List<InquiryRepliesEntity> inquiryReplies = new ArrayList<>();
-
-    // 내가 속한 그룹
-    @Builder.Default
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private List<GroupAssignmentsEntity> groupAssignments = new ArrayList<>();
-
-    // 내가 속한 좌석
-    @Builder.Default
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private List<SeatAssignmentsEntity> seatAssignments = new ArrayList<>();
-
-    // 내가 만든 예약들
-    @Builder.Default
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private List<ReservationsEntity> reservations = new ArrayList<>();
-
-    // 내가 작성한 예약 신고
-    @Builder.Default
-    @OneToMany(mappedBy = "reporter", fetch = FetchType.LAZY)
-    private List<ReservationReportsEntity> reservationReports = new ArrayList<>();
-
-    // 내 패널티(1:1)
-    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
-    private ReservationPenaltiesEntity reservationPenalty;
-
-    // 내가 남긴 회사 리뷰
-    @Builder.Default
-    @OneToMany(mappedBy = "reviewer", fetch = FetchType.LAZY)
-    private List<CompanyReviewsEntity> companyReviews = new ArrayList<>();
-
-    // 내가 단 리뷰 댓글
-    @Builder.Default
-    @OneToMany(mappedBy = "author", fetch = FetchType.LAZY)
-    private List<CompanyReviewCommentsEntity> companyReviewComments = new ArrayList<>();
-
-    // 내가 담당하는 강의들
-    @Builder.Default
-    @OneToMany(mappedBy = "instructor", fetch = FetchType.LAZY)
-    private List<CoursesEntity> coursesTaught = new ArrayList<>();
-
-    // 내가 수강 등록한 강의(조인 엔티티)
-    @Builder.Default
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private List<EnrollmentsEntity> enrollments = new ArrayList<>();
-
-    // 내가 작성한 강의평가
-    @Builder.Default
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private List<CourseEvaluationsEntity> courseEvaluations = new ArrayList<>();
-
-    // 내가 만든 과제
-    @Builder.Default
-    @OneToMany(mappedBy = "createdBy", fetch = FetchType.LAZY)
-    private List<AssignmentsEntity> assignmentsCreated = new ArrayList<>();
-
-    // 내가 제출한 과제
-    @Builder.Default
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private List<AssignmentSubmissionsEntity> assignmentSubmissions = new ArrayList<>();
-
-    // 내가 만든 앨범
-    @Builder.Default
-    @OneToMany(mappedBy = "createdBy", fetch = FetchType.LAZY)
-    private List<AlbumsEntity> albumsCreated = new ArrayList<>();
-
-    // 내가 올린 사진
-    @Builder.Default
-    @OneToMany(mappedBy = "uploader", fetch = FetchType.LAZY)
-    private List<PhotosEntity> photosUploaded = new ArrayList<>();
-
-    // 내가 누른 사진 좋아요 (user_id NULL 행은 포함 안 됨)
-    @Builder.Default
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private List<PhotoLikesEntity> photoLikes = new ArrayList<>();
-
-    // 내가 단 사진 댓글
-    @Builder.Default
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private List<PhotoCommentsEntity> photoComments = new ArrayList<>();
 }
