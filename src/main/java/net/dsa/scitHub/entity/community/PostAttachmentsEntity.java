@@ -1,6 +1,10 @@
 package net.dsa.scitHub.entity.community;
 
 import java.time.LocalDateTime;
+
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -10,6 +14,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@EntityListeners({AuditingEntityListener.class})
 @Table(
     name = "post_attachments",
     indexes = @Index(name = "idx_att_post_created", columnList = "post_id, created_at")
@@ -37,10 +42,9 @@ public class PostAttachmentsEntity {
     @Column(name = "file_size_bytes", columnDefinition = "int unsigned")
     private Integer fileSizeBytes;
 
+    @CreatedDate
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    @PrePersist
-    void onCreate() { if (createdAt == null) createdAt = LocalDateTime.now(); }
 }
 

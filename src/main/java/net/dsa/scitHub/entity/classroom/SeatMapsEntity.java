@@ -4,10 +4,15 @@ import java.time.LocalDateTime;
 import jakarta.persistence.*;
 import lombok.*;
 import java.util.List;
+
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import java.util.ArrayList;
 
 @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
 @Entity
+@EntityListeners({AuditingEntityListener.class})
 @Table(
     name = "seat_maps",
     uniqueConstraints = {
@@ -46,6 +51,7 @@ public class SeatMapsEntity {
     @Column(name = "active_one", insertable = false, updatable = false)
     private Boolean activeOne;
 
+    @CreatedDate
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
@@ -53,7 +59,6 @@ public class SeatMapsEntity {
     void onCreate() {
         if (isActive == null) isActive = true;
         if (versionNo == null) versionNo = 1;
-        if (createdAt == null) createdAt = LocalDateTime.now();
     }
 
     // 좌석 맵 - 좌석

@@ -1,6 +1,10 @@
 package net.dsa.scitHub.entity.reservation;
 
 import java.time.LocalDateTime;
+
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,6 +15,7 @@ import net.dsa.scitHub.entity.user.UsersEntity;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@EntityListeners({AuditingEntityListener.class})
 @Table(
     name = "reservation_penalties",
     uniqueConstraints = @UniqueConstraint(name = "uq_penalty_user", columnNames = "user_id")
@@ -34,17 +39,13 @@ public class ReservationPenaltiesEntity {
     @Column(name = "banned_until")
     private LocalDateTime bannedUntil;
 
+    @LastModifiedDate
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
     @PrePersist
     void onCreate() {
         if (strikeCount == null) strikeCount = 0;
-        if (updatedAt == null) updatedAt = LocalDateTime.now();
     }
 
-    @PreUpdate
-    void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
 }

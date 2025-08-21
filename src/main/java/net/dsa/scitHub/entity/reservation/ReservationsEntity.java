@@ -7,6 +7,10 @@ import lombok.*;
 import net.dsa.scitHub.entity.classroom.RoomsEntity;
 import net.dsa.scitHub.entity.user.UsersEntity;
 import java.util.List;
+
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import java.util.ArrayList;
 
 @Getter @Setter
@@ -14,6 +18,7 @@ import java.util.ArrayList;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@EntityListeners({AuditingEntityListener.class})
 @Table(
     name = "reservations",
     indexes = {
@@ -51,14 +56,21 @@ public class ReservationsEntity {
     @Column(name = "status", nullable = false, length = 10)
     private Status status; // default ACTIVE
 
+    @CreatedDate
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
     @PrePersist
     void onCreate() {
         if (status == null) status = Status.ACTIVE;
-        if (createdAt == null) createdAt = LocalDateTime.now();
     }
+
+    /*
+     * 연관관계 매핑
+     * 자주 호출할 것 같은 것만 리스트로 매핑하고, 나머지는 그때그때
+     * 쿼리로 불러오는 것이 좋음
+     */
+
 
     // 이 예약에 걸린 신고들
     @Builder.Default

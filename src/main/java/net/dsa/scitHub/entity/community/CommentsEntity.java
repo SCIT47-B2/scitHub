@@ -6,6 +6,11 @@ import lombok.*;
 
 import net.dsa.scitHub.entity.user.UsersEntity;
 import java.util.List;
+
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import java.util.ArrayList;
 
 @Data
@@ -13,6 +18,7 @@ import java.util.ArrayList;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@EntityListeners({AuditingEntityListener.class})
 @Table(
     name = "comments",
     indexes = {
@@ -49,22 +55,18 @@ public class CommentsEntity {
     @Column(name = "is_answer", nullable = false, columnDefinition = "tinyint default 0")
     private Boolean isAnswer;
 
+    @CreatedDate
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
+    @LastModifiedDate
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
     @PrePersist
     void onCreate() {
         if (isAnswer == null) isAnswer = false;
-        LocalDateTime now = LocalDateTime.now();
-        if (createdAt == null) createdAt = now;
-        if (updatedAt == null) updatedAt = now;
     }
-
-    @PreUpdate
-    void onUpdate() { this.updatedAt = LocalDateTime.now(); }
 
     // 자식 댓글들
     @Builder.Default

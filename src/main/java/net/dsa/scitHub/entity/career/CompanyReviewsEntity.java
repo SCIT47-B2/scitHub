@@ -6,6 +6,10 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.*;
 import java.util.List;
+
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import java.util.ArrayList;
 
 import net.dsa.scitHub.entity.user.UsersEntity;
@@ -15,6 +19,7 @@ import net.dsa.scitHub.entity.user.UsersEntity;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@EntityListeners({AuditingEntityListener.class})
 @Table(
     name = "company_reviews",
     uniqueConstraints = @UniqueConstraint(name = "uq_review_once", columnNames = {"company_id", "reviewer_id"}),
@@ -48,13 +53,10 @@ public class CompanyReviewsEntity {
     @Column(name = "body", columnDefinition = "MEDIUMTEXT")
     private String body;
 
+    @CreatedDate
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    @PrePersist
-    void onCreate() {
-        if (createdAt == null) createdAt = LocalDateTime.now();
-    }
 
     // 리뷰에 대한 댓글 목록
     @Builder.Default

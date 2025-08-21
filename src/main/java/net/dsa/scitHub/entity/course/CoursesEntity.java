@@ -5,6 +5,11 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import java.util.List;
+
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import java.util.ArrayList;
 
 import net.dsa.scitHub.entity.user.UsersEntity;
@@ -15,6 +20,7 @@ import net.dsa.scitHub.entity.assignment.AssignmentsEntity;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@EntityListeners({AuditingEntityListener.class})
 @Table(
     name = "courses",
     indexes = {
@@ -57,13 +63,16 @@ public class CoursesEntity {
     @Column(name = "class_section", length = 1)
     private ClassSection classSection;
 
+    @CreatedDate
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    @PrePersist
-    void onCreate() {
-        if (createdAt == null) createdAt = LocalDateTime.now();
-    }
+
+    /*
+     * 연관관계 매핑
+     * 자주 호출할 것 같은 것만 리스트로 매핑하고, 나머지는 그때그때
+     * 쿼리로 불러오는 것이 좋음
+     */
 
     // 내가 수강 등록한 강의(조인 엔티티)
     @Builder.Default

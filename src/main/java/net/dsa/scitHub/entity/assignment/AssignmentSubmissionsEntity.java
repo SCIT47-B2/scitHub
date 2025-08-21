@@ -1,6 +1,11 @@
 package net.dsa.scitHub.entity.assignment;
 
 import java.time.LocalDateTime;
+
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -12,6 +17,7 @@ import net.dsa.scitHub.entity.user.UsersEntity;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@EntityListeners({AuditingEntityListener.class})
 @Table(
     name = "assignment_submissions",
     uniqueConstraints = @UniqueConstraint(
@@ -51,19 +57,12 @@ public class AssignmentSubmissionsEntity {
     @Column(name = "file_url", nullable = false, length = 1024)
     private String fileUrl;
 
+    @CreatedDate
     @Column(name = "uploaded_at", nullable = false)
     private LocalDateTime uploadedAt;
 
+    @LastModifiedDate
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    @PrePersist
-    void onCreate() {
-        LocalDateTime now = LocalDateTime.now();
-        if (uploadedAt == null) uploadedAt = now;
-        if (updatedAt == null) updatedAt = now;
-    }
-
-    @PreUpdate
-    void onUpdate() { this.updatedAt = LocalDateTime.now(); }
 }

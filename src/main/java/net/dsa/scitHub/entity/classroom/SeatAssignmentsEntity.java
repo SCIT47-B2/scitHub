@@ -1,12 +1,17 @@
 package net.dsa.scitHub.entity.classroom;
 
 import java.time.LocalDateTime;
+
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import jakarta.persistence.*;
 import lombok.*;
 import net.dsa.scitHub.entity.user.UsersEntity;
 
 @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
 @Entity
+@EntityListeners({AuditingEntityListener.class})
 @Table(
     name = "seat_assignments",
     uniqueConstraints = {
@@ -35,11 +40,8 @@ public class SeatAssignmentsEntity {
         foreignKey = @ForeignKey(name = "fk_sa_user"))
     private UsersEntity user;
 
+    @CreatedDate
     @Column(name = "assigned_at", nullable = false)
     private LocalDateTime assignedAt;
 
-    @PrePersist
-    void onCreate() {
-        if (assignedAt == null) assignedAt = LocalDateTime.now();
-    }
 }

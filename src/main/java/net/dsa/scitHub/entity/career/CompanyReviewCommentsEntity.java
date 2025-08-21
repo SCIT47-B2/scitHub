@@ -1,6 +1,10 @@
 package net.dsa.scitHub.entity.career;
 
 import java.time.LocalDateTime;
+
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,6 +15,7 @@ import net.dsa.scitHub.entity.user.UsersEntity;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@EntityListeners({AuditingEntityListener.class})
 @Table(
     name = "company_review_comments",
     indexes = @Index(name = "idx_crc_review_created", columnList = "review_id, created_at")
@@ -36,11 +41,8 @@ public class CompanyReviewCommentsEntity {
     @Column(name = "body", nullable = false, columnDefinition = "MEDIUMTEXT")
     private String body;
 
+    @CreatedDate
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    @PrePersist
-    void onCreate() {
-        if (createdAt == null) createdAt = LocalDateTime.now();
-    }
 }

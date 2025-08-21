@@ -6,10 +6,15 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 import net.dsa.scitHub.entity.reservation.ReservationsEntity;
 import java.util.List;
+
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import java.util.ArrayList;
 
 @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
 @Entity
+@EntityListeners({AuditingEntityListener.class})
 @Table(name = "rooms")
 public class RoomsEntity {
 
@@ -36,14 +41,21 @@ public class RoomsEntity {
     @Column(name = "is_active", nullable = false, columnDefinition = "tinyint default 1")
     private Boolean isActive;
 
+    @CreatedDate
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
     @PrePersist
     void onCreate() {
         if (isActive == null) isActive = true;
-        if (createdAt == null) createdAt = LocalDateTime.now();
     }
+
+
+    /*
+     * 연관관계 매핑
+     * 자주 호출할 것 같은 것만 리스트로 매핑하고, 나머지는 그때그때
+     * 쿼리로 불러오는 것이 좋음
+     */
 
     // 이 방의 좌석 맵
     @Builder.Default

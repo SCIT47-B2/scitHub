@@ -2,6 +2,9 @@ package net.dsa.scitHub.entity.user;
 
 import java.time.LocalDateTime;
 
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -15,6 +18,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@EntityListeners({AuditingEntityListener.class})
 @Table(
     name = "direct_messages",
     indexes = {
@@ -71,6 +75,7 @@ public class DirectMessagesEntity {
     private LocalDateTime readAt;
 
     // 발송 시각
+    @CreatedDate
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
@@ -87,13 +92,8 @@ public class DirectMessagesEntity {
         if (this.isRead == null) this.isRead = false;
         if (this.deletedBySender == null) this.deletedBySender = false;
         if (this.deletedByReceiver == null) this.deletedByReceiver = false;
-        if (this.createdAt == null) this.createdAt = LocalDateTime.now();
     }
 
-    @PreUpdate
-    void onUpdate() {
-        // 업데이트 시 별도 처리 없음
-    }
 
     // ====== 편의 메서드 ======
     /** 수신자 열람 처리 */

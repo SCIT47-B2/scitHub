@@ -1,6 +1,11 @@
 package net.dsa.scitHub.entity.schedule;
 
 import java.time.LocalDateTime;
+
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -12,6 +17,7 @@ import net.dsa.scitHub.entity.user.UsersEntity;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@EntityListeners({AuditingEntityListener.class})
 @Table(
     name = "events",
     indexes = {
@@ -77,9 +83,11 @@ public class EventsEntity {
     )
     private UsersEntity createdBy;
 
+    @CreatedDate
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
+    @LastModifiedDate
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
@@ -89,11 +97,6 @@ public class EventsEntity {
         if (ddayEnabled == null) ddayEnabled = false;
         if (visibility == null) visibility = Visibility.GLOBAL;
         if (itClassScope == null) itClassScope = ItClassScope.ALL;
-        LocalDateTime now = LocalDateTime.now();
-        if (createdAt == null) createdAt = now;
-        if (updatedAt == null) updatedAt = now;
     }
 
-    @PreUpdate
-    void onUpdate() { this.updatedAt = LocalDateTime.now(); }
 }

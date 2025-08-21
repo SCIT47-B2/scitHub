@@ -8,6 +8,11 @@ import lombok.*;
 import net.dsa.scitHub.entity.user.UsersEntity;
 import net.dsa.scitHub.entity.classroom.SeatsEntity;
 import java.util.List;
+
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import java.util.ArrayList;
 
 @Getter @Setter
@@ -15,6 +20,7 @@ import java.util.ArrayList;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@EntityListeners({AuditingEntityListener.class})
 @Table(
     name = "inquiries",
     indexes = {
@@ -63,9 +69,11 @@ public class InquiriesEntity {
     @Column(name = "status", nullable = false, length = 10)
     private Status status;
 
+    @CreatedDate
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
+    @LastModifiedDate
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
@@ -73,13 +81,14 @@ public class InquiriesEntity {
     void onCreate() {
         if (category == null) category = Category.GENERAL;
         if (status == null) status = Status.OPEN;
-        LocalDateTime now = LocalDateTime.now();
-        if (createdAt == null) createdAt = now;
-        if (updatedAt == null) updatedAt = now;
     }
 
-    @PreUpdate
-    void onUpdate() { this.updatedAt = LocalDateTime.now(); }
+    /*
+     * 연관관계 매핑
+     * 자주 호출할 것 같은 것만 리스트로 매핑하고, 나머지는 그때그때
+     * 쿼리로 불러오는 것이 좋음
+     */
+
 
     // 문의의 답변들
     @Builder.Default

@@ -1,6 +1,10 @@
 package net.dsa.scitHub.entity.album;
 
 import java.time.LocalDateTime;
+
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,6 +15,7 @@ import net.dsa.scitHub.entity.user.UsersEntity;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@EntityListeners({AuditingEntityListener.class})
 @Table(
     name = "photo_likes",
     uniqueConstraints = @UniqueConstraint(name = "uk_photo_likes_once", columnNames = {"photo_id","user_id"}),
@@ -34,11 +39,8 @@ public class PhotoLikesEntity {
         foreignKey = @ForeignKey(name = "fk_pl_user2"))
     private UsersEntity user;
 
+    @CreatedDate
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    @PrePersist
-    void onCreate() {
-        if (createdAt == null) createdAt = LocalDateTime.now();
-    }
 }

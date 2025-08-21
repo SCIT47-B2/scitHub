@@ -2,6 +2,10 @@ package net.dsa.scitHub.entity.community;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,6 +16,7 @@ import net.dsa.scitHub.entity.user.UsersEntity;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@EntityListeners({AuditingEntityListener.class})
 @Table(name = "post_bookmarks")
 public class PostBookmarksEntity {
 
@@ -30,11 +35,9 @@ public class PostBookmarksEntity {
         foreignKey = @ForeignKey(name = "fk_pb_user"))
     private UsersEntity user;
 
+    @CreatedDate
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
-
-    @PrePersist
-    void onCreate() { if (createdAt == null) createdAt = LocalDateTime.now(); }
 
     @Getter @Setter
     @NoArgsConstructor @AllArgsConstructor @EqualsAndHashCode

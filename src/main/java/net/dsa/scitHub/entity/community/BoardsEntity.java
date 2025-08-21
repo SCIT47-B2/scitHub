@@ -6,6 +6,10 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import java.util.List;
+
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import java.util.ArrayList;
 
 /**
@@ -18,6 +22,7 @@ import java.util.ArrayList;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@EntityListeners({AuditingEntityListener.class})
 @Table(
     name = "boards",
     uniqueConstraints = {
@@ -63,6 +68,7 @@ public class BoardsEntity {
     private Boolean isPublic;
 
     // 생성 시각
+    @CreatedDate
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
@@ -72,8 +78,14 @@ public class BoardsEntity {
         if (this.isQna == null) this.isQna = false;
         if (this.isNotice == null) this.isNotice = false;
         if (this.isPublic == null) this.isPublic = true;
-        if (this.createdAt == null) this.createdAt = LocalDateTime.now();
     }
+
+    /*
+     * 연관관계 매핑
+     * 자주 호출할 것 같은 것만 리스트로 매핑하고, 나머지는 그때그때
+     * 쿼리로 불러오는 것이 좋음
+     */
+
 
     // 이 게시판의 게시글들
     @Builder.Default

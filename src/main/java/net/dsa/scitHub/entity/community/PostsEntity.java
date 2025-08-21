@@ -5,6 +5,11 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import java.util.List;
+
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import java.util.ArrayList;
 
 import net.dsa.scitHub.entity.user.UsersEntity;
@@ -14,6 +19,7 @@ import net.dsa.scitHub.entity.user.UsersEntity;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@EntityListeners({AuditingEntityListener.class})
 @Table(
     name = "posts",
     indexes = {
@@ -55,9 +61,11 @@ public class PostsEntity {
     @Column(name = "view_count", nullable = false, columnDefinition = "int unsigned default 0")
     private Integer viewCount;
 
+    @CreatedDate
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
+    @LastModifiedDate
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
@@ -65,19 +73,18 @@ public class PostsEntity {
     void onCreate() {
         if (status == null) status = Status.ACTIVE;
         if (viewCount == null) viewCount = 0;
-        LocalDateTime now = LocalDateTime.now();
-        if (createdAt == null) createdAt = now;
-        if (updatedAt == null) updatedAt = now;
     }
 
-    @PreUpdate
-    void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
 
     public void increaseViewCount() {
         this.viewCount = (this.viewCount == null ? 1 : this.viewCount + 1);
     }
+
+    /*
+     * 연관관계 매핑
+     * 자주 호출할 것 같은 것만 리스트로 매핑하고, 나머지는 그때그때
+     * 쿼리로 불러오는 것이 좋음
+     */
 
     // Q&A 1:1 역방향
     @OneToOne(mappedBy = "post", fetch = FetchType.LAZY)

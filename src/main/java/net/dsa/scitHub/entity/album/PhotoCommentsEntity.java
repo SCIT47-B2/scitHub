@@ -1,6 +1,10 @@
 package net.dsa.scitHub.entity.album;
 
 import java.time.LocalDateTime;
+
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,6 +15,7 @@ import net.dsa.scitHub.entity.user.UsersEntity;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@EntityListeners({AuditingEntityListener.class})
 @Table(
     name = "photo_comments",
     indexes = @Index(name = "idx_pc_photo_created", columnList = "photo_id, created_at")
@@ -37,11 +42,8 @@ public class PhotoCommentsEntity {
     @Column(name = "content", nullable = false, columnDefinition = "MEDIUMTEXT")
     private String content;
 
+    @CreatedDate
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    @PrePersist
-    void onCreate() {
-        if (createdAt == null) createdAt = LocalDateTime.now();
-    }
 }

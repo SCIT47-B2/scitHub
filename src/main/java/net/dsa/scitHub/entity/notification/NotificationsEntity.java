@@ -2,6 +2,9 @@ package net.dsa.scitHub.entity.notification;
 
 import java.time.LocalDateTime;
 
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -16,6 +19,7 @@ import net.dsa.scitHub.entity.user.UsersEntity;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@EntityListeners({AuditingEntityListener.class})
 @Table(
     name = "notifications",
     indexes = {
@@ -69,6 +73,7 @@ public class NotificationsEntity {
     @Column(name = "is_read", nullable = false, columnDefinition = "tinyint default 0")
     private Boolean isRead;
 
+    @CreatedDate
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
@@ -79,7 +84,6 @@ public class NotificationsEntity {
     @PrePersist
     void onCreate() {
         if (isRead == null) isRead = false;
-        if (createdAt == null) createdAt = LocalDateTime.now();
     }
 
     // ===== 편의 메서드 =====

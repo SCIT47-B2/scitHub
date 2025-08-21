@@ -5,6 +5,9 @@ import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -13,6 +16,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@EntityListeners({AuditingEntityListener.class})
 @Table(
     name = "class_schedule_blocks",
     indexes = @Index(name = "idx_csb_scope", columnList = "cohort_no, class_section, label, is_active")
@@ -53,13 +57,13 @@ public class ClassScheduleBlocksEntity {
     @Column(name = "is_active", nullable = false, columnDefinition = "tinyint default 1")
     private Boolean isActive;
 
+    @CreatedDate
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
     @PrePersist
     void onCreate() {
         if (isActive == null) isActive = true;
-        if (createdAt == null) createdAt = LocalDateTime.now();
     }
 
     // ===== Converter: EnumSet<Day> <-> "MON,TUE,..." =====

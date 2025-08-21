@@ -1,6 +1,10 @@
 package net.dsa.scitHub.entity.reservation;
 
 import java.time.LocalDateTime;
+
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -12,6 +16,7 @@ import net.dsa.scitHub.entity.user.UsersEntity;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@EntityListeners({AuditingEntityListener.class})
 @Table(
     name = "reservation_reports",
     indexes = {
@@ -46,12 +51,12 @@ public class ReservationReportsEntity {
     @Column(name = "status", nullable = false, length = 10)
     private Status status; // default PENDING
 
+    @CreatedDate
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
     @PrePersist
     void onCreate() {
         if (status == null) status = Status.PENDING;
-        if (createdAt == null) createdAt = LocalDateTime.now();
     }
 }

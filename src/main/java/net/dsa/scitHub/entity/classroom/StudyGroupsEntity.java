@@ -5,10 +5,15 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import java.util.List;
+
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import java.util.ArrayList;
 
 @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
 @Entity
+@EntityListeners({AuditingEntityListener.class})
 @Table(
     name = "study_groups",
     uniqueConstraints = @UniqueConstraint(name = "uq_group_name", columnNames = {"cohort_no","class_section","name"})
@@ -35,14 +40,21 @@ public class StudyGroupsEntity {
     @Column(name = "order_index", nullable = false, columnDefinition = "int default 0")
     private Integer orderIndex;
 
+    @CreatedDate
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
     @PrePersist
     void onCreate() {
         if (orderIndex == null) orderIndex = 0;
-        if (createdAt == null) createdAt = LocalDateTime.now();
     }
+
+
+    /*
+     * 연관관계 매핑
+     * 자주 호출할 것 같은 것만 리스트로 매핑하고, 나머지는 그때그때
+     * 쿼리로 불러오는 것이 좋음
+     */
 
     // 그룹 과제
     @Builder.Default

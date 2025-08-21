@@ -1,6 +1,10 @@
 package net.dsa.scitHub.entity.course;
 
 import java.time.LocalDateTime;
+
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -13,6 +17,7 @@ import net.dsa.scitHub.entity.user.UsersEntity;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@EntityListeners({AuditingEntityListener.class})
 @Table(
     name = "course_evaluations",
     uniqueConstraints = @UniqueConstraint(name = "uq_ce_once", columnNames = {"course_id","user_id"}),
@@ -63,11 +68,8 @@ public class CourseEvaluationsEntity {
     @Column(name = "comment_text", columnDefinition = "MEDIUMTEXT")
     private String commentText;
 
+    @CreatedDate
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    @PrePersist
-    void onCreate() {
-        if (createdAt == null) createdAt = LocalDateTime.now();
-    }
 }

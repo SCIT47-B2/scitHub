@@ -1,6 +1,10 @@
 package net.dsa.scitHub.entity.inquiry;
 
 import java.time.LocalDateTime;
+
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,6 +15,7 @@ import net.dsa.scitHub.entity.user.UsersEntity;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@EntityListeners({AuditingEntityListener.class})
 @Table(
     name = "inquiry_replies",
     indexes = {
@@ -44,11 +49,8 @@ public class InquiryRepliesEntity {
     @Column(name = "body", nullable = false, columnDefinition = "MEDIUMTEXT")
     private String body;
 
+    @CreatedDate
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    @PrePersist
-    void onCreate() {
-        if (createdAt == null) createdAt = LocalDateTime.now();
-    }
 }

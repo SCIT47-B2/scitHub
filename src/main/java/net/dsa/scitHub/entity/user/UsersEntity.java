@@ -18,6 +18,11 @@ import net.dsa.scitHub.entity.course.*;
 import net.dsa.scitHub.entity.assignment.*;
 import net.dsa.scitHub.entity.album.*;
 import java.util.List;
+
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import java.util.ArrayList;
 
 /**
@@ -30,6 +35,7 @@ import java.util.ArrayList;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@EntityListeners({AuditingEntityListener.class})
 @Entity
 @Table(
     name = "users",
@@ -115,9 +121,11 @@ public class UsersEntity {
     @Column(name = "last_login_at")
     private LocalDateTime lastLoginAt;
 
+    @CreatedDate
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
+    @LastModifiedDate
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
@@ -128,16 +136,14 @@ public class UsersEntity {
         if (this.isActive == null) this.isActive = true;
         if (this.isAdmin == null) this.isAdmin = false;
         if (this.gender == null) this.gender = Gender.N;
-
-        LocalDateTime now = LocalDateTime.now();
-        if (this.createdAt == null) this.createdAt = now;
-        if (this.updatedAt == null) this.updatedAt = now;
     }
 
-    @PreUpdate
-    void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
+
+    /*
+     * 연관관계 매핑
+     * 자주 호출할 것 같은 것만 리스트로 매핑하고, 나머지는 그때그때
+     * 쿼리로 불러오는 것이 좋음
+     */
 
     // 내가 작성한 게시글
     @Builder.Default

@@ -3,6 +3,9 @@ package net.dsa.scitHub.entity.community;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,6 +21,7 @@ import net.dsa.scitHub.entity.user.UsersEntity;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@EntityListeners({AuditingEntityListener.class})
 @Table(name = "board_favorites")
 public class BoardFavoritesEntity {
 
@@ -49,14 +53,10 @@ public class BoardFavoritesEntity {
     private BoardsEntity board;
 
     // 등록 시각
+    @CreatedDate
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    // ==== 라이프사이클 ====
-    @PrePersist
-    void onCreate() {
-        if (this.createdAt == null) this.createdAt = LocalDateTime.now();
-    }
 
     // ==== 편의 생성자 ====
     public static BoardFavoritesEntity of(UsersEntity user, BoardsEntity board) {
