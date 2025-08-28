@@ -1,3 +1,6 @@
+create database scitHub;
+use scitHub;
+
 create table album
 (
     album_id    int auto_increment
