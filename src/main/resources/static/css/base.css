@@ -1,0 +1,27 @@
+/* 가벼운 reset + 공통 레이아웃 */
+html,body{height:100%}
+
+/**
+ * 페이지 레이아웃:
+ * - body: 좌(사이드바) + 우(콘텐츠영역)
+ * - .content: 헤더 + 메인(세로)
+ */
+body{
+  margin:0;
+  display:flex;              /* 좌: 사이드바, 우: 콘텐츠 */
+  background:var(--panel);
+  color:var(--ink);
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+}
+
+/** 우측 콘텐츠 래퍼 */
+.content{
+  flex:1;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;     /* 헤더 위, 메인 아래 */
+}
+
+/** 헤더/메인 패딩(가로 32px 정렬) */
+.homeHeader{ padding:24px 32px 0; }   /* 위 24, 아래 0 (간격은 home.css에서 제어) */
+main{ flex:1; padding:0 32px 32px; }  /* 위 0으로 두고, 헤더에서 하단 간격을 부여 */

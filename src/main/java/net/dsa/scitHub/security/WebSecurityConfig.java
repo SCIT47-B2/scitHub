@@ -27,6 +27,7 @@ public class WebSecurityConfig {
             , "/images/**"          // 이미지 경로
             , "/css/**"             // CSS 파일들
             , "/js/**"              // JavaScript 파일들
+            , "/**"                 // 테스트를 위해 모든 경로 허용 (실제 서비스 시에는 제거 필요)
     };
 
     // @Component 와 같이 객체를 등록할때 사용, 보통 @Configuration 클래스 내에서 사용

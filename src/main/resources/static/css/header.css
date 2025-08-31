@@ -1,0 +1,41 @@
+/* ============ 헤더 ============ */
+/**
+ * 헤더 그리드: 본문 3열(.homeGrid)과 동일한 컬럼 구성으로 정렬
+ * - col1: 320px  (좌측 사이드 카드 폭과 시각적 정렬)
+ * - col2: 1fr    (중앙 컬럼)
+ * - col3: 300px  (우측 일정 카드 폭과 시각적 정렬)
+ */
+.headerGrid{
+    display:grid;
+    grid-template-columns: 320px minmax(0,1fr) 300px;
+    gap:16px;
+    align-items:center;
+}
+
+/** 네비게이션 바(시안: 중앙에 pill 세그먼트) */
+.navBar{ grid-column:2; display:flex; justify-content:center; }
+.navPill{
+    display:inline-flex; align-items:center; gap:6px;
+    background:#fff; border:1px solid #e5e7eb; border-radius:999px; padding:6px;
+    box-shadow:0 2px 10px rgba(0,0,0,.04);
+}
+.navPill .tab{
+    appearance:none; border:0; background:transparent;
+    padding:8px 14px; border-radius:999px;
+    font-weight:700; font-size:13px; line-height:1; color:#111; cursor:pointer;
+    display:inline-flex; align-items:center; 
+    text-decoration: none;
+}
+.navPill .tab.active{ background:#111; color:#fff; }
+.navPill .tab:focus-visible{ outline:2px solid var(--primary); outline-offset:2px; }
+
+/** 헤더 하단 간격: 네비게이션 바 아래로 여백을 주어 메인과 분리 */
+.homeHeader .headerGrid{ margin-bottom:16px; }
+
+@media (max-width: 1360px){
+    .headerGrid{ grid-template-columns: 280px 1fr 280px; }
+}
+@media (max-width: 1080px){
+    .headerGrid{ grid-template-columns: 1fr; }
+    .navBar{ grid-column:1; }
+}

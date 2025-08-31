@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layouts/defaultLayout}">
+    <head>
+        <title>Home</title>
+        <th:block layout:fragment="css">
+            <link rel="stylesheet" th:href="@{/css/home.css}">
+        </th:block>
+    </head>
+    <body>
+        <section class="mainGrid" aria-label="메인 영역" layout:fragment="content">
+
+            <!-- 좌: 운영실 + 새로운 질문 (2단 블록) -->
+            <div class="leftCol">
+                <!-- /** 운영실
+                    @desc   파란색 헤더(클릭 → operations.html) + 본문(공지 리스트)
+                    @param  없음
+                    @return 없음(UI) */ -->
+                <section class="stackCard" aria-label="운영실">
+                    <a class="sectionHead" href="operations.html">운영실</a>
+                    <div class="sectionBody">
+                    <ul class="noticeList">
+                        <li><a href="notice1.html">09/02(화) 20:00~21:00 네트워크 점검</a></li>
+                        <li><a href="notice2.html">09/05(금) 과제 제출 마감</a></li>
+                    </ul>
+                    </div>
+                </section>
+
+                <!-- /** 새로운 질문
+                    @desc   파란색 헤더(클릭 → question_submit.html) + 본문(입력창)
+                    @param  없음
+                    @return 없음(UI) */ -->
+                <section class="stackCard" aria-label="새로운 질문">
+                    <a class="sectionHead" href="question_submit.html">새로운 질문</a>
+                    <div class="sectionBody">
+                        <div class="askBox" role="search">
+                            <input type="text" id="newQuestionInput" placeholder="질문을 입력하세요" aria-label="질문 입력" />
+                            <button class="btn-search" type="button" onclick="location.href='question_submit.html'">등록</button>
+                        </div>
+                        <p class="askHint">입력 후 ‘등록’을 누르면 질문 페이지로 이동합니다.</p>
+                    </div>
+                </section>
+            </div>
+
+            <!-- 중: 검색 → 좌석배치도(비율 유지) -->
+            <div class="centerCol">
+
+                <!-- 검색(중앙 컬럼 너비 = 좌석배치도 너비) -->
+                <div class="search-row" role="search">
+                    <div class="search-input">
+                        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                        <input type="text" placeholder="검색어를 입력하세요" aria-label="검색어" />
+                    </div>
+                    <button class="btn-search" aria-label="검색 버튼">검색</button>
+                </div>
+
+                <!-- 좌석배치도 -->
+                <section class="seatmapCard card" aria-label="좌석배치도 카드">
+                    <div class="seatmap" aria-label="강의실 좌석배치도" style="--cols:16; --rows:10;">
+                        <!-- 상단 슬림 라벨 바 -->
+                        <div class="block labelBar" style="grid-column:3 / span 9; grid-row:1 / span 1;">대강의실</div>
+                        <div class="block labelBar" style="grid-column:14 / span 3; grid-row:1 / span 1;">다목적<br>라운지</div>
+
+                        <!-- 세로 복도 3개 -->
+                        <div class="corridor" style="grid-column:5  / span 1; grid-row:3 / span 8;"></div>
+                        <div class="corridor" style="grid-column:9  / span 1; grid-row:3 / span 8;"></div>
+                        <div class="corridor" style="grid-column:13 / span 1; grid-row:3 / span 8;"></div>
+
+                        <!-- 좌측 세로열 -->
+                        <a class="block small room" href="#" style="grid-column:1 / span 2; grid-row:3 / span 1;">스터디룸5</a>
+                        <a class="block small room" href="#" style="grid-column:1 / span 2; grid-row:4 / span 1;">스터디룸4</a>
+                        <a class="block small room" href="#" style="grid-column:1 / span 2; grid-row:5 / span 1;">스터디룸3</a>
+                        <a class="block small room" href="#" style="grid-column:1 / span 2; grid-row:6 / span 1;">스터디룸2</a>
+                        <a class="block small room" href="#" style="grid-column:1 / span 2; grid-row:7 / span 1;">스터디룸1</a>
+                        <div class="block small gray"  style="grid-column:1 / span 2; grid-row:8 / span 1;">창고</div>
+                        <div class="block small label" style="grid-column:1 / span 2; grid-row:9 / span 1;">화상면접실2</div>
+                        <div class="block small label" style="grid-column:1 / span 2; grid-row:10 / span 1;">화상면접실1</div>
+
+                        <!-- 좌측 2열 -->
+                        <a class="block small room" href="#" style="grid-column:3 / span 2; grid-row:3 / span 1;">스터디룸19</a>
+                        <a class="block small room" href="#" style="grid-column:3 / span 2; grid-row:4 / span 1; background:#cfe0ff;">스터디룸9</a>
+                        <a class="block small room" href="#" style="grid-column:3 / span 2; grid-row:5 / span 1;">스터디룸8</a>
+                        <a class="block small room" href="#" style="grid-column:3 / span 2; grid-row:6 / span 1;">스터디룸7</a>
+                        <a class="block small room" href="#" style="grid-column:3 / span 2; grid-row:7 / span 1;">스터디룸6</a>
+                        <div class="block gray" style="grid-column:3 / span 2; grid-row:8 / span 3;">사무실</div>
+
+                        <!-- 가운데 왼 열 -->
+                        <div class="block"      style="grid-column:6 / span 3; grid-row:3 / span 2;">강의실4</div>
+                        <div class="block blue" style="grid-column:6 / span 3; grid-row:5 / span 2;">강의실3</div>
+                        <div class="block"      style="grid-column:6 / span 3; grid-row:7 / span 2;">강의실2</div>
+                        <div class="block"      style="grid-column:6 / span 3; grid-row:9 / span 2;">강의실1</div>
+
+                        <!-- 가운데 오른 열 -->
+                        <div class="block" style="grid-column:10 / span 3; grid-row:3 / span 2;">강의실8</div>
+                        <div class="block" style="grid-column:10 / span 3; grid-row:5 / span 2;">강의실7</div>
+                        <div class="block" style="grid-column:10 / span 3; grid-row:7 / span 2;">강의실6</div>
+                        <div class="block" style="grid-column:10 / span 3; grid-row:9 / span 2;">강의실5</div>
+
+                        <!-- 우측 열 (라운드 강조) -->
+                        <div class="block blue" style="grid-column:14 / span 3; grid-row:3 / span 2; border-radius:22px;">강의실12</div>
+                        <div class="block blue" style="grid-column:14 / span 3; grid-row:5 / span 2; border-radius:22px;">강의실11</div>
+                        <div class="block"      style="grid-column:14 / span 3; grid-row:7 / span 2; border-radius:22px;">강의실10</div>
+                        <div class="block"      style="grid-column:14 / span 3; grid-row:9 / span 2; border-radius:22px;">강의실9</div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- 우: 일정 -->
+            <div class="rightCol">
+                <section class="card" aria-label="일정">
+                    <h3 class="sectionTitle">일정</h3>
+                    <ul class="scheduleList">
+                    <li>예시) 09/03(수) 팀 프로젝트 킥오프</li>
+                    <li>예시) 09/05(금) 과제 제출 마감</li>
+                    </ul>
+                </section>
+            </div>
+
+        </section>
+
+        <th:block layout:fragment="script">
+        </th:block>
+    </body>
+</html>

@@ -1,0 +1,161 @@
+/* =========================
+  홈 전용 스타일 (home.css)
+  - 헤더(homeHeader): 네비게이션 바
+  - 본문: 좌(운영실·질문) / 중(검색+좌석) / 우(일정) 3열
+  - 네비게이션 바 하단 간격 보장
+  - 좌석배치도 비율/밀도/톤 보정
+========================= */
+
+/** 카드 공통 */
+.card{
+  background:#fff; border:1px solid #eee; border-radius:16px;
+  box-shadow:0 2px 10px rgba(0,0,0,.04);
+}
+
+/* ============ 본문 3열 ============ */
+/** 좌: 운영실·질문 / 중: 검색+좌석 / 우: 일정 */
+.leftCol{ display:flex; flex-direction:column; gap:12px; }
+.centerCol{ display:flex; flex-direction:column; gap:16px; }  /* 검색 ↔ 좌석 간격 */
+.rightCol{ display:flex; flex-direction:column; gap:12px; }
+
+/* ============ 검색(중앙 컬럼 내부) ============ */
+.search-row{ display:flex; gap:10px; align-items:center; }
+.search-input{
+  flex:1; height:40px; display:flex; align-items:center; gap:10px;
+  padding:0 14px; background:#fff; border:1px solid #e5e7eb; border-radius:999px;
+}
+.search-input i{ color:#9aa3b2; }
+.search-input input{
+  flex:1; height:100%; border:none; outline:none; background:transparent; font-size:14px;
+}
+.btn-search{
+  height:40px; padding:0 18px; background:#4f67d9; color:#fff; border:none; border-radius:12px;
+  font-weight:700; cursor:pointer;
+}
+.btn-search:hover{ filter:brightness(.95); }
+
+/* ============ 좌측: 운영실·새로운 질문 (2단 블록) ============ */
+/**
+ * stackCard
+ * @desc  시안처럼 [파란 헤더 블록] + [내용 블록]을 수직으로 쌓는 컨테이너
+ * @html  <section class="stackCard"> <a class="sectionHead">..</a> <div class="sectionBody">..</div> </section>
+ */
+.stackCard{
+  background:transparent; border:none; box-shadow:none; /* card 외곽선 제거 */
+  display:flex; flex-direction:column; gap:8px;
+  border-radius:16px; /* 내부 블록과 곡률 통일 */
+}
+
+/**
+ * sectionHead (클릭 영역)
+ * @desc  텍스트만 들어가는 파란색 헤더. 전체가 링크로 동작
+ * @param href  링크 목적지
+ * @return 없음(UI)
+ */
+.sectionHead{
+  display:block;
+  padding:10px 12px;
+  background:var(--primary);
+  color:#fff; text-decoration:none;
+  border-radius:12px;
+  font-weight:900; font-size:15px; letter-spacing:.2px;
+  box-shadow:0 2px 8px rgba(79,103,217,.15);
+}
+.sectionHead:hover{ filter:brightness(.97); }
+
+/**
+ * sectionBody (실제 내용 영역)
+ * @desc  운영실: 공지 리스트 / 새로운 질문: 입력창 등
+ */
+.sectionBody{
+  padding:12px;
+  background:#fff;
+  border:1px solid #e5e7eb;
+  border-radius:12px;
+}
+
+/** 운영실 공지 리스트(본문) */
+.noticeList{ margin:0; padding-left:18px; }
+.noticeList li{ font-size:13px; line-height:1.6; color:#333; }
+.noticeList li a{ color:var(--primary); text-decoration:none; font-weight:700; }
+.noticeList li a:hover{ text-decoration:underline; }
+
+/** 새로운 질문 입력 박스(본문) */
+.askBox{
+  display:flex; gap:10px; align-items:center;
+  padding:0; border:none; background:transparent; /* sectionBody가 이미 박스 역할 */
+}
+.askBox input{
+  flex:1; border:1px solid #e5e7eb; outline:none; background:#fff; height:36px; font-size:14px;
+  border-radius:10px; padding:0 12px;
+}
+.askHint{ font-size:12px; color:var(--muted); }
+
+/* ============ 좌석배치도 ============ */
+.seatmapCard.card{ padding:16px; }
+
+/**
+ * 좌석배치도 래퍼
+ * - 중앙 컬럼 너비에 맞춰 확대/축소
+ * - 세로는 aspect-ratio로 비율 유지
+ * - --cols / --rows / --gap / --pad 로 미세 조정 가능
+ */
+.seatmap{
+  --cols:16;      /* 가로 칸 수(시안 기준) */
+  --rows:14;      /* 세로 칸 수: 14 권장(13~15 조정) */
+  --gap:9px;      /* 칸 간격 */
+  --pad:12px;     /* 컨테이너 안쪽 여백 */
+
+  width:100%;
+  aspect-ratio: calc(var(--cols) / var(--rows));
+  display:grid;
+  grid-template-columns: repeat(var(--cols), 1fr);
+  grid-template-rows: repeat(var(--rows), 1fr);
+  gap:var(--gap);
+  padding:var(--pad);
+  border-radius:18px;
+  background:#f7f8fb;
+  box-sizing:border-box;
+}
+
+/** 좌석 타일(공통) */
+.block{
+  display:flex; align-items:center; justify-content:center; text-align:center;
+  background:#fff; border:1px solid #eceff4; color:#111; font-weight:800;
+  border-radius:16px;
+  padding:4px 6px; letter-spacing:-0.2px;
+}
+.block.small{
+  font-weight:700; font-size:12px; line-height:1.15; border-radius:10px;
+  word-break:keep-all;
+}
+.block.pill{ border-radius:20px; }
+.block.gray{ background:#f4f6fa; color:#111; }
+.block.blue{ background:#cfe0ff; }                 /* 파란 톤 다운 */
+.block.label{ background:#f3f4f6; color:#6b7280; border-style:dashed; }
+
+/** 상단 슬림 라벨 바(대강의실/다목적라운지) */
+.labelBar{
+  background:linear-gradient(#eef2ff,#eef2ff);
+  border:1px solid rgba(17,17,17,.06);
+  border-radius:999px;
+  font-size:14px; font-weight:800;
+  padding:3px 8px;
+}
+
+/** 복도(톤 완화) */
+.corridor{
+  background:#f3f6fb;
+  border:1px dashed rgba(0,0,0,.08);
+  border-radius:12px;
+}
+
+/* 반응형: 좌석 내부 간격 축소 */
+@media (max-width: 1200px){ .seatmap{ --gap:8px; } }
+@media (max-width: 960px){  .seatmap{ --gap:7px; } }
+
+/* ============ 기타 ============ */
+.sectionTitle{ margin:0; font-size:15px; font-weight:900; letter-spacing:.2px; } /* (기존 h3 유지용) */
+.scheduleList{ margin:0; padding-left:16px; }
+.scheduleList li{ font-size:13px; line-height:1.6; color:#333; }
+.isHidden{ display:none; }
