@@ -1,0 +1,12 @@
+/* 디자인 토큰(사이트 공통 변수) */
+:root{
+  --bg:#fff;
+  --panel:#f5f6f8;
+  --ink:#111;
+  --muted:#666;
+  --primary:#4f67d9;
+  --shadow:0 4px 20px rgba(0,0,0,.08);
+  --sidebar-w:240px;
+  --radius:20px;
+  --progress:56; /* 기본 진행률(필요 시 페이지에서 override) */
+}

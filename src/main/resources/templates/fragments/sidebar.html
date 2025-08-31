@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+    <body>
+        <aside class="sidebar" aria-label="사이드바" th:fragment="sidebarFragment(menuItems)">
+            <a th:href="@{/}" class="logo">SCIT Hub</a>
+
+            <a th:href="@{/mypage}" class="profile-link">
+                <section class="profile" aria-label="프로필">
+                    <img th:src="@{/images/chiikawaPuzzle.png}" alt="프로필 이미지">
+                    <div>
+                        <h3 class="name">SCIT47</h3>
+                        <p class="handle">@vysoeeun</p>
+                    </div>
+                </section>
+            </a>
+
+            <nav class="menu" aria-label="메뉴">
+                <div>
+                    <a th:each="menu : ${menuItems}"
+                        th:href="${ctx + menu.url}"
+                        th:text="${menu.name}"
+                        th:classappend="${#strings.startsWith(activeUri, ctx + menu.url)} ? 'active' : ''">
+                    </a>
+                </div>
+
+                <div class="menu-bottom">
+                    <a href="#"><i class="fa-solid fa-bell"></i>알림</a>
+                    <a href="#"><i class="fa-solid fa-gear"></i>설정</a>
+                </div>
+            </nav>
+            <div class="bottom">
+                <div class="study-card" role="status" aria-label="학습 현황 56%">
+                    <div class="study-head">
+                        <span class="title">학습 현황</span>
+                        <span class="subtitle">SCIT 과정</span>
+                    </div>
+                    <div class="study-bottom">
+                        <span class="big-percent">56%</span>
+                        <div class="ring" style="--progress:56" aria-hidden="true"></div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </body>
+</html>
