@@ -3,7 +3,7 @@ package net.dsa.scitHub.entity.company;
 import jakarta.persistence.*;
 import lombok.*;
 import net.dsa.scitHub.entity.board.Comment;
-import net.dsa.scitHub.entity.user.User;
+import net.dsa.scitHub.entity.user.Account;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -20,7 +20,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString(exclude = {"company", "user", "comments"})
+@ToString(exclude = {"company", "account", "comments"})
 public class CompanyReview {
     
     /** 회사 리뷰 고유 식별자 */
@@ -36,8 +36,8 @@ public class CompanyReview {
     
     /** 리뷰 작성자 */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "account_id")
+    private Account account;
     
     /** 회사 평점 (1-5점) */
     @Column(name = "rating", nullable = false)

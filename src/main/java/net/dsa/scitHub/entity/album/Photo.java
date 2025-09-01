@@ -3,7 +3,7 @@ package net.dsa.scitHub.entity.album;
 import jakarta.persistence.*;
 import lombok.*;
 import net.dsa.scitHub.entity.board.Comment;
-import net.dsa.scitHub.entity.user.User;
+import net.dsa.scitHub.entity.user.Account;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -20,7 +20,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString(exclude = {"album", "user", "comments"})
+@ToString(exclude = {"album", "account", "comments"})
 /** 앨범에 포함된 사진 */
 public class Photo {
     
@@ -37,8 +37,8 @@ public class Photo {
     
     /** 사진 업로드 사용자 */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "account_id", nullable = false)
+    private Account account;
     
     /** 사진 파일 URL */
     @Column(name = "file_url", nullable = false, length = 1024)

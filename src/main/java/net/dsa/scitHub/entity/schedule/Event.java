@@ -2,7 +2,7 @@ package net.dsa.scitHub.entity.schedule;
 
 import jakarta.persistence.*;
 import lombok.*;
-import net.dsa.scitHub.entity.user.User;
+import net.dsa.scitHub.entity.user.Account;
 import net.dsa.scitHub.enums.Visibility;
 
 import java.time.LocalDateTime;
@@ -15,7 +15,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString(exclude = {"user"})
+@ToString(exclude = {"account"})
 public class Event {
     
     /** 이벤트 고유 식별자 */
@@ -32,8 +32,8 @@ public class Event {
     
     /** 이벤트 생성자 */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "account_id")
+    private Account account;
     
     /** 이벤트 제목 */
     @Column(name = "title", nullable = false, length = 150)

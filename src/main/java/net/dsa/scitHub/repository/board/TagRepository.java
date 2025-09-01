@@ -30,14 +30,6 @@ public interface TagRepository extends JpaRepository<Tag, Integer> {
     @Query("SELECT t.name, COUNT(t) FROM Tag t GROUP BY t.name ORDER BY COUNT(t) DESC")
     List<Object[]> findPopularTags();
     
-    /** 특정 게시판의 태그들 조회 */
-    @Query("SELECT t FROM Tag t WHERE t.post.board.boardId = :boardId")
-    List<Tag> findTagsByBoard(@Param("boardId") Integer boardId);
-    
-    /** 특정 사용자가 사용한 태그들 조회 */
-    @Query("SELECT t FROM Tag t WHERE t.post.user.userId = :userId")
-    List<Tag> findTagsByUser(@Param("userId") Integer userId);
-    
     /** 태그별 게시글 수 조회 */
     @Query("SELECT t.name, COUNT(DISTINCT t.post) FROM Tag t GROUP BY t.name ORDER BY COUNT(DISTINCT t.post) DESC")
     List<Object[]> countPostsByTag();
@@ -45,8 +37,4 @@ public interface TagRepository extends JpaRepository<Tag, Integer> {
     /** 최근에 사용된 태그들 조회 */
     @Query("SELECT DISTINCT t.name FROM Tag t JOIN t.post p ORDER BY p.createdAt DESC")
     List<String> findRecentlyUsedTags();
-    
-    /** 특정 태그를 사용한 게시글들의 작성자 조회 */
-    @Query("SELECT DISTINCT t.post.user FROM Tag t WHERE t.name = :tagName")
-    List<Object> findUsersByTagName(@Param("tagName") String tagName);
 }

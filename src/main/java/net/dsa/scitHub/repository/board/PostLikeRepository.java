@@ -17,13 +17,13 @@ public interface PostLikeRepository extends JpaRepository<PostLike, Integer> {
     List<PostLike> findByPost_PostId(Integer postId);
     
     /** 사용자별 좋아요 목록 조회 */
-    List<PostLike> findByUser_UserId(Integer userId);
+    List<PostLike> findByAccount_AccountId(Integer accountId);
     
     /** 특정 사용자의 특정 게시글 좋아요 조회 */
-    Optional<PostLike> findByPost_PostIdAndUser_UserId(Integer postId, Integer userId);
+    Optional<PostLike> findByPost_PostIdAndAccount_AccountId(Integer postId, Integer accountId);
     
     /** 좋아요 존재 여부 확인 */
-    boolean existsByPost_PostIdAndUser_UserId(Integer postId, Integer userId);
+    boolean existsByPost_PostIdAndAccount_AccountId(Integer postId, Integer accountId);
     
     /** 게시글별 좋아요 수 조회 */
     Long countByPost_PostId(Integer postId);
@@ -33,8 +33,8 @@ public interface PostLikeRepository extends JpaRepository<PostLike, Integer> {
     List<Object[]> findMostLikedPosts();
     
     /** 특정 사용자가 누른 좋아요 개수 */
-    @Query("SELECT COUNT(pl) FROM PostLike pl WHERE pl.user.userId = :userId")
-    Long countLikesByUser(@Param("userId") Integer userId);
+    @Query("SELECT COUNT(pl) FROM PostLike pl WHERE pl.account.accountId = :accountId")
+    Long countLikesByAccount(@Param("accountId") Integer accountId);
     
     /** 게시글별 좋아요 수 조회 */
     @Query("SELECT pl.post.postId, COUNT(pl) FROM PostLike pl GROUP BY pl.post.postId")
@@ -45,6 +45,6 @@ public interface PostLikeRepository extends JpaRepository<PostLike, Integer> {
     List<PostLike> findLikesByBoard(@Param("boardId") Integer boardId);
     
     /** 사용자별 좋아요 수 조회 */
-    @Query("SELECT pl.user.userId, COUNT(pl) FROM PostLike pl WHERE pl.user IS NOT NULL GROUP BY pl.user.userId ORDER BY COUNT(pl) DESC")
-    List<Object[]> countLikesByUser();
+    @Query("SELECT pl.account.accountId, COUNT(pl) FROM PostLike pl WHERE pl.account IS NOT NULL GROUP BY pl.account.accountId ORDER BY COUNT(pl) DESC")
+    List<Object[]> countLikesByAccount();
 }

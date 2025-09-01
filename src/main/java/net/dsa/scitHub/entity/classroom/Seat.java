@@ -2,7 +2,7 @@ package net.dsa.scitHub.entity.classroom;
 
 import jakarta.persistence.*;
 import lombok.*;
-import net.dsa.scitHub.entity.user.User;
+import net.dsa.scitHub.entity.user.Account;
 
 import java.util.Objects;
 
@@ -13,7 +13,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString(exclude = {"classroom", "user"})
+@ToString(exclude = {"classroom", "account"})
 public class Seat {
     
     /** 좌석 고유 식별자 */
@@ -37,8 +37,8 @@ public class Seat {
     
     /** 좌석을 배정받은 사용자 */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "account_id")
+    private Account account;
     
     @Override
     public boolean equals(Object o) {

@@ -2,7 +2,7 @@ package net.dsa.scitHub.entity.studentGroup;
 
 import jakarta.persistence.*;
 import lombok.*;
-import net.dsa.scitHub.entity.user.User;
+import net.dsa.scitHub.entity.user.Account;
 import net.dsa.scitHub.enums.ClassSection;
 
 import java.util.List;
@@ -43,7 +43,7 @@ public class StudentGroup {
     
     /** 그룹에 속한 사용자들 */
     @OneToMany(mappedBy = "studentGroup")
-    private List<User> users;
+    private List<Account> users;
     
     @Override
     public boolean equals(Object o) {

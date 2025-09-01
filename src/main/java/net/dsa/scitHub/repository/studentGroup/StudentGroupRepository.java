@@ -37,15 +37,7 @@ public interface StudentGroupRepository extends JpaRepository<StudentGroup, Inte
            "GROUP BY sg.cohortNo, sg.classSection ORDER BY sg.cohortNo DESC, sg.classSection")
     List<Object[]> countGroupsByCohortAndSection();
     
-    /** 멤버 수와 함께 그룹 조회 */
-    @Query("SELECT sg, COUNT(u) FROM StudentGroup sg LEFT JOIN sg.users u GROUP BY sg ORDER BY COUNT(u) DESC")
-    List<Object[]> findGroupsWithMemberCount();
-    
     /** 특정 기수의 최대 순서 인덱스 조회 */
     @Query("SELECT MAX(sg.orderIndex) FROM StudentGroup sg WHERE sg.cohortNo = :cohortNo")
     Integer findMaxOrderIndexByCohortNo(@Param("cohortNo") Integer cohortNo);
-    
-    /** 멤버가 있는 그룹만 조회 */
-    @Query("SELECT DISTINCT sg FROM StudentGroup sg JOIN sg.users u")
-    List<StudentGroup> findGroupsWithMembers();
 }

@@ -34,6 +34,6 @@ public interface BoardRepository extends JpaRepository<Board, Integer> {
     List<Object[]> findBoardsWithPostCount();
     
     /** 특정 사용자가 즐겨찾기한 게시판들 */
-    @Query("SELECT b FROM Board b JOIN b.bookmarks bb WHERE bb.user.userId = :userId")
-    List<Board> findBookmarkedBoardsByUser(@Param("userId") Integer userId);
+    @Query("SELECT b FROM Board b JOIN b.bookmarks bb WHERE bb.account.accountId = :accountId")
+    List<Board> findBookmarkedBoardsByAccount(@Param("accountId") Integer accountId);
 }

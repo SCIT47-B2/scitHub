@@ -2,7 +2,7 @@ package net.dsa.scitHub.entity.board;
 
 import jakarta.persistence.*;
 import lombok.*;
-import net.dsa.scitHub.entity.user.User;
+import net.dsa.scitHub.entity.user.Account;
 
 import java.util.Objects;
 
@@ -13,7 +13,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString(exclude = {"post", "user"})
+@ToString(exclude = {"post", "account"})
 public class PostLike {
     
     /** 게시글 좋아요 고유 식별자 */
@@ -29,8 +29,8 @@ public class PostLike {
     
     /** 좋아요 누른 사용자 */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "account_id")
+    private Account account;
     
     @Override
     public boolean equals(Object o) {

@@ -2,7 +2,7 @@ package net.dsa.scitHub.entity.board;
 
 import jakarta.persistence.*;
 import lombok.*;
-import net.dsa.scitHub.entity.user.User;
+import net.dsa.scitHub.entity.user.Account;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -20,7 +20,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString(exclude = {"board", "user", "comments", "attachmentFiles", "tags", "likes"})
+@ToString(exclude = {"board", "account", "comments", "attachmentFiles", "tags", "likes"})
 public class Post {
     
     /** 게시글 고유 식별자 */
@@ -36,8 +36,8 @@ public class Post {
     
     /** 게시글 작성자 */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "account_id", nullable = false)
+    private Account account;
     
     /** 게시글 제목 */
     @Column(name = "title", nullable = false, length = 200)

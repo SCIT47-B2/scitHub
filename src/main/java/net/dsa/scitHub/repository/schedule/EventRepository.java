@@ -15,7 +15,7 @@ import java.util.List;
 public interface EventRepository extends JpaRepository<Event, Integer> {
     
     /** 사용자별 이벤트 조회 */
-    List<Event> findByUser_UserId(Integer userId);
+    List<Event> findByAccount_AccountId(Integer accountId);
     
     /** 공개 범위별 조회 */
     List<Event> findByVisibility(Visibility visibility);
@@ -25,8 +25,8 @@ public interface EventRepository extends JpaRepository<Event, Integer> {
     List<Event> findByStartAtBetween(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
     
     /** 사용자에게 보여질 수 있는 이벤트들 조회 (공개 이벤트 + 본인 이벤트) */
-    @Query("SELECT e FROM Event e WHERE e.visibility = 'PUBLIC' OR e.user.userId = :userId")
-    List<Event> findVisibleEvents(@Param("userId") Integer userId);
+    @Query("SELECT e FROM Event e WHERE e.visibility = 'PUBLIC' OR e.account.accountId = :accountId")
+    List<Event> findVisibleEvents(@Param("accountId") Integer accountId);
     
     /** 종일 이벤트 조회 */
     List<Event> findByIsAllDay(Boolean isAllDay);

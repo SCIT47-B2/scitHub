@@ -2,7 +2,7 @@ package net.dsa.scitHub.entity.schedule;
 
 import jakarta.persistence.*;
 import lombok.*;
-import net.dsa.scitHub.entity.user.User;
+import net.dsa.scitHub.entity.user.Account;
 
 import java.time.LocalDate;
 import java.util.Objects;
@@ -14,7 +14,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString(exclude = "user")
+@ToString(exclude = "account")
 public class Dday {
     
     /** 디데이 고유 식별자 */
@@ -25,8 +25,8 @@ public class Dday {
     
     /** 디데이 등록 사용자 */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "account_id", nullable = false)
+    private Account account;
     
     /** 디데이 날짜 */
     @Column(name = "dday", nullable = false)

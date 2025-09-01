@@ -29,12 +29,12 @@ public class Message {
     /** 메시지 발신자 */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sender_id", nullable = false)
-    private User sender;
+    private Account sender;
     
     /** 메시지 수신자 */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "receiver_id", nullable = false)
-    private User receiver;
+    private Account receiver;
     
     /** 메시지 제목 */
     @Column(name = "title", nullable = false, length = 200)

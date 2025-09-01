@@ -23,10 +23,10 @@ public interface CompanyReviewRepository extends JpaRepository<CompanyReview, In
     Page<CompanyReview> findByCompany_CompanyId(Integer companyId, Pageable pageable);
     
     /** 사용자별 리뷰 조회 */
-    List<CompanyReview> findByUser_UserId(Integer userId);
+    List<CompanyReview> findByAccount_AccountId(Integer accountId);
     
     /** 특정 회사에 대한 특정 사용자의 리뷰 조회 */
-    Optional<CompanyReview> findByCompany_CompanyIdAndUser_UserId(Integer companyId, Integer userId);
+    Optional<CompanyReview> findByCompany_CompanyIdAndAccount_AccountId(Integer companyId, Integer accountId);
     
     /** 회사별 평균 평점 조회 */
     @Query("SELECT AVG(cr.rating) FROM CompanyReview cr WHERE cr.company.companyId = :companyId")

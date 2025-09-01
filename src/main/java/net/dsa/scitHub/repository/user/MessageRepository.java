@@ -1,4 +1,4 @@
-package net.dsa.scitHub.repository.user;
+package net.dsa.scitHub.repository.account;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,19 +17,19 @@ import java.util.List;
 public interface MessageRepository extends JpaRepository<Message, Integer> {
     
     /** 발신자별 메시지 조회 */
-    List<Message> findBySender_UserId(Integer senderId);
+    List<Message> findBySender_AccountId(Integer senderId);
     
     /** 수신자별 메시지 조회 */
-    List<Message> findByReceiver_UserId(Integer receiverId);
+    List<Message> findByReceiver_AccountId(Integer receiverId);
     
     /** 수신자별 메시지 조회 (페이징) */
-    Page<Message> findByReceiver_UserId(Integer receiverId, Pageable pageable);
+    Page<Message> findByReceiver_AccountId(Integer receiverId, Pageable pageable);
     
     /** 발신자별 메시지 조회 (페이징) */
-    Page<Message> findBySender_UserId(Integer senderId, Pageable pageable);
+    Page<Message> findBySender_AccountId(Integer senderId, Pageable pageable);
     
     /** 읽지 않은 메시지 수 조회 */
-    @Query("SELECT COUNT(m) FROM Message m WHERE m.receiver.userId = :receiverId AND m.isRead = false")
+    @Query("SELECT COUNT(m) FROM Message m WHERE m.receiver.accountId = :receiverId AND m.isRead = false")
     Long countUnreadMessages(@Param("receiverId") Integer receiverId);
     
     /** 메시지를 읽음으로 표시 */
@@ -39,11 +39,11 @@ public interface MessageRepository extends JpaRepository<Message, Integer> {
     
     /** 수신자의 모든 메시지를 읽음으로 표시 */
     @Modifying
-    @Query("UPDATE Message m SET m.isRead = true WHERE m.receiver.userId = :receiverId AND m.isRead = false")
+    @Query("UPDATE Message m SET m.isRead = true WHERE m.receiver.accountId = :receiverId AND m.isRead = false")
     void markAllAsReadByReceiver(@Param("receiverId") Integer receiverId);
     
     /** 읽지 않은 메시지들 조회 */
-    @Query("SELECT m FROM Message m WHERE m.receiver.userId = :receiverId AND m.isRead = false ORDER BY m.createdAt DESC")
+    @Query("SELECT m FROM Message m WHERE m.receiver.accountId = :receiverId AND m.isRead = false ORDER BY m.createdAt DESC")
     List<Message> findUnreadMessages(@Param("receiverId") Integer receiverId);
     
     /** 제목으로 검색 */
@@ -59,8 +59,8 @@ public interface MessageRepository extends JpaRepository<Message, Integer> {
     
     /** 두 사용자 간의 메시지 대화 조회 */
     @Query("SELECT m FROM Message m WHERE " +
-           "(m.sender.userId = :user1Id AND m.receiver.userId = :user2Id) OR " +
-           "(m.sender.userId = :user2Id AND m.receiver.userId = :user1Id) " +
+           "(m.sender.accountId = :user1Id AND m.receiver.accountId = :user2Id) OR " +
+           "(m.sender.accountId = :user2Id AND m.receiver.accountId = :user1Id) " +
            "ORDER BY m.createdAt")
-    List<Message> findConversationBetweenUsers(@Param("user1Id") Integer user1Id, @Param("user2Id") Integer user2Id);
+    List<Message> findConversationBetweenAccounts(@Param("user1Id") Integer user1Id, @Param("user2Id") Integer user2Id);
 }

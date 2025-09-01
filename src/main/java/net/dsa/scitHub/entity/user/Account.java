@@ -16,7 +16,7 @@ import java.util.Objects;
 
 
 @Entity
-@Table(name = "user")
+@Table(name = "account")
 @EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
@@ -24,13 +24,13 @@ import java.util.Objects;
 @AllArgsConstructor
 @Builder
 @ToString(exclude = "studentGroup")
-public class User {
+public class Account {
     
     /** 사용자 고유 식별자 */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
-    private Integer userId;
+    @Column(name = "account_id")
+    private Integer accountId;
     
     /** 기수 번호 */
     @Column(name = "cohort_no", nullable = false)
@@ -108,13 +108,13 @@ public class User {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof User)) return false;
-        User user = (User) o;
-        return Objects.equals(userId, user.userId);
+        if (!(o instanceof Account)) return false;
+        Account account = (Account) o;
+        return Objects.equals(accountId, account.accountId);
     }
     
     @Override
     public int hashCode() {
-        return Objects.hash(userId);
+        return Objects.hash(accountId);
     }
 }

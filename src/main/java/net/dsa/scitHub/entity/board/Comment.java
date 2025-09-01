@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import net.dsa.scitHub.entity.album.Photo;
 import net.dsa.scitHub.entity.company.CompanyReview;
-import net.dsa.scitHub.entity.user.User;
+import net.dsa.scitHub.entity.user.Account;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -21,7 +21,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString(exclude = {"user", "post", "companyReview", "photo"})
+@ToString(exclude = {"account", "post", "companyReview", "photo"})
 public class Comment {
     
     /** 댓글 고유 식별자 */
@@ -32,8 +32,8 @@ public class Comment {
     
     /** 댓글 작성자 */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "account_id", nullable = false)
+    private Account account;
     
     /** 댓글 내용 */
     @Column(name = "comment", nullable = false, columnDefinition = "MEDIUMTEXT")

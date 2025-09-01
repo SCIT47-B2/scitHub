@@ -17,17 +17,17 @@ public interface SeatRepository extends JpaRepository<Seat, Integer> {
     List<Seat> findByClassroom_ClassroomId(Integer classroomId);
     
     /** 사용자별 좌석 조회 */
-    List<Seat> findByUser_UserId(Integer userId);
+    List<Seat> findByAccount_AccountId(Integer accountId);
     
     /** 특정 좌석 위치로 조회 */
     Optional<Seat> findByClassroom_ClassroomIdAndRowNoAndColNo(Integer classroomId, Integer rowNo, Integer colNo);
     
     /** 빈 좌석들 조회 */
-    @Query("SELECT s FROM Seat s WHERE s.classroom.classroomId = :classroomId AND s.user IS NULL")
+    @Query("SELECT s FROM Seat s WHERE s.classroom.classroomId = :classroomId AND s.account IS NULL")
     List<Seat> findAvailableSeats(@Param("classroomId") Integer classroomId);
     
     /** 사용 중인 좌석들 조회 */
-    @Query("SELECT s FROM Seat s WHERE s.classroom.classroomId = :classroomId AND s.user IS NOT NULL")
+    @Query("SELECT s FROM Seat s WHERE s.classroom.classroomId = :classroomId AND s.account IS NOT NULL")
     List<Seat> findOccupiedSeats(@Param("classroomId") Integer classroomId);
     
     /** 강의실별 좌석을 위치 순으로 조회 */
@@ -39,11 +39,11 @@ public interface SeatRepository extends JpaRepository<Seat, Integer> {
     List<Object[]> countSeatsByClassroom();
     
     /** 강의실별 사용 중인 좌석 수 조회 */
-    @Query("SELECT s.classroom.classroomId, COUNT(s) FROM Seat s WHERE s.user IS NOT NULL GROUP BY s.classroom.classroomId")
+    @Query("SELECT s.classroom.classroomId, COUNT(s) FROM Seat s WHERE s.account IS NOT NULL GROUP BY s.classroom.classroomId")
     List<Object[]> countOccupiedSeatsByClassroom();
     
     /** 강의실별 빈 좌석 수 조회 */
-    @Query("SELECT s.classroom.classroomId, COUNT(s) FROM Seat s WHERE s.user IS NULL GROUP BY s.classroom.classroomId")
+    @Query("SELECT s.classroom.classroomId, COUNT(s) FROM Seat s WHERE s.account IS NULL GROUP BY s.classroom.classroomId")
     List<Object[]> countAvailableSeatsByClassroom();
     
     /** 특정 행의 좌석들 조회 */

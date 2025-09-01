@@ -17,14 +17,14 @@ import java.util.List;
 public interface NotificationRepository extends JpaRepository<Notification, Integer> {
     
     /** 사용자별 알림 조회 */
-    List<Notification> findByUser_UserId(Integer userId);
+    List<Notification> findByAccount_AccountId(Integer accountId);
     
     /** 사용자별 알림 조회 (페이징) */
-    Page<Notification> findByUser_UserId(Integer userId, Pageable pageable);
+    Page<Notification> findByAccount_AccountId(Integer accountId, Pageable pageable);
     
     /** 읽지 않은 알림 수 조회 */
-    @Query("SELECT COUNT(n) FROM Notification n WHERE n.user.userId = :userId AND n.isRead = false")
-    Long countUnreadNotifications(@Param("userId") Integer userId);
+    @Query("SELECT COUNT(n) FROM Notification n WHERE n.account.accountId = :accountId AND n.isRead = false")
+    Long countUnreadNotifications(@Param("accountId") Integer accountId);
     
     /** 알림을 읽음으로 표시 */
     @Modifying
@@ -33,16 +33,16 @@ public interface NotificationRepository extends JpaRepository<Notification, Inte
     
     /** 사용자의 모든 알림을 읽음으로 표시 */
     @Modifying
-    @Query("UPDATE Notification n SET n.isRead = true WHERE n.user.userId = :userId")
-    void markAllAsReadByUserId(@Param("userId") Integer userId);
+    @Query("UPDATE Notification n SET n.isRead = true WHERE n.account.accountId = :accountId")
+    void markAllAsReadByAccountId(@Param("accountId") Integer accountId);
     
     /** 읽지 않은 알림들 조회 */
-    @Query("SELECT n FROM Notification n WHERE n.user.userId = :userId AND n.isRead = false ORDER BY n.createdAt DESC")
-    List<Notification> findUnreadNotifications(@Param("userId") Integer userId);
+    @Query("SELECT n FROM Notification n WHERE n.account.accountId = :accountId AND n.isRead = false ORDER BY n.createdAt DESC")
+    List<Notification> findUnreadNotifications(@Param("accountId") Integer accountId);
     
     /** 읽은 알림들 조회 */
-    @Query("SELECT n FROM Notification n WHERE n.user.userId = :userId AND n.isRead = true ORDER BY n.createdAt DESC")
-    List<Notification> findReadNotifications(@Param("userId") Integer userId);
+    @Query("SELECT n FROM Notification n WHERE n.account.accountId = :accountId AND n.isRead = true ORDER BY n.createdAt DESC")
+    List<Notification> findReadNotifications(@Param("accountId") Integer accountId);
     
     /** 제목으로 검색 */
     List<Notification> findByTitleContaining(String title);

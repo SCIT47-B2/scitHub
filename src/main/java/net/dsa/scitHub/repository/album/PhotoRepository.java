@@ -22,10 +22,10 @@ public interface PhotoRepository extends JpaRepository<Photo, Integer> {
     Page<Photo> findByAlbum_AlbumId(Integer albumId, Pageable pageable);
     
     /** 사용자별 사진 조회 */
-    List<Photo> findByUser_UserId(Integer userId);
+    List<Photo> findByAccount_AccountId(Integer accountId);
     
     /** 사용자별 사진 조회 (페이징) */
-    Page<Photo> findByUser_UserId(Integer userId, Pageable pageable);
+    Page<Photo> findByAccount_AccountId(Integer accountId, Pageable pageable);
     
     /** 설명이 있는 사진들 조회 */
     @Query("SELECT p FROM Photo p WHERE p.caption IS NOT NULL AND LENGTH(p.caption) > 0")
@@ -47,8 +47,8 @@ public interface PhotoRepository extends JpaRepository<Photo, Integer> {
     List<Object[]> countPhotosByAlbum();
     
     /** 사용자별 사진 수 조회 */
-    @Query("SELECT p.user.userId, COUNT(p) FROM Photo p GROUP BY p.user.userId ORDER BY COUNT(p) DESC")
-    List<Object[]> countPhotosByUser();
+    @Query("SELECT p.account.accountId, COUNT(p) FROM Photo p GROUP BY p.account.accountId ORDER BY COUNT(p) DESC")
+    List<Object[]> countPhotosByAccount();
     
     /** 댓글이 있는 사진들 조회 */
     @Query("SELECT DISTINCT p FROM Photo p JOIN p.comments c")

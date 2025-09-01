@@ -22,7 +22,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString(exclude = {"user", "post", "comment", "reservation", "companyReview"})
+@ToString(exclude = {"account", "post", "comment", "reservation", "companyReview"})
 public class Report {
     
     /** 신고 고유 식별자 */
@@ -33,8 +33,8 @@ public class Report {
     
     /** 신고 접수자 */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "account_id", nullable = false)
+    private Account account;
     
     /** 신고 내용 */
     @Column(name = "content")

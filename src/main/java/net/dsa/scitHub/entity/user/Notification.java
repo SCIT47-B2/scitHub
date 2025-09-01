@@ -22,7 +22,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString(exclude = {"user", "post", "comment", "message", "studentGroup", "event", "reservation"})
+@ToString(exclude = {"account", "post", "comment", "message", "studentGroup", "event", "reservation"})
 public class Notification {
     
     /** 알림 고유 식별자 */
@@ -33,8 +33,8 @@ public class Notification {
     
     /** 알림 대상 사용자 */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "account_id", nullable = false)
+    private Account account;
     
     /** 알림 제목 */
     @Column(name = "title", nullable = false, length = 150)

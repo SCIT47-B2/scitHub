@@ -14,7 +14,7 @@ import java.util.List;
 public interface ReservationRepository extends JpaRepository<Reservation, Integer> {
     
     /** 사용자별 예약 조회 */
-    List<Reservation> findByUser_UserId(Integer userId);
+    List<Reservation> findByAccount_AccountId(Integer accountId);
     
     /** 강의실별 예약 조회 */
     List<Reservation> findByClassroom_ClassroomId(Integer classroomId);
@@ -42,16 +42,16 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
     List<Reservation> findPastReservations(@Param("now") LocalDateTime now);
     
     /** 사용자별 다가올 예약 조회 */
-    @Query("SELECT r FROM Reservation r WHERE r.user.userId = :userId AND r.startAt > :now ORDER BY r.startAt")
-    List<Reservation> findUpcomingReservationsByUser(@Param("userId") Integer userId, @Param("now") LocalDateTime now);
+    @Query("SELECT r FROM Reservation r WHERE r.account.accountId = :accountId AND r.startAt > :now ORDER BY r.startAt")
+    List<Reservation> findUpcomingReservationsByAccount(@Param("accountId") Integer accountId, @Param("now") LocalDateTime now);
     
     /** 강의실별 예약 수 조회 */
     @Query("SELECT r.classroom.classroomId, COUNT(r) FROM Reservation r GROUP BY r.classroom.classroomId ORDER BY COUNT(r) DESC")
     List<Object[]> countReservationsByClassroom();
     
     /** 사용자별 예약 수 조회 */
-    @Query("SELECT r.user.userId, COUNT(r) FROM Reservation r GROUP BY r.user.userId ORDER BY COUNT(r) DESC")
-    List<Object[]> countReservationsByUser();
+    @Query("SELECT r.account.accountId, COUNT(r) FROM Reservation r GROUP BY r.account.accountId ORDER BY COUNT(r) DESC")
+    List<Object[]> countReservationsByAccount();
     
     /** 특정 시간대의 강의실 가용성 체크 */
     @Query("SELECT c.classroomId FROM Classroom c WHERE c.isActive = true AND c.classroomId NOT IN " +

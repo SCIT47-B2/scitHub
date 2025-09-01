@@ -18,10 +18,10 @@ public interface CourseReviewRepository extends JpaRepository<CourseReview, Inte
     List<CourseReview> findByCourse_CourseId(Integer courseId);
     
     /** 사용자별 리뷰 조회 */
-    List<CourseReview> findByUser_UserId(Integer userId);
+    List<CourseReview> findByAccount_AccountId(Integer accountId);
     
     /** 특정 사용자의 특정 강의 리뷰 조회 */
-    Optional<CourseReview> findByUser_UserIdAndCourse_CourseId(Integer userId, Integer courseId);
+    Optional<CourseReview> findByAccount_AccountIdAndCourse_CourseId(Integer accountId, Integer courseId);
     
     /** 강의별 준비성 평균 점수 */
     @Query("SELECT AVG(cr.scorePreparedness) FROM CourseReview cr WHERE cr.course.courseId = :courseId")

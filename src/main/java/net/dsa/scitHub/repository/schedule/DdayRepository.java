@@ -14,14 +14,14 @@ import java.util.List;
 public interface DdayRepository extends JpaRepository<Dday, Integer> {
     
     /** 사용자별 디데이 조회 */
-    List<Dday> findByUser_UserId(Integer userId);
+    List<Dday> findByAccount_AccountId(Integer accountId);
     
     /** 특정 날짜의 디데이 조회 */
     List<Dday> findByDday(LocalDate dday);
     
     /** 사용자별 디데이를 날짜 순으로 조회 */
-    @Query("SELECT d FROM Dday d WHERE d.user.userId = :userId ORDER BY d.dday")
-    List<Dday> findByUserIdOrderByDday(@Param("userId") Integer userId);
+    @Query("SELECT d FROM Dday d WHERE d.account.accountId = :accountId ORDER BY d.dday")
+    List<Dday> findByAccountIdOrderByDday(@Param("accountId") Integer accountId);
     
     /** 특정 기간의 디데이들 조회 */
     @Query("SELECT d FROM Dday d WHERE d.dday >= :fromDate AND d.dday <= :toDate")
@@ -36,15 +36,15 @@ public interface DdayRepository extends JpaRepository<Dday, Integer> {
     List<Dday> findPastDdays(@Param("today") LocalDate today);
     
     /** 사용자별 다가오는 디데이들 조회 */
-    @Query("SELECT d FROM Dday d WHERE d.user.userId = :userId AND d.dday >= :today ORDER BY d.dday")
-    List<Dday> findUpcomingDdaysByUser(@Param("userId") Integer userId, @Param("today") LocalDate today);
+    @Query("SELECT d FROM Dday d WHERE d.account.accountId = :accountId AND d.dday >= :today ORDER BY d.dday")
+    List<Dday> findUpcomingDdaysByAccount(@Param("accountId") Integer accountId, @Param("today") LocalDate today);
     
     /** 제목으로 검색 */
     List<Dday> findByTitleContaining(String title);
     
     /** 특정 사용자의 디데이 수 조회 */
-    @Query("SELECT COUNT(d) FROM Dday d WHERE d.user.userId = :userId")
-    Long countByUserId(@Param("userId") Integer userId);
+    @Query("SELECT COUNT(d) FROM Dday d WHERE d.account.accountId = :accountId")
+    Long countByAccountId(@Param("accountId") Integer accountId);
     
     /** 이번 달의 디데이들 조회 */
     @Query("SELECT d FROM Dday d WHERE YEAR(d.dday) = :year AND MONTH(d.dday) = :month")

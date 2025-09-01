@@ -20,7 +20,7 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     Page<Post> findByBoard_BoardId(Integer boardId, Pageable pageable);
     
     /** 사용자별 게시글 조회 (페이징) */
-    Page<Post> findByUser_UserId(Integer userId, Pageable pageable);
+    Page<Post> findByAccount_AccountId(Integer accountId, Pageable pageable);
     
     /** 제목과 내용으로 검색 */
     @Query("SELECT p FROM Post p WHERE p.title LIKE %:keyword% OR p.content LIKE %:keyword%")

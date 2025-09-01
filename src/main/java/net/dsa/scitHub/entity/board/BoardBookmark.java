@@ -2,7 +2,7 @@ package net.dsa.scitHub.entity.board;
 
 import jakarta.persistence.*;
 import lombok.*;
-import net.dsa.scitHub.entity.user.User;
+import net.dsa.scitHub.entity.user.Account;
 
 import java.util.Objects;
 
@@ -13,7 +13,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString(exclude = {"board", "user"})
+@ToString(exclude = {"board", "account"})
 public class BoardBookmark {
     
     /** 게시판 즐겨찾기 고유 식별자 */
@@ -29,8 +29,8 @@ public class BoardBookmark {
     
     /** 즐겨찾기 등록 사용자 */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "account_id", nullable = false)
+    private Account account;
     
     @Override
     public boolean equals(Object o) {

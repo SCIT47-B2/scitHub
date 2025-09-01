@@ -14,16 +14,16 @@ import java.util.Optional;
 public interface BoardBookmarkRepository extends JpaRepository<BoardBookmark, Integer> {
     
     /** 사용자별 즐겨찾기한 게시판 조회 */
-    List<BoardBookmark> findByUser_UserId(Integer userId);
+    List<BoardBookmark> findByAccount_AccountId(Integer accountId);
     
     /** 게시판별 즐겨찾기 목록 조회 */
     List<BoardBookmark> findByBoard_BoardId(Integer boardId);
     
     /** 특정 사용자의 특정 게시판 즐겨찾기 조회 */
-    Optional<BoardBookmark> findByBoard_BoardIdAndUser_UserId(Integer boardId, Integer userId);
+    Optional<BoardBookmark> findByBoard_BoardIdAndAccount_AccountId(Integer boardId, Integer accountId);
     
     /** 즐겨찾기 존재 여부 확인 */
-    boolean existsByBoard_BoardIdAndUser_UserId(Integer boardId, Integer userId);
+    boolean existsByBoard_BoardIdAndAccount_AccountId(Integer boardId, Integer accountId);
     
     /** 게시판별 즐겨찾기 수 조회 */
     @Query("SELECT bb.board.boardId, COUNT(bb) FROM BoardBookmark bb GROUP BY bb.board.boardId")
@@ -34,6 +34,6 @@ public interface BoardBookmarkRepository extends JpaRepository<BoardBookmark, In
     List<Object[]> findMostBookmarkedBoards();
     
     /** 특정 사용자의 즐겨찾기 개수 */
-    @Query("SELECT COUNT(bb) FROM BoardBookmark bb WHERE bb.user.userId = :userId")
-    Long countBookmarksByUser(@Param("userId") Integer userId);
+    @Query("SELECT COUNT(bb) FROM BoardBookmark bb WHERE bb.account.accountId = :accountId")
+    Long countBookmarksByAccount(@Param("accountId") Integer accountId);
 }

@@ -3,7 +3,7 @@ package net.dsa.scitHub.entity.reservation;
 import jakarta.persistence.*;
 import lombok.*;
 import net.dsa.scitHub.entity.classroom.Classroom;
-import net.dsa.scitHub.entity.user.User;
+import net.dsa.scitHub.entity.user.Account;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -19,7 +19,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString(exclude = {"classroom", "user"})
+@ToString(exclude = {"classroom", "account"})
 public class Reservation {
     
     /** 예약 고유 식별자 */
@@ -35,8 +35,8 @@ public class Reservation {
     
     /** 예약 사용자 */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "account_id", nullable = false)
+    private Account account;
     
     /** 예약 시작 시간 */
     @Column(name = "start_at", nullable = false)

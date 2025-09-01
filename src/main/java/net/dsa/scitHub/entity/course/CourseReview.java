@@ -2,7 +2,7 @@ package net.dsa.scitHub.entity.course;
 
 import jakarta.persistence.*;
 import lombok.*;
-import net.dsa.scitHub.entity.user.User;
+import net.dsa.scitHub.entity.user.Account;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -18,7 +18,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString(exclude = {"course", "user"})
+@ToString(exclude = {"course", "account"})
 public class CourseReview {
     
     /** 강의 리뷰 고유 식별자 */
@@ -34,8 +34,8 @@ public class CourseReview {
     
     /** 리뷰 작성자 */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "account_id")
+    private Account account;
     
     /** 강사 준비성 점수 */
     @Column(name = "score_preparedness", nullable = false)

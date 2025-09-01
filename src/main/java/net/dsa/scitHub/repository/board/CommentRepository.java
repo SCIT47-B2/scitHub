@@ -19,7 +19,7 @@ public interface CommentRepository extends JpaRepository<Comment, Integer> {
     List<Comment> findByPost_PostId(Integer postId);
     
     /** 사용자별 댓글 조회 (페이징) */
-    Page<Comment> findByUser_UserId(Integer userId, Pageable pageable);
+    Page<Comment> findByAccount_AccountId(Integer accountId, Pageable pageable);
     
     /** 회사 리뷰별 댓글 조회 */
     List<Comment> findByCompanyReview_CompanyReviewId(Integer companyReviewId);
@@ -46,8 +46,8 @@ public interface CommentRepository extends JpaRepository<Comment, Integer> {
     List<Comment> findModifiedComments();
     
     /** 사용자별 댓글 수 조회 */
-    @Query("SELECT c.user.userId, COUNT(c) FROM Comment c GROUP BY c.user.userId ORDER BY COUNT(c) DESC")
-    List<Object[]> countCommentsByUser();
+    @Query("SELECT c.account.accountId, COUNT(c) FROM Comment c GROUP BY c.account.accountId ORDER BY COUNT(c) DESC")
+    List<Object[]> countCommentsByAccount();
     
     /** 게시글별 댓글 수 조회 */
     @Query("SELECT c.post.postId, COUNT(c) FROM Comment c WHERE c.post IS NOT NULL GROUP BY c.post.postId")

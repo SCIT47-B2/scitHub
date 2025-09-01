@@ -58,9 +58,9 @@ create table student_group
     order_index      int             not null
 );
 
-create table user
+create table account
 (
-    user_id           int auto_increment
+    account_id           int auto_increment
         primary key,
     cohort_no         int                                              not null,
     username          varchar(32)                                      not null,
@@ -78,7 +78,7 @@ create table user
     role              enum ('USER', 'ADMIN') default 'USER'            not null,
     last_login_at     datetime                                         null on update CURRENT_TIMESTAMP,
     created_at        datetime               default CURRENT_TIMESTAMP null,
-    constraint user_student_group_student_group_id_fk
+    constraint account_student_group_student_group_id_fk
         foreign key (student_group_id) references student_group (student_group_id)
             on delete set null
 );
@@ -88,14 +88,14 @@ create table board_bookmark
     board_bookmark_id int auto_increment
         primary key,
     board_id          int not null,
-    user_id           int not null,
+    account_id           int not null,
     constraint board_bookmark_uq
-        unique (board_id, user_id),
+        unique (board_id, account_id),
+    constraint board_bookmark_account_account_id_fk
+        foreign key (account_id) references account (account_id)
+            on delete cascade,
     constraint board_bookmark_board_board_id_fk
         foreign key (board_id) references board (board_id)
-            on delete cascade,
-    constraint board_bookmark_user_user_id_fk
-        foreign key (user_id) references user (user_id)
             on delete cascade
 );
 
@@ -104,18 +104,18 @@ create table company_review
     company_review_id int auto_increment
         primary key,
     company_id        int                                not null,
-    user_id           int                                null,
+    account_id           int                                null,
     rating            tinyint                            not null,
     content           mediumtext                         null,
     created_at        datetime default CURRENT_TIMESTAMP not null,
     constraint company_review_uq
-        unique (company_id, user_id),
+        unique (company_id, account_id),
+    constraint company_review_account_account_id_fk
+        foreign key (account_id) references account (account_id)
+            on delete set null,
     constraint company_review_company_company_id_fk
         foreign key (company_id) references company (company_id)
-            on delete cascade,
-    constraint company_review_user_user_id_fk
-        foreign key (user_id) references user (user_id)
-            on delete set null
+            on delete cascade
 );
 
 create table course_review
@@ -123,7 +123,7 @@ create table course_review
     course_review_id    int auto_increment
         primary key,
     course_id           int                                not null,
-    user_id             int                                null,
+    account_id             int                                null,
     score_preparedness  tinyint                            not null,
     score_profesion     tinyint                            not null,
     score_communication tinyint                            not null,
@@ -135,24 +135,24 @@ create table course_review
     comment_text        mediumtext                         null,
     created_at          datetime default CURRENT_TIMESTAMP not null,
     constraint course_review_uq
-        unique (user_id, course_id),
+        unique (account_id, course_id),
+    constraint course_review_account_account_id_fk
+        foreign key (account_id) references account (account_id)
+            on delete set null,
     constraint course_review_course_course_id_fk
         foreign key (course_id) references course (course_id)
-            on delete cascade,
-    constraint course_review_user_user_id_fk
-        foreign key (user_id) references user (user_id)
-            on delete set null
+            on delete cascade
 );
 
 create table dday
 (
     dday_id int auto_increment
         primary key,
-    user_id int          not null,
+    account_id int          not null,
     dday    date         not null,
     title   varchar(100) not null,
-    constraint dday_user_user_id_fk
-        foreign key (user_id) references user (user_id)
+    constraint dday_account_account_id_fk
+        foreign key (account_id) references account (account_id)
             on delete cascade
 );
 
@@ -161,14 +161,14 @@ create table event
     event_id   int auto_increment
         primary key,
     visibility enum ('PUBLIC', 'PRIVATE') default 'PUBLIC' not null,
-    user_id    int                                         null,
+    account_id    int                                         null,
     title      varchar(150)                                not null,
     content    mediumtext                                  null,
     start_at   datetime                                    not null,
     end_at     datetime                                    null,
     is_all_day tinyint                    default 0        not null,
-    constraint event_user_user_id_fk
-        foreign key (user_id) references user (user_id)
+    constraint event_account_account_id_fk
+        foreign key (account_id) references account (account_id)
             on delete cascade
 );
 
@@ -182,10 +182,10 @@ create table message
     content     mediumtext                         not null,
     is_read     tinyint  default 0                 not null,
     created_at  datetime default CURRENT_TIMESTAMP null,
-    constraint message_user_user_id_fk
-        foreign key (sender_id) references user (user_id),
-    constraint message_user_user_id_fk_2
-        foreign key (receiver_id) references user (user_id)
+    constraint message_account_account_id_fk
+        foreign key (sender_id) references account (account_id),
+    constraint message_account_account_id_fk_2
+        foreign key (receiver_id) references account (account_id)
 );
 
 create table photo
@@ -193,15 +193,15 @@ create table photo
     photo_id   int auto_increment
         primary key,
     album_id   int                                not null,
-    user_id    int                                not null,
+    account_id    int                                not null,
     file_url   varchar(1024)                      not null,
     caption    varchar(255)                       null,
     created_at datetime default CURRENT_TIMESTAMP not null,
+    constraint photo_account_account_id_fk
+        foreign key (account_id) references account (account_id),
     constraint photo_album_album_id_fk
         foreign key (album_id) references album (album_id)
-            on delete cascade,
-    constraint photo_user_user_id_fk
-        foreign key (user_id) references user (user_id)
+            on delete cascade
 );
 
 create table post
@@ -209,16 +209,16 @@ create table post
     post_id    int auto_increment
         primary key,
     board_id   int                                not null,
-    user_id    int                                not null,
+    account_id    int                                not null,
     title      varchar(200)                       not null,
     content    mediumtext                         not null,
     view_count int      default 0                 not null,
     created_at datetime default CURRENT_TIMESTAMP not null,
     updated_at datetime                           null on update CURRENT_TIMESTAMP,
+    constraint post_account_account_id_fk
+        foreign key (account_id) references account (account_id),
     constraint post_board_board_id_fk
-        foreign key (board_id) references board (board_id),
-    constraint post_user_user_id_fk
-        foreign key (user_id) references user (user_id)
+        foreign key (board_id) references board (board_id)
 );
 
 create table attachment_file
@@ -238,13 +238,15 @@ create table comment
 (
     comment_id        int auto_increment
         primary key,
-    user_id           int                                not null,
-    comment           mediumtext                         not null,
+    account_id           int                                not null,
+    content           mediumtext                         not null,
     created_at        datetime default CURRENT_TIMESTAMP not null,
     updated_at        datetime                           null on update CURRENT_TIMESTAMP,
     post_id           int                                null,
     company_review_id int                                null,
     photo_id          int                                null,
+    constraint comment_account_account_id_fk
+        foreign key (account_id) references account (account_id),
     constraint comment_company_review_company_review_id_fk
         foreign key (company_review_id) references company_review (company_review_id)
             on delete cascade,
@@ -253,9 +255,7 @@ create table comment
             on delete cascade,
     constraint comment_post_post_id_fk
         foreign key (post_id) references post (post_id)
-            on delete cascade,
-    constraint comment_user_user_id_fk
-        foreign key (user_id) references user (user_id)
+            on delete cascade
 );
 
 create table post_bookmark
@@ -263,31 +263,31 @@ create table post_bookmark
     post_bookmark_id int auto_increment
         primary key,
     post_id          int not null,
-    user_id          int not null,
+    account_id          int not null,
     constraint post_bookmark_uq
-        unique (post_id, user_id),
+        unique (post_id, account_id),
+    constraint post_bookmark_account_account_id_fk
+        foreign key (account_id) references account (account_id)
+            on delete cascade,
     constraint post_bookmark_post_post_id_fk
         foreign key (post_id) references post (post_id)
-            on delete cascade,
-    constraint post_bookmark_user_user_id_fk
-        foreign key (user_id) references user (user_id)
             on delete cascade
 );
 
 create table post_like
 (
     post_id      int not null,
-    user_id      int null,
+    account_id      int null,
     post_like_id int auto_increment
         primary key,
     constraint post_like_uq
-        unique (post_id, user_id),
+        unique (post_id, account_id),
+    constraint post_like_account_account_id_fk
+        foreign key (account_id) references account (account_id)
+            on delete set null,
     constraint post_like_post_post_id_fk
         foreign key (post_id) references post (post_id)
-            on delete cascade,
-    constraint post_like_user_user_id_fk
-        foreign key (user_id) references user (user_id)
-            on delete set null
+            on delete cascade
 );
 
 create table reservation
@@ -295,15 +295,15 @@ create table reservation
     reservation_id int auto_increment
         primary key,
     classroom_id   int                                not null,
-    user_id        int                                not null,
+    account_id        int                                not null,
     start_at       datetime                           not null,
     end_at         datetime                           not null,
     created_at     datetime default CURRENT_TIMESTAMP not null,
+    constraint reservation_account_account_id_fk
+        foreign key (account_id) references account (account_id)
+            on delete cascade,
     constraint reservation_classroom_classroom_id_fk
         foreign key (classroom_id) references classroom (classroom_id)
-            on delete cascade,
-    constraint reservation_user_user_id_fk
-        foreign key (user_id) references user (user_id)
             on delete cascade
 );
 
@@ -311,7 +311,7 @@ create table notification
 (
     notification_id  int auto_increment
         primary key,
-    user_id          int                                not null,
+    account_id          int                                not null,
     title            varchar(150)                       not null,
     content          mediumtext                         not null,
     target_url       varchar(500)                       null,
@@ -323,6 +323,9 @@ create table notification
     student_group_id int                                null,
     event_id         int                                null,
     reservation_id   int                                null,
+    constraint notification_account_account_id_fk
+        foreign key (account_id) references account (account_id)
+            on delete cascade,
     constraint notification_comment_comment_id_fk
         foreign key (comment_id) references comment (comment_id)
             on delete cascade,
@@ -340,9 +343,6 @@ create table notification
             on delete cascade,
     constraint notification_student_group_student_group_id_fk
         foreign key (student_group_id) references student_group (student_group_id)
-            on delete cascade,
-    constraint notification_user_user_id_fk
-        foreign key (user_id) references user (user_id)
             on delete cascade
 );
 
@@ -350,7 +350,7 @@ create table report
 (
     report_id         int auto_increment
         primary key,
-    user_id           int                                                                not null,
+    account_id           int                                                                not null,
     content           varchar(255)                                                       null,
     status            enum ('PENDING', 'RESOLVED', 'REJECTED') default 'PENDING'         not null,
     created_at        datetime                                 default CURRENT_TIMESTAMP not null,
@@ -358,6 +358,8 @@ create table report
     comment_id        int                                                                null,
     reservation_id    int                                                                null,
     company_review_id int                                                                null,
+    constraint report_account_account_id_fk
+        foreign key (account_id) references account (account_id),
     constraint report_comment_comment_id_fk
         foreign key (comment_id) references comment (comment_id)
             on delete cascade,
@@ -369,9 +371,7 @@ create table report
             on delete cascade,
     constraint report_reservation_reservation_id_fk
         foreign key (reservation_id) references reservation (reservation_id)
-            on delete cascade,
-    constraint report_user_user_id_fk
-        foreign key (user_id) references user (user_id)
+            on delete cascade
 );
 
 create table seat
@@ -381,13 +381,13 @@ create table seat
     classroom_id int not null,
     row_no       int not null,
     col_no       int not null,
-    user_id      int null,
+    account_id      int null,
+    constraint seat_account_account_id_fk
+        foreign key (account_id) references account (account_id)
+            on delete set null,
     constraint seat_classroom_classroom_id_fk
         foreign key (classroom_id) references classroom (classroom_id)
-            on delete cascade,
-    constraint seat_user_user_id_fk
-        foreign key (user_id) references user (user_id)
-            on delete set null
+            on delete cascade
 );
 
 create table tag
@@ -402,5 +402,3 @@ create table tag
         foreign key (post_id) references post (post_id)
             on delete cascade
 );
-
-
