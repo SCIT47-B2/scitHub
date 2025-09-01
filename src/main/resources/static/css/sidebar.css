@@ -2,8 +2,7 @@
 .sidebar{
   width:var(--sidebar-w);
   min-height:100vh;
-  background:var(--bg);
-  box-shadow:var(--shadow);
+  background:var(--panel);
   border-top-right-radius:var(--radius);
   border-bottom-right-radius:var(--radius);
   padding:24px 18px;

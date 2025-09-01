@@ -55,7 +55,7 @@
 .sectionHead{
   display:block;
   padding:10px 12px;
-  background:var(--primary);
+  background:var(--secondary);
   color:#fff; text-decoration:none;
   border-radius:12px;
   font-weight:900; font-size:15px; letter-spacing:.2px;

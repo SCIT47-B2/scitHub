@@ -9,7 +9,7 @@ html,body{height:100%}
 body{
   margin:0;
   display:flex;              /* 좌: 사이드바, 우: 콘텐츠 */
-  background:var(--panel);
+  background:var(--bg);
   color:var(--ink);
   font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;
 }

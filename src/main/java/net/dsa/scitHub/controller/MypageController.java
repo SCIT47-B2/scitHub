@@ -11,7 +11,7 @@ import net.dsa.scitHub.dto.MenuItem;
 @Controller
 public class MypageController {
     // 마이페이지 요청
-    @GetMapping("/mypage")
+    @GetMapping({"/mypage", "/mypage/info"})
     public String myPage(Model model) {
         List<MenuItem> menuItems = List.of(
             new MenuItem("기본 정보", "/mypage/info"),
