@@ -33,6 +33,10 @@ public class Board {
     /** 게시판에 작성된 게시글들 */
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL)
     private List<Post> posts;
+
+    /** 게시판 즐겨찾기 목록 */
+    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL)
+    private List<BoardBookmark> bookmarks;
     
     @Override
     public boolean equals(Object o) {

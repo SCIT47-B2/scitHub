@@ -9,12 +9,11 @@ import org.springframework.stereotype.Repository;
 
 import net.dsa.scitHub.entity.user.User;
 import net.dsa.scitHub.enums.Gender;
+import net.dsa.scitHub.enums.Role;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-
-import javax.management.relation.Role;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Integer> {
