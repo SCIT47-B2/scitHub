@@ -39,7 +39,7 @@ public interface CommentRepository extends JpaRepository<Comment, Integer> {
                                           @Param("endDate") LocalDateTime endDate);
     
     /** 댓글 내용으로 검색 */
-    List<Comment> findByCommentContaining(String keyword);
+    List<Comment> findByContentContaining(String keyword);
     
     /** 수정된 댓글들 조회 */
     @Query("SELECT c FROM Comment c WHERE c.updatedAt IS NOT NULL AND c.updatedAt > c.createdAt")
