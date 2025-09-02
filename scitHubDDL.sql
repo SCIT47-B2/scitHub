@@ -239,7 +239,7 @@ create table comment
     comment_id        int auto_increment
         primary key,
     user_id           int                                not null,
-    comment           mediumtext                         not null,
+    content           mediumtext                         not null,
     created_at        datetime default CURRENT_TIMESTAMP not null,
     updated_at        datetime                           null on update CURRENT_TIMESTAMP,
     post_id           int                                null,

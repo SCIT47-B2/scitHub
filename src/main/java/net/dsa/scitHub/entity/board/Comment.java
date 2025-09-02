@@ -36,8 +36,8 @@ public class Comment {
     private User user;
     
     /** 댓글 내용 */
-    @Column(name = "comment", nullable = false, columnDefinition = "MEDIUMTEXT")
-    private String comment;
+    @Column(name = "content", nullable = false, columnDefinition = "MEDIUMTEXT")
+    private String content;
     
     /** 댓글 작성 시간 */
     @CreatedDate
