@@ -6,7 +6,17 @@ package net.dsa.scitHub.enums;
  */
 public enum Role {
     /** 일반 사용자 */
-    USER,
+    USER("ROLE_USER"),
     /** 관리자 */
-    ADMIN
+    ADMIN("ROLE_ADMIN");
+
+    private final String displayName;
+
+    Role(String displayName) {
+        this.displayName = displayName;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
 }
