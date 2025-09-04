@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layouts/defaultLayout}">
+    <head>
+        <title>companyReview</title>
+        <th:block layout:fragment="css">
+            <link rel="stylesheet" th:href="@{/css/home.css}">
+            <link rel="stylesheet" th:href="@{/css/archive.css}">
+        </th:block>
+    </head>
+    <body>
+        <section class="mainGrid" aria-label="메인 영역" layout:fragment="content">
+            <div class="container">
+                <!-- 검색바 -->
+                <div class="search-box">
+                    <form th:action="@{/archive/companyReview}" method="get">
+                        <i class="fa fa-search"></i>
+                        <input type="text" name="name" placeholder="회사명으로 찾기">
+                        <button type="submit" style="display: none;"></button>
+                    </form>
+                </div>
+
+                <!-- 테이블 -->
+                <div class="table-container">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>회사명</th>
+                        <th class="dropdown">
+                            <button>업종 ▼</button>
+                            <ul class="dropdown-menu">
+                                <li><a th:href="@{/archive/companyReview}">전체</a></li>
+                                <li><a th:href="@{/archive/companyReview(industry='IT')}">IT</a></li>
+                                <li><a th:href="@{/archive/companyReview(industry='MANUFACTURING')}">제조</a></li>
+                                <li><a th:href="@{/archive/companyReview(industry='FINANCE')}">금융</a></li>
+                                <li><a th:href="@{/archive/companyReview(industry='TELECOM')}">통신</a></li>
+                                <li><a th:href="@{/archive/companyReview(industry='SERVICE')}">서비스</a></li>
+                                <li><a th:href="@{/archive/companyReview(industry='OTHER')}">그 외</a></li>
+                            </ul>
+                        </th>
+                        <th class="dropdown">
+                            <button>유형 ▼</button>
+                            <ul class="dropdown-menu">
+                                <li><a th:href="@{/archive/companyReview}">전체</a></li>
+                                <li><a th:href="@{/archive/companyReview(type='IN_HOUSE_SI')}">자사 SI</a></li>
+                                <li><a th:href="@{/archive/companyReview(type='EXTERNAL_SI')}">타사 SI</a></li>
+                                <li><a th:href="@{/archive/companyReview(type='IN_HOUSE_DEV')}">자사 개발</a></li>
+                                <li><a th:href="@{/archive/companyReview(type='SES')}">SES(파견)</a></li>
+                                <li><a th:href="@{/archive/companyReview(type='OTHER')}">그 외</a></li>
+                            </ul>
+                        </th>
+                        <th class="dropdown">
+                            <button>위치 ▼</button>
+                            <ul class="dropdown-menu">
+                                <li><a th:href="@{/archive/companyReview}">전체</a></li>
+                                <li><a th:href="@{/archive/companyReview(location='칸토')}">칸토</a></li>
+                                <li><a th:href="@{/archive/companyReview(location='홋카이도')}">홋카이도</a></li>
+                                <li><a th:href="@{/archive/companyReview(location='토카이')}">토카이</a></li>
+                                <li><a th:href="@{/archive/companyReview(location='킨키')}">킨키</a></li>
+                                <li><a th:href="@{/archive/companyReview(location='츄고쿠,시코쿠')}">츄고쿠,시코쿠</a></li>
+                                <li><a th:href="@{/archive/companyReview(location='큐슈,오키나와')}">큐슈,오키나와</a></li>
+                                <li><a th:href="@{/archive/companyReview(location='호쿠리쿠,코우신에츠')}">호쿠리쿠,코우신에츠</a></li>
+                            </ul>
+                        </th>
+                        <th class="dropdown">
+                            <button>취업인원 ▼</button>
+                            <ul class="dropdown-menu">
+                                <li><a th:href="@{/archive/companyReview(headcount='desc')}">내림차순</a></li>
+                                <li><a th:href="@{/archive/companyReview(headcount='asc')}">오름차순</a></li>
+                            </ul>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="c : ${companyList}">
+                            <td>
+                                <div style="display: inline-flex; align-items: center;">
+                                    <img th:src="@{${c.logoUrl}}" alt="logo"
+                                        style="width:40px; height:auto; margin-right:8px;">
+                                    <span th:text="${c.name}"></span>
+                                </div>
+                            </td>
+                            <td th:text="${c.industry.displayName}"></td>
+                            <td th:text="${c.type.displayName}"></td>
+                            <td th:text="${c.location}"></td>
+                            <td th:text="${c.headcount}"></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- 페이지네이션 -->
+                <div class="pagination">
+                    <span></span>
+                    <span class="active">1</span>
+                    <span>2</span>
+                    <span>3</span>
+                    <span>4</span>
+                    <span>5</span>
+                    <span>></span>
+                </div>
+                </div>
+            </div>
+        </section>
+        <th:block layout:fragment="script">
+        </th:block>
+    </body>
+</html>
