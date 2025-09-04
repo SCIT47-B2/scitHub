@@ -6,7 +6,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import groovy.util.logging.Slf4j;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +23,7 @@ public class ArchiveController {
     private final CompanyService cs;
 
     // 아카이브 페이지 요청
-    @GetMapping({"/archive", "/archive/companyReview"})
+    @GetMapping({"/archive", "/archive/companyList"})
     public String archivePage(
             Model model,
             @RequestParam(name="industry", required=false) Industry industry,
@@ -34,7 +33,7 @@ public class ArchiveController {
             @RequestParam(name="name", required=false) String name
         ) {
         List<MenuItem> menuItems = List.of(
-            new MenuItem("회사 리뷰", "/archive/companyReview"),
+            new MenuItem("회사 리뷰", "/archive/companyList"),
             new MenuItem("사진 앨범", "/archive/photoAlbum")
         );
         model.addAttribute("menuItems", menuItems);
@@ -63,7 +62,7 @@ public class ArchiveController {
 
         model.addAttribute("companyList", companyList);
 
-        return "archive/companyReview"; // templates/archive/companyReview.html
+        return "archive/companyList"; // templates/archive/companyList.html
     }
 
 
