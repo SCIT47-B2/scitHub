@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>ID 중복확인</title>
+  <link rel="stylesheet" th:href="@{/css/main.css}">
+  <style>
+    .btnRow{ display:flex; gap:8px; margin-top:12px; }
+    .btnPrimary{
+      padding:8px 12px; border:2px solid #111; background:#111; color:#fff;
+      border-radius:9999px; font-weight:700; cursor:pointer;
+    }
+    .btnSecondary{
+      padding:8px 12px; border:2px solid #111; background:#fff; color:#111;
+      border-radius:9999px; font-weight:700; cursor:pointer;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>[ ID 중복 확인 ]</h1>
+  </header>
+
+  <section>
+    <!-- 결과만 표시: 컨트롤러에서 searchId, result(true=사용가능) 전달 -->
+    <div th:if="${result != null}">
+      <!-- 사용 가능한 경우 -->
+      <div th:if="${result}">
+        <p>
+          <span th:text="|${searchId} : 사용할 수 있는 ID입니다.|"></span>
+        </p>
+        <div class="btnRow">
+          <!-- 사용하기: 부모창에 값 세팅 후 닫기 -->
+          <button type="button" id="useButton" class="btnPrimary" th:data-id="${searchId}">이 ID 사용하기</button>
+          <!-- 닫기 -->
+          <button type="button" class="btnSecondary closeBtn">닫기</button>
+        </div>
+      </div>
+
+      <!-- 사용 불가능한 경우 -->
+      <div th:if="${not result}">
+        <p>
+          <span th:text="|${searchId} : 이미 사용 중인 ID입니다.|"></span>
+        </p>
+        <p>다른 ID로 다시 시도해 주세요.</p>
+        <div class="btnRow">
+          <!-- 닫기(사용 불가여도 닫기 가능) -->
+          <button type="button" class="btnSecondary closeBtn">닫기</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 방어: 직접 접근 등으로 result가 없는 경우 -->
+    <div th:if="${result == null}">
+      <p>잘못된 접근입니다.</p>
+      <div class="btnRow">
+        <button type="button" class="btnSecondary closeBtn">닫기</button>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    /**
+     * 부모창에 아이디/체크상태 반영 후 닫기
+     * @param {string} chosenId - 선택된 아이디
+     * @returns {void}
+     */
+    function applyIdAndClose(chosenId){
+      try{
+        const parent = opener && !opener.closed ? opener.document : null;
+        if(!parent){
+          window.close();
+          return;
+        }
+        // 회원가입 페이지의 아이디 input(id="#id")에 값 반영
+        const idInput = parent.querySelector('#id') || parent.querySelector('#memberId');
+        if(idInput) idInput.value = chosenId;
+
+        // 중복확인 상태 히든 필드가 있다면 값 반영
+        const idChecked = parent.querySelector('#idChecked');
+        const checkedId = parent.querySelector('#checkedId');
+        if(idChecked) idChecked.value = 'true';
+        if(checkedId) checkedId.value = chosenId;
+
+        // 다음 입력으로 포커스 이동(선택)
+        parent.querySelector('#pw')?.focus();
+      } finally {
+        window.close();
+      }
+    }
+
+    window.onload = function(){
+      // 닫기 버튼들(사용 가능/불가능 공통)
+      document.querySelectorAll('.closeBtn').forEach(btn => {
+        btn.addEventListener('click', () => window.close());
+      });
+
+      // 사용 가능일 때만 존재
+      const useBtn = document.querySelector('#useButton');
+      if(useBtn){
+        useBtn.addEventListener('click', function(){
+          const id = this.getAttribute('data-id') || this.dataset.id || '';
+          if(!id){ window.close(); return; }
+          applyIdAndClose(id);
+        });
+      }
+    }
+  </script>
+</body>
+</html>
