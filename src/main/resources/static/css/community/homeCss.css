@@ -1,0 +1,227 @@
+.search-section {
+    position: relative;
+    margin: 30px 50px;
+}
+
+.category-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+#category-dropdown {
+    appearance: none;
+    /* 기본 select 스타일 제거 */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 30px;
+    padding: 8px 30px 8px 16px;
+    font-size: 14px;
+    color: #495057;
+    cursor: pointer;
+    min-width: 120px;
+
+    /* 포커스 스타일 */
+    outline: none;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+#category-dropdown:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+#category-dropdown:hover {
+    border-color: #adb5bd;
+}
+
+/* 커스텀 드롭다운 화살표 */
+.category-dropdown::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 4px solid #6c757d;
+    pointer-events: none;
+}
+
+/* 드롭다운이 열렸을 때 화살표 회전 */
+#category-dropdown:focus+.category-dropdown::after {
+    transform: translateY(-50%) rotate(180deg);
+}
+
+/* 옵션 스타일 (브라우저마다 제한적) */
+#category-dropdown option {
+    padding: 8px;
+    background-color: white;
+    color: #495057;
+}
+
+#category-dropdown option:hover {
+    background-color: #f8f9fa;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    #category-dropdown {
+        min-width: 100px;
+        font-size: 13px;
+        padding: 6px 25px 6px 10px;
+    }
+
+    .category-dropdown::after {
+        right: 8px;
+        border-left: 3px solid transparent;
+        border-right: 3px solid transparent;
+        border-top: 3px solid #6c757d;
+    }
+}
+
+/* 검색 바 스타일 */
+.search-bar {
+    display: inline-block;
+    margin-left: 40px;
+    width: 40%;
+}
+
+.search-bar input {
+    width: 100%;
+    padding: 10px 20px;
+    border: 1px solid #ddd;
+    border-radius: 25px;
+    background-color: #f8f9fa;
+}
+
+/* 글쓰기 버튼 스타일 */
+.write-btn {
+    box-sizing: border-box;
+    background-color: #5270ad;
+    color: white;
+    width: 90px;
+    height: 100%;
+    padding: auto;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 500;
+    position: absolute;
+    right: 30px;
+    top: auto;
+}
+
+/* 즐겨찾기 게시판 관련 */
+.content-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    padding: 0 30px;
+}
+
+.category-section {
+    background-color: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid #e9ecef;
+}
+
+.category-header {
+    background: linear-gradient(135deg, #74b9ff, #0984e3);
+    color: white;
+    padding: 15px 20px;
+    margin: -20px -20px 20px -20px;
+    border-radius: 12px 12px 0 0;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.category-header.purple {
+    background: linear-gradient(135deg, #a29bfe, #6c5ce7);
+}
+
+.category-header.teal {
+    background: linear-gradient(135deg, #00cec9, #00b894);
+}
+
+.post-item {
+    padding: 15px 0;
+    border-bottom: 1px solid #f1f3f4;
+}
+
+.post-item:last-child {
+    border-bottom: none;
+}
+
+.post-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.post-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: #ddd;
+}
+
+.post-author {
+    font-size: 14px;
+    color: #666;
+}
+
+.post-date {
+    font-size: 12px;
+    color: #999;
+    margin-left: auto;
+}
+
+.post-title {
+    font-size: 15px;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 10px;
+    line-height: 1.4;
+}
+
+.post-stats {
+    display: flex;
+    gap: 15px;
+    font-size: 12px;
+    color: #666;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.bookmark-icon {
+    margin-left: auto;
+    cursor: pointer;
+    color: #ccc;
+}
+
+.bookmark-icon.active {
+    color: #6c5ce7;
+}
+
+
+/** 게시판 배치 관련 */
+.favoriteBoardGrid {
+    display:grid;
+    grid-template-columns: 250px repeat(auto-fill, 100px);
+    gap:16px;
+    align-items:start;
+}
+@media (max-width: 1080px){
+    .favoriteBoardGrid { grid-template-columns: 1fr; }
+}

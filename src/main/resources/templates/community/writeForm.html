@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layouts/defaultLayout}">
+    <head>
+        <title>Home</title>
+        <th:block layout:fragment="css">
+            <link rel="stylesheet" th:href="@{/css/home.css}">
+        </th:block>
+        <script>
+            $('.write-btn').click( function() {
+                
+            })
+        </script>
+    </head>
+    <body>
+        <section class="mainField" aria-label="메인 영역" layout:fragment="content">
+            <div class="search-section">
+                <div class="category-dropdown">
+                    <select name="category" id="category-dropdown">
+                        <option value="all" selected>전체</option>
+                        <option value="출강하는 게시판">출강하는 게시판</option>
+                        <option value="자유게시판">자유게시판</option>
+                        <option value="IT">IT</option>
+                        <option value="일본어">일본어</option>
+                        <option value="일본 생활&문화">일본 생활&문화</option>
+                        <option value="취업&꿀팁">취업&꿀팁</option>
+                        <option value="취미&여행&맛집">취미&여행&맛집</option>
+                        <option value="자격증">자격증</option>
+                        <option value="졸업생">졸업생</option>
+                    </select>
+                </div>
+                    
+                <div class="search-bar">
+                    <input type="text" placeholder="검색">
+                </div>
+                    
+                <button class="write-btn">글쓰기 ✏️</button>
+            </div>
+
+            <div class="formField">
+                <form th:action="@{write}" method="post" id="postForm">
+                    <input type="text" name="title" id="title">
+                    <textarea name="content" id="content"></textarea>
+                    <div id="tagArea">
+                        <input type="text" placeholder="태그 입력">
+                    </div>
+                </form>
+            </div>
+        </section>
+        <th:block layout:fragment="script">
+        </th:block>
+    </body>
+</html>
