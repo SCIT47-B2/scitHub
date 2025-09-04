@@ -6,7 +6,7 @@ package net.dsa.scitHub.enums;
 public enum CompanyType {
     /** 자사 개발 */
     IN_HOUSE_DEV("자사 개발"),
-    /** 자사 SI */
+    /** 자사 SI */                          
     IN_HOUSE_SI("자사 SI"),
     /** 타사 SI */
     EXTERNAL_SI("타사 SI"),

@@ -42,4 +42,5 @@ public enum Industry {
         }
         throw new IllegalArgumentException("Unknown display name: " + displayName);
     }
+
 }
