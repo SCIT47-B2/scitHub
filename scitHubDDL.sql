@@ -33,8 +33,8 @@ create table company
     name       varchar(150)                                       not null,
     logo_url   varchar(500)                                       null,
     location   varchar(100)                                       not null,
-    industry   enum ('IT', '제조', '금융', '산업', '통신', '서비스', '그 외')  not null,
-    type       enum ('자사 개발', '자사 SI', '타사 SI', 'SES(파견)', '그 외') not null,
+    industry   enum ('IT','MANUFACTURING','FINANCE','INDUSTRIAL','TELECOM','SERVICE','OTHER')  not null,
+    type       enum ('IN_HOUSE_DEV','IN_HOUSE_SI','EXTERNAL_SI','SES','OTHER') not null,
     headcount  int                                                null
 );
 
