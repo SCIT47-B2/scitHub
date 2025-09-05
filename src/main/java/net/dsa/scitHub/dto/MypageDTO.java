@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class MypageDTO {
     
+    private Integer userId;         // hidden name="userId"
     private Integer cohortNo;     // select name="cohortNo"
     private String userName;           // input name="userName"
     private String avatarUrl;       // input name="avatarUrl"

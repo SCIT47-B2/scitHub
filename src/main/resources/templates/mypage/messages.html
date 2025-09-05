@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <title>My Page - 쪽지함</title>
+    <th:block layout:fragment="css">
+        <link rel="stylesheet" th:href="@{/css/mypage.css}">
+        <!-- 추가적인 CSS for message box -->
+        <style>
+            .message-box { padding: 20px; }
+            .tabs { display: flex; border-bottom: 1px solid #ccc; margin-bottom: 20px; }
+            .tab-item { padding: 10px 20px; cursor: pointer; border: 1px solid transparent; border-bottom: none; }
+            .tab-item.active { border-color: #ccc; border-bottom: 1px solid white; margin-bottom: -1px; background: white; font-weight: bold; }
+            .message-list { list-style: none; padding: 0; }
+            .message-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; cursor: pointer; }
+            .message-item:hover { background: #f9f9f9; }
+            .message-item .title { font-weight: bold; }
+            .message-item .sender, .message-item .date { color: #666; font-size: 0.9em; }
+            .pagination { text-align: center; margin-top: 20px; }
+            .pagination a { margin: 0 5px; text-decoration: none; color: #007bff; padding: 5px 10px; border: 1px solid #ddd; border-radius: 4px;}
+            .pagination a.active { font-weight: bold; background-color: #007bff; color: white; border-color: #007bff; }
+            .modal-backdrop { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000; }
+            .modal-content { background: white; padding: 20px; border-radius: 5px; width: 500px; max-width: 90%; box-shadow: 0 5px 15px rgba(0,0,0,.5); }
+            .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ccc; padding-bottom: 10px; margin-bottom: 10px; }
+            .modal-body textarea, .modal-body input { width: 100%; padding: 8px; margin-bottom: 10px; box-sizing: border-box; }
+            .modal-footer { text-align: right; }
+        </style>
+    </th:block>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/tokens.css}">
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="stylesheet" th:href="@{/css/sidebar.css}">
+</head>
+<body>
+
+<div th:replace="~{fragments/sidebar :: sidebarFragment(${menuItems})}"></div>
+
+<section class="message-box" aria-label="메인 영역" layout:fragment="content">
+    <div class="header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h1>쪽지함</h1>
+        <button id="composeBtn" class="btn primary">새 쪽지 작성</button>
+    </div>
+
+    <div class="tabs">
+        <div id="receivedTab" class="tab-item active" data-type="received">받은 쪽지함</div>
+        <div id="sentTab" class="tab-item" data-type="sent">보낸 쪽지함</div>
+    </div>
+
+    <ul id="messageList" class="message-list">
+        <!-- 메시지 아이템이 여기에 동적으로 추가됩니다. -->
+    </ul>
+    <div id="pagination" class="pagination">
+        <!-- 페이지네이션 링크가 여기에 동적으로 추가됩니다. -->
+    </div>
+</section>
+
+<!-- 새 쪽지 작성 모달 -->
+<div id="composeModal" class="modal-backdrop">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>새 쪽지 작성</h3>
+            <button class="btn-close" onclick="closeComposeModal()">&times;</button>
+        </div>
+        <form id="composeForm">
+            <div class="modal-body">
+                <input type="text" id="receiverUsername" placeholder="받는 사람 아이디" required>
+                <input type="text" id="messageTitle" placeholder="제목" required>
+                <textarea id="messageContent" rows="10" placeholder="내용" required></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn" onclick="closeComposeModal()">취소</button>
+                <button type="submit" class="btn primary">보내기</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 쪽지 상세 보기 모달 -->
+<div id="viewModal" class="modal-backdrop">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="viewTitle"></h3>
+            <button class="btn-close" onclick="closeViewModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p><strong>보낸 사람:</strong> <span id="viewSender"></span></p>
+            <p><strong>받는 사람:</strong> <span id="viewReceiver"></span></p>
+            <p><strong>시간:</strong> <span id="viewTimestamp"></span></p>
+            <hr>
+            <p id="viewContent" style="white-space: pre-wrap;"></p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" id="deleteBtn" class="btn danger">삭제</button>
+            <button type="button" class="btn" onclick="closeViewModal()">닫기</button>
+        </div>
+    </div>
+</div>
+
+
+<th:block layout:fragment="script">
+<script th:inline="javascript">
+    const receivedTab = document.getElementById('receivedTab');
+    const sentTab = document.getElementById('sentTab');
+    const messageList = document.getElementById('messageList');
+    const paginationContainer = document.getElementById('pagination');
+    const composeBtn = document.getElementById('composeBtn');
+    const composeModal = document.getElementById('composeModal');
+    const composeForm = document.getElementById('composeForm');
+    const viewModal = document.getElementById('viewModal');
+
+    let currentType = 'received';
+    let currentPage = 0;
+
+    const API_BASE_URL = /*[[@{/mypage/api/messages}]]*/ '/mypage/api/messages';
+
+    // 날짜 포맷팅 함수
+    function formatDateTime(dateTimeString) {
+        if (!dateTimeString) return '';
+        const date = new Date(dateTimeString);
+        return date.toLocaleString('ko-KR');
+    }
+
+    // 메시지 목록 가져오기
+    async function fetchMessages(type, page = 0) {
+        try {
+            const response = await fetch(`${API_BASE_URL}/${type}?page=${page}&size=10&sort=createdAt,desc`);
+            if (!response.ok) throw new Error('메시지를 불러오는데 실패했습니다.');
+            const pageData = await response.json();
+            renderMessages(pageData.content, type);
+            renderPagination(pageData);
+        } catch (error) {
+            console.error(error);
+            messageList.innerHTML = `<li>${error.message}</li>`;
+        }
+    }
+
+    // 메시지 목록 렌더링
+    function renderMessages(messages, type) {
+        messageList.innerHTML = '';
+        if (!messages || messages.length === 0) {
+            messageList.innerHTML = '<li>쪽지가 없습니다.</li>';
+            return;
+        }
+        messages.forEach(msg => {
+            const li = document.createElement('li');
+            li.className = 'message-item';
+            li.dataset.messageId = msg.messageId;
+            const isUnread = type === 'received' && !msg.isRead;
+            li.innerHTML = `
+                <div class="info">
+                    <div class="title">${isUnread ? '<strong>[읽지않음]</strong> ' : ''}${msg.title}</div>
+                    <div class="sender">${type === 'received' ? 'From: ' + msg.senderName : 'To: ' + msg.receiverName}</div>
+                </div>
+                <div class="date">${formatDateTime(msg.createdAt)}</div>
+            `;
+            li.addEventListener('click', () => openViewModal(msg.messageId));
+            messageList.appendChild(li);
+        });
+    }
+
+    // 페이지네이션 렌더링
+    function renderPagination(pageData) {
+        paginationContainer.innerHTML = '';
+        if (pageData.totalPages <= 1) return;
+
+        for (let i = 0; i < pageData.totalPages; i++) {
+            const pageLink = document.createElement('a');
+            pageLink.href = '#';
+            pageLink.innerText = i + 1;
+            if (i === pageData.number) {
+                pageLink.classList.add('active');
+            }
+            pageLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                fetchMessages(currentType, i);
+            });
+            paginationContainer.appendChild(pageLink);
+        }
+    }
+
+    // 탭 전환
+    function switchTab(type) {
+        currentType = type;
+        currentPage = 0;
+        receivedTab.classList.toggle('active', type === 'received');
+        sentTab.classList.toggle('active', type === 'sent');
+        fetchMessages(currentType, currentPage);
+    }
+
+    // 모달 열기/닫기
+    function openComposeModal() { composeModal.style.display = 'flex'; }
+    function closeComposeModal() { composeModal.style.display = 'none'; composeForm.reset(); }
+    function closeViewModal() { viewModal.style.display = 'none'; }
+
+    // 쪽지 보내기
+    composeForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const receiverUsername = document.getElementById('receiverUsername').value;
+        const title = document.getElementById('messageTitle').value;
+        const content = document.getElementById('messageContent').value;
+
+        try {
+            const response = await fetch(API_BASE_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ receiverUsername: receiverUsername, title, content })
+            });
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText || '쪽지 전송에 실패했습니다.');
+            }
+            alert('쪽지를 성공적으로 보냈습니다.');
+            closeComposeModal();
+            switchTab('sent');
+        } catch (error) {
+            alert(error.message);
+        }
+    });
+
+    // 상세 보기 모달 열기
+    async function openViewModal(messageId) {
+        try {
+            const response = await fetch(`${API_BASE_URL}/${messageId}`);
+            if (!response.ok) throw new Error('쪽지를 불러올 수 없습니다.');
+            const msg = await response.json();
+
+            document.getElementById('viewTitle').innerText = msg.title;
+            document.getElementById('viewSender').innerText = msg.senderName;
+            document.getElementById('viewReceiver').innerText = msg.receiverName;
+            document.getElementById('viewTimestamp').innerText = formatDateTime(msg.createdAt);
+            document.getElementById('viewContent').innerText = msg.content;
+            
+            document.getElementById('deleteBtn').onclick = () => deleteMessage(messageId);
+
+            viewModal.style.display = 'flex';
+            
+            if (currentType === 'received' && !msg.isRead) {
+                fetchMessages(currentType, currentPage);
+            }
+        } catch (error) {
+            alert(error.message);
+        }
+    }
+
+    // 메시지 삭제
+    async function deleteMessage(messageId) {
+        if (!confirm('정말로 이 쪽지를 삭제하시겠습니까?')) return;
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/${messageId}`, { method: 'DELETE' });
+            if (!response.ok) throw new Error('삭제에 실패했습니다.');
+            alert('쪽지가 삭제되었습니다.');
+            closeViewModal();
+            fetchMessages(currentType, currentPage);
+        } catch (error) {
+            alert(error.message);
+        }
+    }
+
+    // 초기화
+    document.addEventListener('DOMContentLoaded', () => {
+        receivedTab.addEventListener('click', () => switchTab('received'));
+        sentTab.addEventListener('click', () => switchTab('sent'));
+        composeBtn.addEventListener('click', openComposeModal);
+        fetchMessages(currentType, currentPage);
+    });
+</script>
+</th:block>
+</body>
+</html>

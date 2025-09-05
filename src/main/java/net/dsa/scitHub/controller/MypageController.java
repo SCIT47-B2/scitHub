@@ -52,6 +52,18 @@ public class MypageController {
         return "mypage/info"; // templates/mypage/info.html
     }
 
+    // 쪽지함 페이지 요청
+    @GetMapping("/mypage/messages")
+    public String messagesPage(Model model) {
+        // 사이드바 메뉴 아이템 설정
+        List<MenuItem> menuItems = List.of(
+            new MenuItem("기본 정보", "/mypage/info"),
+            new MenuItem("쪽지함", "/mypage/messages")
+        );
+        model.addAttribute("menuItems", menuItems);
+        return "mypage/messages";
+    }
+
    /**
 	 * 개인정보 수정 폼에서 전달된 값 처리
 	 * @param user 로그인 사용자의 인증 정보

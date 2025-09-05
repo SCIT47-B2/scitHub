@@ -75,11 +75,8 @@ public class UserService {
                 .orElseThrow(() -> new EntityNotFoundException(username + ": 아이디가 없습니다."));
 
         return MypageDTO.builder()
+                .userId(entity.getUserId())
                 .cohortNo(entity.getCohortNo())
-                /**
-                 * A안: avatarUrl에는 '파일명'만 들어있습니다(예: 20250904_uuid.png)
-                 * 템플릿에서 th:src로 "/uploads/avatar/{파일명}"을 조합하여 사용합니다.
-                 */
                 .avatarUrl(entity.getAvatarUrl())
                 .userName(entity.getUsername())
                 .name(entity.getNameKor())
