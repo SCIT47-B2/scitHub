@@ -24,7 +24,11 @@ public class MessageController {
     private final MessageService messageService;
 
     /**
-     * 메시지 전송
+     * 새 메시지를 전송합니다.
+     *
+     * @param requestDto  MessageCreateRequestDto - 메시지 생성 요청 정보 (수신자, 제목, 내용)
+     * @param userDetails UserDetails - 현재 로그인한 사용자 정보
+     * @return ResponseEntity<MessageResponseDto> - 생성된 메시지 정보와 201 Created 상태
      */
     @PostMapping
     public ResponseEntity<MessageResponseDto> sendMessage(
@@ -38,7 +42,11 @@ public class MessageController {
     }
 
     /**
-     * 받은 메시지 목록 조회
+     * 현재 로그인한 사용자가 받은 메시지 목록을 조회합니다.
+     *
+     * @param userDetails UserDetails - 현재 로그인한 사용자 정보
+     * @param pageable    Pageable - 페이징 정보 (size, sort 등)
+     * @return ResponseEntity<Page<MessageResponseDto>> - 받은 메시지 목록 페이지
      */
     @GetMapping("/received")
     public ResponseEntity<Page<MessageResponseDto>> getReceivedMessages(
@@ -51,7 +59,11 @@ public class MessageController {
     }
 
     /**
-     * 보낸 메시지 목록 조회
+     * 현재 로그인한 사용자가 보낸 메시지 목록을 조회합니다.
+     *
+     * @param userDetails UserDetails - 현재 로그인한 사용자 정보
+     * @param pageable    Pageable - 페이징 정보 (size, sort 등)
+     * @return ResponseEntity<Page<MessageResponseDto>> - 보낸 메시지 목록 페이지
      */
     @GetMapping("/sent")
     public ResponseEntity<Page<MessageResponseDto>> getSentMessages(
@@ -64,11 +76,15 @@ public class MessageController {
     }
 
     /**
-     * 메시지 상세 조회
+     * 메시지 한 건을 상세 조회합니다.
+     *
+     * @param messageId   Integer - 조회할 메시지 ID
+     * @param userDetails UserDetails - 현재 로그인한 사용자 정보
+     * @return ResponseEntity<MessageResponseDto> - 메시지 상세 정보
      */
     @GetMapping("/{messageId}")
     public ResponseEntity<MessageResponseDto> getMessage(
-            @PathVariable Integer messageId,
+            @PathVariable("messageId") Integer messageId,
             @AuthenticationPrincipal UserDetails userDetails
     ) {
         String username = userDetails.getUsername();
@@ -77,11 +93,15 @@ public class MessageController {
     }
 
     /**
-     * 메시지 삭제
+     * 메시지를 삭제합니다.
+     *
+     * @param messageId   Integer - 삭제할 메시지 ID
+     * @param userDetails UserDetails - 현재 로그인한 사용자 정보
+     * @return ResponseEntity<Void> - 204 No Content 상태
      */
     @DeleteMapping("/{messageId}")
     public ResponseEntity<Void> deleteMessage(
-            @PathVariable Integer messageId,
+            @PathVariable("messageId") Integer messageId,
             @AuthenticationPrincipal UserDetails userDetails
     ) {
         String username = userDetails.getUsername();
@@ -90,7 +110,10 @@ public class MessageController {
     }
 
     /**
-     * 읽지 않은 메시지 수 조회
+     * 현재 로그인한 사용자의 읽지 않은 메시지 수를 조회합니다.
+     *
+     * @param userDetails UserDetails - 현재 로그인한 사용자 정보
+     * @return ResponseEntity<Long> - 읽지 않은 메시지 개수
      */
     @GetMapping("/unread-count")
     public ResponseEntity<Long> countUnreadMessages(
