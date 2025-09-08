@@ -1,0 +1,127 @@
+/************************************************************
+ * My Page - 프로필 카드(하얀 박스 안에 좌/우 2컬럼)
+ * 핵심: minmax(0,1fr) + min-width:0 로 우측 오버플로우 방지
+ ************************************************************/
+
+/** 하얀 카드 컨테이너 */
+.profileGrid{
+  grid-column: 2;                /* 중앙 컬럼에 배치 */
+  width: 80%;
+  max-width: 960px;              /* 카드 최대폭 제한 */
+  margin: 0 100px;                /* 중앙 정렬 */
+  margin-top: 10%;
+  margin-left: 20%;
+  background: #fff;              /* 하얀 박스 */
+  border-radius: 16px;
+  padding: 40px 48px;
+
+  display: grid;
+  grid-template-columns: 320px minmax(0, 1fr); /* 우측 컬럼 오버플로우 방지 */
+  gap: 40px;
+  align-items: start;
+}
+
+/** 그리드 자식들이 카드 밖으로 밀려나지 않도록 */
+.profileLeft,
+.profileWrap,
+.profileWrap .profileRight{
+  min-width: 0;
+}
+
+/** 반응형: 좁은 화면에선 1열 카드 */
+@media (max-width: 1080px){
+  .profileGrid{
+    grid-column: 1 / -1;
+    grid-template-columns: 1fr;
+    max-width: 720px;
+    padding: 28px 24px;
+  }
+}
+
+/* ============== 좌측: 아바타 + 요약 ============== */
+.profileLeft{
+  display: grid;
+  grid-auto-rows: max-content;
+  row-gap: 14px;
+  justify-items: center;
+}
+
+.avatar{
+  position: relative;
+  width: 96px; height: 96px;
+  border-radius: 30%;
+  overflow: hidden;
+  background: #eef1f6;
+  display: grid; place-items: center;
+  border: 4px solid #fff;
+  box-shadow: 0 6px 20px rgba(0,0,0,.08);
+}
+.avatar img{ width: 100%; height: 100%; object-fit: cover; }
+
+.editAvatarBtn{
+  position: absolute; right: -6px; bottom: -6px;
+  width: 36px; height: 36px; border: 0; border-radius: 50%;
+  background: var(--primary); color: #fff;
+  display: grid; place-items: center;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(79,103,217,.35);
+}
+.editAvatarBtn:hover{ filter: brightness(.95); }
+
+.nameBlock .displayName{
+  font-weight: 700; font-size: 16px; margin: 6px 0 2px; text-align: center;
+}
+.nameBlock .handle{
+  font-size: 12px; color: var(--muted); margin: 0 0 6px; text-align: center;
+}
+.miniBadges{ display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.pill{ padding: 6px 10px; border-radius: 999px; background: #f0f2f6; font-size: 12px; }
+
+/* ============== 우측: 입력 폼 ============== */
+.profileWrap .profileRight{ display: grid; row-gap: 14px; }
+
+.formRow{
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr);  /* 우측 필드가 넘치지 않도록 */
+  align-items: center; gap: 12px;
+}
+.formRow > label{ font-weight: 700; font-size: 13px; color: #444; }
+
+.formRow .field input[type="text"],
+.formRow .field input[type="email"],
+.formRow .field input[type="tel"],
+.formRow .field input[type="date"]{
+  width: 100%;
+  height: 38px;
+  border-radius: 12px;
+  border: 1px solid #e6e8ec;
+  background: #f5f7fb;
+  padding: 0 12px;
+  outline: none;
+  transition: box-shadow .15s ease, border-color .15s ease;
+  box-sizing: border-box;
+}
+.formRow .field input:focus{
+  border-color: #d8dcf5;
+  box-shadow: 0 0 0 3px rgba(79,103,217,.12);
+}
+
+.radioGroup{ display: inline-flex; align-items: center; gap: 18px; }
+.radioItem{ display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: #333; }
+.radioItem input[type="radio"]{ width: 16px; height: 16px; accent-color: var(--primary); }
+
+.actionRow{ display: flex; gap: 12px; justify-content: flex-end; margin-top: 6px; }
+.btn{
+  height: 38px; padding: 0 16px; border-radius: 12px;
+  border: 1px solid #e6e8ec; background: #fff; color: #333; font-weight: 700; cursor: pointer;
+}
+.btn:hover{ filter: brightness(.98); }
+.btn.primary{ background: var(--primary); color: #fff; border-color: transparent; box-shadow: 0 6px 16px rgba(79,103,217,.25); }
+.btn.primary:hover{ filter: brightness(.96); }
+
+@media (max-width: 720px){
+  .formRow{ grid-template-columns: 1fr; }
+  .formRow > label{ margin-bottom: 6px; }
+  .actionRow{ justify-content: stretch; }
+  .btn, .btn.primary{ flex: 1; }
+}

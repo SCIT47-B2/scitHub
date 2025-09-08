@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <title>My Page - 쪽지함</title>
+
+    <!-- 공통/기반 스타일 -->
+    <link rel="stylesheet" th:href="@{/css/tokens.css}">
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="stylesheet" th:href="@{/css/sidebar.css}">
+    <link rel="stylesheet" th:href="@{/css/mypage.css}">
+    <!-- 아이콘 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- 쪽지함 전용 -->
+    <link rel="stylesheet" th:href="@{/css/message.css}">
+</head>
+<body>
+
+<!-- 사이드바 -->
+<div th:replace="~{fragments/sidebar :: sidebarFragment(${menuItems})}"></div>
+
+<!-- 메인 영역 (넓은 유동 폭 + 가운데) -->
+<section class="message-box layoutWide" aria-label="메인 영역" layout:fragment="content">
+    <div class="header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+        <h1>쪽지함</h1>
+        <button id="composeBtn" class="btn primary">새 쪽지 작성</button>
+    </div>
+
+    <div class="tabs">
+        <div id="receivedTab" class="tab-item active" data-type="received">받은 쪽지함</div>
+        <div id="sentTab" class="tab-item" data-type="sent">보낸 쪽지함</div>
+    </div>
+
+    <ul id="messageList" class="message-list"></ul>
+    <div id="pagination" class="pagination"></div>
+</section>
+
+<!-- 새 쪽지 작성 모달 -->
+<div id="composeModal" class="modal-backdrop">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>새 쪽지 작성</h3>
+      <button class="btn-close" onclick="closeComposeModal()">&times;</button>
+    </div>
+    <form id="composeForm">
+      <div class="modal-body">
+        <input type="text" id="receiverUsername" placeholder="받는 사람 아이디" required>
+        <input type="text" id="messageTitle" placeholder="제목" required>
+        <textarea id="messageContent" rows="10" placeholder="내용" required></textarea>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn" onclick="closeComposeModal()">취소</button>
+        <button type="submit" class="btn primary">보내기</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- 쪽지 상세 보기 모달 -->
+<div id="viewModal" class="modal-backdrop">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 id="viewTitle"></h3>
+      <button class="btn-close" onclick="closeViewModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p><strong>보낸 사람:</strong> <span id="viewSender"></span></p>
+      <p><strong>받는 사람:</strong> <span id="viewReceiver"></span></p>
+      <p><strong>시간:</strong> <span id="viewTimestamp"></span></p>
+      <hr>
+      <p id="viewContent" style="white-space: pre-wrap;"></p>
+    </div>
+    <div class="modal-footer">
+      <button type="button" id="deleteBtn" class="btn danger">삭제</button>
+      <button type="button" class="btn" onclick="closeViewModal()">닫기</button>
+    </div>
+  </div>
+</div>
+
+<!-- 스크립트 -->
+<th:block layout:fragment="script">
+<script th:inline="javascript">
+    /** -----------------------------------------------
+     * 디버깅 공통 fetch 래퍼: 요청/응답 로깅
+     * ----------------------------------------------- */
+    async function debugFetch(url, options = {}) {
+        console.groupCollapsed('%c[HTTP] %s %s', 'color:#888', (options.method || 'GET'), url);
+        console.log('> options:', options);
+        try {
+            const res = await fetch(url, options);
+            console.log('< status:', res.status, res.statusText);
+            try {
+                const cloned = res.clone();
+                const ct = cloned.headers.get('content-type') || '';
+                if (ct.includes('application/json')) {
+                    const peek = await cloned.json();
+                    console.log('< peek json:', peek);
+                } else {
+                    const peekText = await cloned.text();
+                    console.log('< peek text:', peekText.slice(0, 500));
+                }
+            } catch (peekErr) {
+                console.warn('peek failed:', peekErr);
+            }
+            console.groupEnd();
+            return res;
+        } catch (err) {
+            console.groupEnd();
+            console.error('[HTTP ERROR]', err);
+            throw err;
+        }
+    }
+
+    // DOM 캐시
+    const receivedTab = document.getElementById('receivedTab');
+    const sentTab = document.getElementById('sentTab');
+    const messageList = document.getElementById('messageList');
+    const paginationContainer = document.getElementById('pagination');
+    const composeBtn = document.getElementById('composeBtn');
+    const composeModal = document.getElementById('composeModal');
+    const composeForm = document.getElementById('composeForm');
+    const viewModal = document.getElementById('viewModal');
+
+    // 상태
+    let currentType = 'received';
+    let currentPage = 0;
+
+    // API 기본 URL
+    const API_BASE_URL = /*[[@{/mypage/api/messages}]]*/ '/mypage/api/messages';
+
+    function formatDateTime(dateTimeString) {
+        if (!dateTimeString) return '';
+        const date = new Date(dateTimeString);
+        return date.toLocaleString('ko-KR');
+    }
+
+    async function fetchMessages(type, page = 0) {
+        const url = `${API_BASE_URL}/${type}?page=${page}&size=10&sort=createdAt,desc`;
+        console.info('[fetchMessages] type:', type, 'page:', page, '→', url);
+        try {
+            const response = await debugFetch(url);
+            if (!response.ok) throw new Error('메시지를 불러오는데 실패했습니다.');
+            const pageData = await response.json();
+            renderMessages(pageData.content, type);
+            renderPagination(pageData);
+        } catch (error) {
+            console.error('[fetchMessages] error:', error);
+            messageList.innerHTML = `<li>${error.message}</li>`;
+        }
+    }
+
+    function renderMessages(messages, type) {
+        messageList.innerHTML = '';
+        if (!messages || messages.length === 0) {
+            messageList.innerHTML = '<li>쪽지가 없습니다.</li>';
+            return;
+        }
+        messages.forEach((msg, idx) => {
+            if (msg.messageId == null) {
+                console.error('[renderMessages] messageId 누락', { index: idx, msg });
+            }
+            const li = document.createElement('li');
+            li.className = 'message-item';
+            li.dataset.messageId = msg.messageId;
+
+            const isUnread = type === 'received' && !msg.isRead;
+            li.innerHTML = `
+                <div class="info">
+                    <div class="title">${isUnread ? '<strong>[읽지않음]</strong> ' : ''}${msg.title}</div>
+                    <div class="sender">${type === 'received' ? 'From: ' + msg.senderName : 'To: ' + msg.receiverName}</div>
+                </div>
+                <div class="date">${formatDateTime(msg.createdAt)}</div>
+            `;
+            li.addEventListener('click', () => openViewModal(li.dataset.messageId));
+            messageList.appendChild(li);
+        });
+    }
+
+    function renderPagination(pageData) {
+        paginationContainer.innerHTML = '';
+        if (pageData.totalPages <= 1) return;
+        for (let i = 0; i < pageData.totalPages; i++) {
+            const pageLink = document.createElement('a');
+            pageLink.href = '#';
+            pageLink.innerText = i + 1;
+            if (i === pageData.number) pageLink.classList.add('active');
+            pageLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                fetchMessages(currentType, i);
+            });
+            paginationContainer.appendChild(pageLink);
+        }
+    }
+
+    function switchTab(type) {
+        currentType = type;
+        currentPage = 0;
+        receivedTab.classList.toggle('active', type === 'received');
+        sentTab.classList.toggle('active', type === 'sent');
+        fetchMessages(currentType, currentPage);
+    }
+
+    // 모달 컨트롤
+    function openComposeModal() { composeModal.style.display = 'flex'; }
+    function closeComposeModal() { composeModal.style.display = 'none'; composeForm.reset(); }
+    function closeViewModal() { viewModal.style.display = 'none'; }
+
+    composeForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const receiverUsername = document.getElementById('receiverUsername').value;
+        const title = document.getElementById('messageTitle').value;
+        const content = document.getElementById('messageContent').value;
+
+        const url = API_BASE_URL;
+        const options = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ receiverUsername: receiverUsername, title, content })
+        };
+
+        try {
+            const response = await debugFetch(url, options);
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText || '쪽지 전송에 실패했습니다.');
+            }
+            alert('쪽지를 성공적으로 보냈습니다.');
+            closeComposeModal();
+            switchTab('sent');
+        } catch (error) {
+            alert(error.message);
+        }
+    });
+
+    async function openViewModal(messageId) {
+        if (!messageId) {
+            alert('쪽지 식별자 오류입니다. 관리자에게 문의해주세요.');
+            return;
+        }
+        const url = `${API_BASE_URL}/${messageId}`;
+        try {
+            const response = await debugFetch(url);
+            if (!response.ok) {
+                if (response.status === 404) alert('해당 쪽지를 찾을 수 없습니다. (404)');
+                else if (response.status === 403) alert('열람 권한이 없습니다. (403)');
+                else if (response.status === 401) alert('로그인이 만료되었습니다. 다시 로그인해주세요. (401)');
+                else alert('쪽지를 불러올 수 없습니다. (' + response.status + ')');
+                return;
+            }
+            const msg = await response.json();
+            document.getElementById('viewTitle').innerText = msg.title;
+            document.getElementById('viewSender').innerText = msg.senderName;
+            document.getElementById('viewReceiver').innerText = msg.receiverName;
+            document.getElementById('viewTimestamp').innerText = formatDateTime(msg.createdAt);
+            document.getElementById('viewContent').innerText = msg.content;
+
+            document.getElementById('deleteBtn').onclick = () => deleteMessage(messageId);
+            viewModal.style.display = 'flex';
+
+            if (currentType === 'received' && !msg.isRead) {
+                fetchMessages(currentType, currentPage);
+            }
+        } catch (error) {
+            alert('쪽지를 불러올 수 없습니다.');
+        }
+    }
+
+    async function deleteMessage(messageId) {
+        if (!confirm('정말로 이 쪽지를 삭제하시겠습니까?')) return;
+        const url = `${API_BASE_URL}/${messageId}`;
+        try {
+            const response = await debugFetch(url, { method: 'DELETE' });
+            if (!response.ok) {
+                alert('삭제에 실패했습니다.');
+                return;
+            }
+            alert('쪽지가 삭제되었습니다.');
+            closeViewModal();
+            fetchMessages(currentType, currentPage);
+        } catch (error) {
+            alert('삭제 중 오류가 발생했습니다.');
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        receivedTab.addEventListener('click', () => switchTab('received'));
+        sentTab.addEventListener('click', () => switchTab('sent'));
+        composeBtn.addEventListener('click', openComposeModal);
+        fetchMessages(currentType, currentPage);
+    });
+</script>
+</th:block>
+</body>
+</html>
