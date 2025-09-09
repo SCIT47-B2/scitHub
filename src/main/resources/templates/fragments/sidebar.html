@@ -1,15 +1,28 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+                xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
     <body>
         <aside class="sidebar" aria-label="사이드바" th:fragment="sidebarFragment(menuItems)">
             <a th:href="@{/}" class="logo">SCIT Hub</a>
 
-            <a th:href="@{/mypage}" class="profile-link">
+            <a th:href="@{/mypage/info}" class="profile-link">
                 <section class="profile" aria-label="프로필">
-                    <img th:src="@{/images/chiikawaPuzzle.png}" alt="프로필 이미지">
+                    <img
+                    th:if="${currentUser != null and !#strings.isEmpty(currentUser.avatarUrl)}"
+                    th:src="@{/uploads/avatar/{f}(f=${currentUser.avatarUrl})}"
+                    alt="프로필 이미지" />
+
+                    <img
+                    th:unless="${currentUser != null and !#strings.isEmpty(currentUser.avatarUrl)}"
+                    th:src="@{/images/chiikawaPuzzle.png}"
+                    alt="프로필 이미지" />
                     <div>
-                        <h3 class="name">SCIT47</h3>
-                        <p class="handle">@vysoeeun</p>
+                        <h3 class="name"
+                            th:text="${currentUser != null ? currentUser.name : ''}">
+                        </h3>
+                        <p class="handle"
+                        th:text="${currentUser != null ? '@' + currentUser.userName : ''}">
+                        </p>
                     </div>
                 </section>
             </a>
