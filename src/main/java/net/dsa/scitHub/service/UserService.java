@@ -51,7 +51,17 @@ public class UserService {
 				.build();
 		log.info("회원가입 엔티티 : {}", entity);
 		ur.save(entity);
-    
-}
+	}
+
+	/**
+	 * userId로 username 조회
+	 * @param userId
+	 * @return username or null
+	 */
+	public String findNameKorById(Integer userId) {
+		return ur.findById(userId)
+				.map(User::getNameKor)
+				.orElse(null);
+	}
 
 }
