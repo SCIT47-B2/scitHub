@@ -14,8 +14,12 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dsa.scitHub.dto.PostDTO;
+import net.dsa.scitHub.entity.board.Board;
 import net.dsa.scitHub.entity.board.Post;
+import net.dsa.scitHub.entity.user.User;
+import net.dsa.scitHub.repository.board.BoardRepository;
 import net.dsa.scitHub.repository.board.PostRepository;
+import net.dsa.scitHub.repository.user.UserRepository;
 
 @Service
 @Slf4j
@@ -23,6 +27,8 @@ import net.dsa.scitHub.repository.board.PostRepository;
 @Transactional
 public class PostService {
     private final PostRepository pr;
+    private final UserRepository ur;
+    private final BoardRepository br;
 
     /**
      * 게시판 ID와 검색 조건에 따른 게시글 목록 조회 (페이징)
@@ -85,5 +91,41 @@ public class PostService {
         }
 
         return postDTOList;
+    }
+
+    /**
+     * 게시글 저장
+     * @param postDTO   저장할 게시글 정보
+     */
+    public void savePost(PostDTO postDTO) {
+
+        User user;
+        Board board;
+        try {
+            user = ur.findById(postDTO.getUserId()).orElse(null);
+            log.debug("사용자 정보: {}", user);
+        } catch (Exception e) {
+            log.error("사용자 조회 중 오류 발생: {}", e.getMessage());
+            return;
+        }
+        try {
+            board = br.findById(postDTO.getBoardId()).orElse(null);
+            log.debug("게시판 정보: {}", board);
+        } catch (Exception e) {
+            log.error("게시판 조회 중 오류 발생: {}", e.getMessage());
+            return;
+        }
+
+        if (user == null) {
+            log.error("존재하지 않는 사용자 ID: {}", postDTO.getUserId());
+            return;
+        }
+        if (board == null) {
+            log.error("존재하지 않는 게시판 ID: {}", postDTO.getBoardId());
+            return;
+        }
+
+        Post post = PostDTO.convertToPostEntity(postDTO, user, board);
+        pr.save(post);
     }
 }

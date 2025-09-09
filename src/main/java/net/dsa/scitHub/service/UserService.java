@@ -64,6 +64,16 @@ public class UserService {
         log.info("회원가입 엔티티 : {}", entity);
         ur.save(entity);
     }
+    /**
+     * userId로 username 조회
+     * @param userId
+     * @return username or null
+     */
+    public String findNameKorById(Integer userId) {
+      return ur.findById(userId)
+          .map(User::getNameKor)
+          .orElse(null);
+    }
 
     /**
      * 회원정보 조회
@@ -129,7 +139,7 @@ public class UserService {
 
             log.debug("아바타 저장 완료: dir={}, file={}", avatarDir, savedFileName);
         }
-
+      
         log.debug("저장되는 Entity: {}", entity);
         ur.save(entity); // @Transactional 이므로 커밋 시점에 flush
         log.debug("저장 후 조회: {}", ur.findByUsername(dto.getUserName()));

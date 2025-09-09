@@ -1,12 +1,12 @@
 /* ================================== */
-/* 공지사항 페이지 스타일        */
+/* 문의 페이지 스타일        */
 /* ================================== */
 
 /* 메인 콘텐츠 영역을 '왼쪽 콘텐츠'와 '오른쪽 사이드'로 분할 */
 .content-container {
     display: grid;
     /* 1fr은 나머지 전체, 320px는 우측 고정 폭 */
-    grid-template-columns: minmax(0, 1fr) 320px;
+    grid-template-columns: minmax(0, 1fr) 500px;
     gap: 24px; /* 좌우 컬럼 사이 간격 */
     align-items: center;
 }
@@ -66,57 +66,57 @@
     background-color: #3b50b0;
 }
 
-/* 2. 전체 공지 테이블 */
-.announcement-section {
+/* 2. 전체 문의 테이블 */
+.inquiry-section {
     background-color: var(--bg);
     padding: 24px;
     border-radius: var(--radius);
     box-shadow: var(--shadow);
 }
-.announcement-section h2 {
+.inquiry-section h2 {
     margin: 0 0 16px;
     font-size: 18px;
     font-weight: 700;
 }
-.announcement-table {
+.inquiry-table {
     width: 100%;
     border-collapse: collapse; /* 셀 사이 간격 제거 */
     font-size: 14px;
 }
-.announcement-table thead {
+.inquiry-table thead {
     background-color: var(--primary);
     color: white;
 }
-.announcement-table th,
-.announcement-table td {
+.inquiry-table th,
+.inquiry-table td {
     padding: 12px 10px;
     text-align: center;
     border-bottom: 1px solid #e5e7eb;
     vertical-align: middle;
 }
-.announcement-table td:nth-child(2) {
+.inquiry-table td:nth-child(2) {
     text-align: left;
 }
-.announcement-table th:nth-child(2), /* 제목 */
-.announcement-table td:nth-child(2) {
+.inquiry-table th:nth-child(2), /* 제목 */
+.inquiry-table td:nth-child(2) {
     width: 40%; /* 제목 컬럼이 너비를 많이 차지하도록 */
 }
-.announcement-table td a {
+.inquiry-table td a {
     color: var(--ink);
     text-decoration: none;
 }
-.announcement-table td a:hover {
+.inquiry-table td a:hover {
     text-decoration: underline;
 }
-.announcement-table tbody tr:last-child td {
+.inquiry-table tbody tr:last-child td {
     border-bottom: none; /* 마지막 줄 밑줄 제거 */
 }
-.announcement-table tbody tr:hover {
+.inquiry-table tbody tr:hover {
     background-color: var(--panel);
 }
 
 /* "게시물이 없습니다" 메시지 스타일 */
-.announcement-table .no-data {
+.inquiry-table .no-data {
     padding: 80px 0; /* 상하로 넓은 영역 차지 */
     text-align: center;
     background-color: #ffffff; /* 하얀색 배경 */
@@ -126,7 +126,7 @@
 }
 
 /* 메시지 행에는 호버 효과 제거 */
-.announcement-table tbody tr:hover .no-posts {
+.inquiry-table tbody tr:hover .no-posts {
     background-color: #ffffff;
 }
 
@@ -169,68 +169,78 @@
     color: white;
 }
 
-
-/* --- 오른쪽 사이드 콘텐츠 --- */
-.side-content {
+/* --- 오른쪽 사이드 콘텐츠 (문의 폼) --- */
+.inquiry-form-container {
+    background-color: #4A67C5; /* 배경색을 파란색으로 변경 */
+    padding: 32px 24px; /* 내부 여백 조정 */
+    border-radius: 24px; /* 모서리를 훨씬 둥글게 */
     display: flex;
     flex-direction: column;
-    gap: 24px; /* 공지 패널 사이 간격 */
+    gap: 16px; /* 요소들 사이의 간격 조정 */
+    box-shadow: var(--shadow); /* 부드러운 그림자 효과 유지 */
+    margin: 0 50px; /* 좌우 여백 추가 */
 }
-.notice-panel {
-    background-color: var(--bg);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    overflow: hidden; /* 헤더의 둥근 모서리가 보이도록 */
-}
-.notice-panel .panel-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 14px 20px;
-    background-color: var(--primary);
-    color: white;
-    text-decoration: none;
+.inquiry-form-container h2 {
+    margin: 0 0 8px 0; /* 제목 아래쪽 여백 추가 */
+    font-size: 18px;
     font-weight: 700;
-}
-.notice-panel .panel-header h3 {
-    margin: 0;
-    font-size: 16px;
-}
-.notice-panel .notice-list {
-    list-style: none;
-    padding: 8px 20px 20px;
-    margin: 0;
-    font-size: 14px;
-}
-.notice-panel .notice-list li:hover {
-    background-color: var(--panel);
-}
-.notice-panel .notice-list li a {
-    display: flex;
-    justify-content: space-between;
-    padding: 12px 5px;
-    text-decoration: none;
-    color: var(--ink);
-    border-bottom: 1px solid #e5e7eb;
-}
-.notice-panel .notice-list li a .title:hover {
-    text-decoration: underline;
-}
-.notice-panel .notice-list li:last-child a {
-    border-bottom: none;
-}
-.notice-panel .notice-list .title {
-    /* 긴 제목은 ...으로 생략 */
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    padding-right: 16px;
-}
-.notice-panel .notice-list .date {
-    color: var(--muted);
-    flex-shrink: 0;
+    color: white; /* 글자색 흰색으로 변경 */
+    display: flex; /* 아이콘과 텍스트 정렬을 위해 flex 사용 */
+    align-items: center;
+    gap: 8px; /* 아이콘과 텍스트 사이 간격 */
 }
 
+/* form 내부에 간격을 추가하는 코드 */
+.inquiry-form-container form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px; /* 이 값을 조절 */
+}
+
+/* 라벨은 디자인에 없으므로 숨김 처리 (웹 접근성을 위해 HTML에는 남겨둠) */
+.inquiry-form-container .form-group label {
+    display: none;
+}
+.inquiry-form-container input[type="text"],
+.inquiry-form-container textarea {
+    width: 100%;
+    padding: 14px 16px; /* 내부 여백 조정 */
+    border: none; /* 테두리 제거 */
+    border-radius: 16px; /* 모서리 둥글게 */
+    font-size: 14px;
+    box-sizing: border-box;
+    background-color: white; /* 배경색 흰색으로 */
+    font-family: inherit; /* 부모 폰트 상속 */
+}
+
+/* 입력 필드 포커스 시 효과 제거 (디자인에 없음) */
+.inquiry-form-container input[type="text"]:focus,
+.inquiry-form-container textarea:focus {
+    outline: none; /* 포커스 시 외곽선 제거 */
+    box-shadow: 0 0 0 2px #8A9ED9; /* 포커스 시 부드러운 효과 추가 */
+}
+.inquiry-form-container textarea {
+    resize: none; /* 사용자가 크기 조절 못하게 막음 */
+    min-height: 200px; /* 높이 조정 */
+}
+
+/* 문의 등록 버튼 */
+.inquiry-form-container .submit-btn {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 16px; /* 모서리 둥글게 */
+    background-color: #8A9ED9; /* 버튼 색상 변경 */
+    color: white;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-top: 8px;
+}
+.inquiry-form-container .submit-btn:hover {
+    background-color: #7288C4; /* 호버 시 약간 더 진하게 */
+}
 
 /* --- 반응형 --- */
 @media (max-width: 1200px) {
