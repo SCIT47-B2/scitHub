@@ -39,7 +39,7 @@ public class PostDTO {
                 .title(post.getTitle())
                 .content(post.getContent())
                 .viewCount(post.getViewCount())
-                .isComment(post.getComments().size() > 0)
+                .isComment(!post.getComments().isEmpty())
                 .createdAt(post.getCreatedAt())
                 .updatedAt(post.getUpdatedAt())
                 .build();
