@@ -20,7 +20,7 @@
 <div th:replace="~{fragments/sidebar :: sidebarFragment(${menuItems})}"></div>
 
 <!-- 메인 영역 -->
-<section class="message-box" aria-label="메인 영역" layout:fragment="content">
+<section class="message-box" layout:fragment="content">
     <div class="header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
         <h1>メッセージ</h1>
         <button id="composeBtn" class="btn primary">新規メッセージ作成</button>
@@ -30,7 +30,7 @@
         <form id="searchForm">
             <select id="searchType">
                 <option value="all">すべて</option>
-                <option value="author">送信者</option>
+                <option value="author">差出人</option>
                 <option value="title">件名</option>
                 <option value="content">本文</option>
             </select>
@@ -90,7 +90,7 @@
       <button class="btn-close" onclick="closeViewModal()">&times;</button>
     </div>
     <div class="modal-body">
-      <p><strong>送信者:</strong> <span id="viewSender"></span></p>
+      <p><strong>差出人:</strong> <span id="viewSender"></span></p>
       <p><strong>宛先:</strong> <span id="viewReceiver"></span></p>
       <p><strong>日時:</strong> <span id="viewTimestamp"></span></p>
       <hr>
