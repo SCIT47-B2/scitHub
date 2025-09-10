@@ -19,6 +19,7 @@ public class PostDTO {
     private String title;
     private String content;
     private Integer viewCount;
+    private Integer likeCount;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

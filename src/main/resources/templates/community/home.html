@@ -7,14 +7,15 @@
         <th:block layout:fragment="css">
         </th:block>
         <link rel="stylesheet" th:href="@{/css/community/homeCss.css}">
+        <link rel="stylesheet" th:href="@{/css/searchBar.css}">
         <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
     </head>
     <body>
         <section class="mainField" aria-label="메인 영역" layout:fragment="content">
             <!-- 이곳에 작성하면 메인 영역에 내용이 추가됩니다. -->
-            <div class="search-section">
-                <div class="category-dropdown">
-                    <select name="category" id="category-dropdown">
+            <div class="searchSection">
+                <div class="categorySection">
+                    <select name="category" id="categoryDropdown">
                         <option value="all" selected>전체</option>
                         <option value="출강하는 게시판">출강하는 게시판</option>
                         <option value="자유게시판">자유게시판</option>
@@ -28,19 +29,21 @@
                     </select>
                 </div>
                     
-                <div class="search-bar">
+                <div class="searchBar">
                     <input type="text" placeholder="검색">
                 </div>
                     
-                <button class="write-btn">글쓰기 ✏️</button>
+                <button class="writeBtn">글쓰기 ✏️</button>
                 <script>
-                    $('.write-btn').click( function() {
+                    $('.writeBtn').click( function() {
                         location.href = 'writePost';
                     })
                 </script>
             </div>
+            
 
             <div class="FavoriteBoardGrid">
+                <a th:href="@{readPost?postId=4}">읽기 창으로 이동</a>
                 <div class="category-section">
                     <div class="category-header">일본 생활&문화</div>
                     
