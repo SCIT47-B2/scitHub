@@ -35,8 +35,8 @@
           <div class="avatar" id="avatarBox" aria-label="프로필 이미지" role="img">
             <!-- DB에는 파일명만 저장된다고 가정: /uploads/avatar/{fileName} 로 서빙 -->
             <img id="avatarImg"
-                 th:src="${#strings.isEmpty(user.avatarUrl)} ? @{/images/chiikawaPuzzle.png} : @{/uploads/avatar/{f}(f=${user.avatarUrl})}"
-                 alt="프로필 이미지">
+                th:src="${#strings.isEmpty(user.avatarUrl)} ? @{/images/chiikawaPuzzle.png} : @{/uploads/avatar/{f}(f=${user.avatarUrl})}"
+                alt="프로필 이미지">
             <button class="editAvatarBtn" id="editAvatarBtn" title="프로필 이미지 변경" type="button">
               <i class="fa-solid fa-pen" aria-hidden="true"></i>
               <span class="sr-only">프로필 이미지 변경</span>
@@ -94,8 +94,8 @@
               <label for="birth">생년월일</label>
               <div class="field">
                 <input id="birth" name="birth" type="date"
-                       th:value="${#temporals.format(user.birth, 'yyyy-MM-dd')}"
-                       th:attr="max=${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}">
+                      th:value="${#temporals.format(user.birth, 'yyyy-MM-dd')}"
+                      th:attr="max=${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}">
               </div>
             </div>
 

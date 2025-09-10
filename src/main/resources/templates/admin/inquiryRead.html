@@ -49,8 +49,8 @@
                     </div>
                 </div>
 
-                <!-- 4. 답변(댓글) 작성 폼 (댓글이 없을 경우에만 보이도록 할 수 있음) -->
-                <div class="comment-form-container" th:if="*{comments.isEmpty()}">
+                <!-- 4. 답변(댓글) 작성 폼 -->
+                <div class="comment-form-container" th:if="${currentUser.role == 'ROLE_ADMIN'}">
                     <h3>回答作成</h3>
                     <form th:action="@{/admin/inquiry/addComment}" method="post">
                         <input type="hidden" name="postId" th:value="*{postId}">

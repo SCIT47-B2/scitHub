@@ -70,9 +70,9 @@ public class UserService {
      * @return username or null
      */
     public String findNameKorById(Integer userId) {
-      return ur.findById(userId)
-          .map(User::getNameKor)
-          .orElse(null);
+        return ur.findById(userId)
+            .map(User::getNameKor)
+            .orElse(null);
     }
 
     /**
@@ -94,6 +94,7 @@ public class UserService {
                 .gender(entity.getGender().name())
                 .email(entity.getEmail())
                 .phone(entity.getPhone())
+                .role(entity.getRole().getDisplayName())
                 .build();
     }
 
@@ -139,7 +140,7 @@ public class UserService {
 
             log.debug("아바타 저장 완료: dir={}, file={}", avatarDir, savedFileName);
         }
-      
+
         log.debug("저장되는 Entity: {}", entity);
         ur.save(entity); // @Transactional 이므로 커밋 시점에 flush
         log.debug("저장 후 조회: {}", ur.findByUsername(dto.getUserName()));
