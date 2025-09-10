@@ -5,15 +5,15 @@ package net.dsa.scitHub.enums;
  */
 public enum CompanyType {
     /** 자사 개발 */
-    IN_HOUSE_DEV("자사 개발"),
+    IN_HOUSE_DEV("自社開発"),
     /** 자사 SI */                          
-    IN_HOUSE_SI("자사 SI"),
+    IN_HOUSE_SI("自社SI"),
     /** 타사 SI */
-    EXTERNAL_SI("타사 SI"),
+    EXTERNAL_SI("他社SI"),
     /** SES(파견) */
-    SES("SES(파견)"),
+    SES("SES(派遣)"),
     /** 기타 */
-    OTHER("그 외");
+    OTHER("その他");
     
     private final String displayName;
     

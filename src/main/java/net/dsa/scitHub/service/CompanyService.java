@@ -4,8 +4,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +32,33 @@ public class CompanyService {
 
     @Autowired
     private CompanyRepository cr;
+
+    //위치 큰 분류명과 세부 지역 매핑하는 맵
+    private static final Map<String, List<String>> locationMap = new HashMap<>();
+    static {
+        locationMap.put("関東", List.of("東京", "茨城", "栃木", "群馬", "埼玉", "千葉", "神奈川"));
+        locationMap.put("北海道", List.of("北海道", "青森", "岩手", "宮城", "秋田", "山形", "福島"));
+        locationMap.put("東海", List.of("愛知", "静岡", "岐阜", "三重"));
+        locationMap.put("近畿", List.of("大阪", "京都", "兵庫", "奈良", "和歌山", "滋賀"));
+        locationMap.put("中国・四国", List.of("鳥取", "島根", "岡山", "広島", "山口", "徳島", "香川", "愛媛", "高知"));
+        locationMap.put("九州・沖縄", List.of("福岡", "佐賀", "長崎", "熊本", "大分", "宮崎", "鹿児島", "沖縄"));
+        locationMap.put("北陸・甲信越", List.of("新潟", "長野", "山梨", "富山", "石川", "福井"));
+    }
+
+    public Page<CompanyDTO> findCompanies(String name, Industry industry, CompanyType type, String location, Pageable pageable) {
+        List<String> locations = null;
+        if (location != null && !location.isEmpty()) {
+            locations = locationMap.get(location);
+        }
+
+        Page<Company> companyPage = cr.findWithFilters(name, industry, type, locations, pageable);
+
+        return companyPage.map(CompanyDTO::convertToCompanyDTO);
+    }
+
+    public List<String> getLocationsForBroadLocation(String broadLocation) {
+        return locationMap.get(broadLocation);
+    }
 
     /**
      * 이름으로 필터링된 초기 회사 목록 조회
@@ -73,7 +105,7 @@ public class CompanyService {
      * @return 필터링된 회사 목록
      */
     public List<CompanyDTO> selectByType(List<CompanyDTO> allCompanies, CompanyType type) {
-        
+
         List<CompanyDTO> filteredList = new ArrayList<>();
         for (CompanyDTO company : allCompanies) {
             if (company.getType() == type) {
@@ -83,22 +115,9 @@ public class CompanyService {
         return filteredList;
     }
 
-
-    //위치 큰 분류명과 세부 지역 매핑하는 맵
-    private static final Map<String, List<String>> locationMap = new HashMap<>();
-    static {
-        locationMap.put("칸토", List.of("도쿄", "이바라키", "토치기", "군마", "사이타마", "치바", "카나가와"));
-        locationMap.put("홋카이도", List.of("홋카이도", "아오모리", "이와테", "미야기", "아키타", "야마가타", "후쿠시마"));
-        locationMap.put("토카이", List.of("아이치", "시즈오카", "기후", "미에"));
-        locationMap.put("킨키", List.of("오사카", "교토", "효고", "나라", "와카야마", "시가"));
-        locationMap.put("츄고쿠,시코쿠", List.of("톳토리", "시마네", "오카야마", "히로시마", "야마구치", "토쿠시마", "카가와", "에히메", "코치"));
-        locationMap.put("큐슈,오키나와", List.of("후쿠오카", "사가", "나가사키", "쿠마모토", "오이타", "미야자키", "가고시마", "오키나와"));
-        locationMap.put("호쿠리쿠,코우신에츠", List.of("니가타", "나가노", "야마나시", "도야마", "이시카와", "후쿠이"));
-    }
-
     /**
      * 큰 분류명에 따라 회사 목록 조회
-     * @param location 큰 분류명
+     * @param broadLocation 큰 분류명
      * @return 해당 분류에 속한 회사 목록
      */
     public List<CompanyDTO> selectByBroadLocation(String broadLocation) {
@@ -141,6 +160,34 @@ public class CompanyService {
             allCompanies.sort((c1,c2) -> Integer.compare(c2.getHeadcount(), c1.getHeadcount()));
         }
         return allCompanies;
+    }
+
+    /**
+     * 평균 평점 순으로 정렬
+     * @param companyList
+     * @param averageRating
+     * @return
+     */
+    public List<CompanyDTO> orderByAverageRating(List<CompanyDTO> companyList, String averageRating) {
+        if ("asc".equals(averageRating)) {
+            companyList.sort((c1, c2) -> Double.compare(c1.getAverageRating(), c2.getAverageRating()));
+        } else {
+            companyList.sort((c1, c2) -> Double.compare(c2.getAverageRating(), c1.getAverageRating()));
+        }
+        return companyList;
+	}
+
+    /**
+     * ID로 회사 조회.
+     * @param companyId 조회할 회사 ID
+     * @return CompanyDTO 객체 (없으면 null)
+     */
+    @Transactional
+    public CompanyDTO selectById(Integer companyId) {
+        //findById 메서드는 Optional을 반환하므로 처리 필요
+        Optional<Company> companyOptional = cr.findById(companyId);
+
+        return companyOptional.map(CompanyDTO::convertToCompanyDTO).orElse(null);
     }
 
 }

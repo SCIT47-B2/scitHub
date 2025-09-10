@@ -118,6 +118,12 @@ tbody tr:hover {
     background-color: #f0f0f0;
 }
 
+.company-name-link {
+    color: inherit; /* 부모 요소(td)의 글자색을 상속받아 검정색으로 보임 */
+    text-decoration: none; /* 밑줄 제거 */
+}
+
+
 /* Pagination */
 .pagination {
     display: flex;
@@ -147,4 +153,257 @@ tbody tr:hover {
 
 .pagination span:hover:not(.active) {
     background-color: #f0f0f0;
+}
+
+
+/* companyReview.html CSS */
+.back-button {
+    display: block;
+    width: 30px;
+    height: 30px;
+    text-align: center;
+    line-height: 30px;
+    font-size: 1.2rem;
+    color: #333;
+    margin-bottom: 20px; /* 회사 헤더와의 간격 */
+}
+
+.company-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background-color: #d6dbe8;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    margin-bottom: 30px;
+}
+
+.company-info-box {
+    display: flex;
+    align-items: center;
+}
+
+.company-logo {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    margin-right: 15px;
+    object-fit: cover; /* 이미지 비율 유지 */
+}
+
+.company-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.company-name-rating {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.company-name-rating h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    margin-right: 10px;
+    color: #333;
+}
+
+.rating-display {
+    font-size: 1.2rem;
+    color: #666;
+}
+
+/* Average Rating Stars */
+.avg-rating-stars {
+    display: flex;
+    align-items: center;
+    font-size: 1.2rem;
+    color: #d1d1d1; /* 기본 별 색상 */
+}
+
+.avg-rating-stars .fa-star.filled {
+    color: #000000; /* 채워진 별 색상 */
+}
+
+.avg-rating-stars span {
+    margin-left: 5px;
+    font-weight: bold;
+    color: #666;
+}
+
+/* Company Meta Info (산업, 유형, 위치) */
+.company-meta-info span {
+    background-color: #B2C1E1;
+    padding: 3px 8px;
+    border-radius: 15px;
+    margin-right: 5px;
+    font-size: 0.9rem;
+    color: #333;
+}
+
+/* Review Write Button */
+.review-write-button {
+    background-color: #5270AD;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 20px;
+    text-decoration: none;
+    font-weight: bold;
+    display: flex; /* 아이콘과 텍스트 정렬 */
+    align-items: center;
+    gap: 8px; /* 아이콘과 텍스트 사이 간격 */
+    transition: background-color 0.2s ease;
+}
+.review-write-button:hover {
+    background-color: #42609A; /* 호버 색상 */
+}
+
+/* Review List Grid */
+.review-list-container {
+     padding-top: 20px; /* hr 아래 간격 */
+}
+
+.review-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* 반응형 2열 그리드 */
+    gap: 20px;
+}
+
+.review-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* 카드 그림자 */
+    background-color: white;
+}
+
+.review-author {
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+/* Individual Review Rating Stars */
+.review-rating-stars {
+    color: #d1d1d1; /* 기본 별 색상 */
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+}
+
+.review-rating-stars .fa-star.filled {
+    color: #000000; /* 채워진 별 색상 */
+}
+
+.review-content {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: #555;
+}
+
+/* Modal Styles */
+.modal-overlay {
+    display: none; /* Hidden by default */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Ensure it's on top */
+}
+
+/* Modal Content */
+.modal-content {
+    background-color: #4a5a8a; /* 이미지와 유사한 배경색 */
+    color: white;
+    padding: 25px 30px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.close-button {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 28px;
+    cursor: pointer;
+}
+
+.modal-title {
+    font-size: 1.5rem;
+    margin-top: 0;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* Star Rating */
+.star-rating-area {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    font-size: 2rem;
+}
+
+.star-rating-area .stars {
+    margin-right: 15px;
+}
+
+.star-rating-area .stars > i {
+    color: #dcdcdc; /* 비활성 별 색상 */
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.star-rating-area .stars > i.hover,
+.star-rating-area .stars > i.filled {
+    color: #000000; /* 활성/호버 별 색상 */
+}
+
+.star-rating-area .rating-value {
+    font-weight: bold;
+    min-width: 20px;
+    text-align: center;
+}
+
+/* Review Textarea */
+.review-textarea {
+    width: 100%;
+    height: 120px;
+    padding: 10px;
+    border: none;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    font-size: 1rem;
+    resize: vertical;
+}
+
+/* Submit Button */
+.submit-button {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    background-color: #8a99c2; /* 버튼 배경색 */
+    color: white;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.submit-button:hover {
+    background-color: #7384b0;
 }
