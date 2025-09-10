@@ -1,89 +1,201 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
-    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-    layout:decorate="~{layouts/defaultLayout}">
-    <head>
-        <title>Home</title>
-        <th:block layout:fragment="css">
-            <link rel="stylesheet" th:href="@{/css/home.css}">
-        </th:block>
-    </head>
-    <body>
-        <section class="mainGrid" aria-label="메인 영역" layout:fragment="content">
-            <section class="profileGrid" aria-label="사용자 정보">
-        <!-- 좌측: 아바타 + 표시용 정보 (카드 바깥) -->
-        <div class="profileLeft">
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      >
+  <head>
+    <title>My Page</title>
+    <th:block layout:fragment="css">
+      <link rel="stylesheet" th:href="@{/css/mypage.css}">
+    </th:block>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/tokens.css}">
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="stylesheet" th:href="@{/css/sidebar.css}">
+  </head>
+  <body>
+
+    <div th:replace="~{fragments/sidebar :: sidebarFragment(${menuItems})}"></div>
+
+    <section class="" aria-label="메인 영역" layout:fragment="content">
+
+      <!-- /** 단일 폼
+           * @desc   좌측(아바타 업로드) + 우측(정보 입력) 한 번에 저장
+           * @action /mypage/info  (POST, multipart/form-data)
+           * @return 서버에서 DB 업데이트 후 redirect:/mypage/info
+           */ -->
+      <form id="profileForm"
+            class="profileGrid oneForm"
+            th:object="${user}"
+            th:action="@{/mypage/info}"
+            method="post"
+            enctype="multipart/form-data">
+
+        <!-- 좌측: 아바타 + 표시용 정보 -->
+        <section class="profileLeft" aria-label="프로필 요약">
           <div class="avatar" id="avatarBox" aria-label="프로필 이미지" role="img">
-            <span class="fa-solid fa-user"></span>
+            <!-- DB에는 파일명만 저장된다고 가정: /uploads/avatar/{fileName} 로 서빙 -->
+            <img id="avatarImg"
+                 th:src="${#strings.isEmpty(user.avatarUrl)} ? @{/images/chiikawaPuzzle.png} : @{/uploads/avatar/{f}(f=${user.avatarUrl})}"
+                 alt="프로필 이미지">
             <button class="editAvatarBtn" id="editAvatarBtn" title="프로필 이미지 변경" type="button">
-              <i class="fa-solid fa-pen"></i>
+              <i class="fa-solid fa-pen" aria-hidden="true"></i>
+              <span class="sr-only">프로필 이미지 변경</span>
             </button>
+            <!-- 실제 파일 입력(숨김). 컨트롤러에서 @RequestParam("avatar")로 받으세요 -->
+            <input id="avatar" name="avatar" type="file" accept="image/*" hidden>
           </div>
+
           <div class="nameBlock">
-            <p id="displayName" class="displayName">이름</p>
-            <p id="displayKana" class="handle">カナ・ネーム</p>
-            <p id="displayId" class="handle">@userid</p>
+            <p id="displayName" class="displayName" th:text="${user.name}">홍길동</p>
+            <p id="displayId" class="handle" th:text="${'@' + user.userName}">@userid</p>
           </div>
+
           <div class="miniBadges">
             <span id="badgeCourse" class="pill">Smart Cloud IT Master</span>
           </div>
           <div class="miniBadges">
-            <span id="badgeCohort" class="pill">47기 서울</span>
+            <span id="badgeCohort" class="pill" th:text="${user.cohortNo + '기 서울'}">47기 서울</span>
           </div>
-        </div>
+        </section>
 
-        <!-- 우측: 폼(읽기→편집→저장) - 카드(하얀 네모) 내부 -->
-        <div id="profileWrap" class="profileWrap readonly">
-          <form id="profileForm" class="profileRight" novalidate autocomplete="on">
+        <!-- 우측: 입력 필드 -->
+        <section id="profileWrap" class="profileWrap readonly" aria-label="프로필 입력">
+          <div class="profileRight">
             <div class="formRow">
               <label for="name">이름</label>
-              <div class="field"><input id="name" name="name" type="text" placeholder="이름" autocomplete="name" /></div>
-            </div>
-            <div class="formRow">
-              <label for="kanaName">名前</label>
-              <div class="field"><input id="kanaName" name="kanaName" type="text" placeholder="カナ・セウン" /></div>
+              <div class="field">
+                <input id="name" name="name" type="text" placeholder="이름" th:field="*{name}">
+              </div>
             </div>
 
             <div class="formRow" role="radiogroup" aria-label="성별">
               <label>성별</label>
               <div class="radioGroup">
                 <label class="radioItem">
-                  <input type="radio" name="gender" value="M" /> <span>남</span>
+                  <input type="radio" th:field="*{gender}" name="gender" value="M"> <span>남</span>
                 </label>
                 <label class="radioItem">
-                  <input type="radio" name="gender" value="F" /> <span>여</span>
+                  <input type="radio" th:field="*{gender}" name="gender" value="F"> <span>여</span>
+                </label>
+                <label class="radioItem">
+                  <input type="radio" th:field="*{gender}" value="N"> <span>선택 안함</span>
                 </label>
               </div>
             </div>
 
             <div class="formRow">
               <label for="email">이메일</label>
-              <div class="field"><input id="email" name="email" type="email" placeholder="name@example.com" autocomplete="email" /></div>
+              <div class="field">
+                <input id="email" name="email" type="email" placeholder="name@example.com" th:field="*{email}">
+              </div>
             </div>
 
             <div class="formRow">
               <label for="birth">생년월일</label>
-              <div class="field"><input id="birth" name="birth" type="date" autocomplete="bday" /></div>
+              <div class="field">
+                <input id="birth" name="birth" type="date"
+                       th:value="${#temporals.format(user.birth, 'yyyy-MM-dd')}"
+                       th:attr="max=${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}">
+              </div>
             </div>
 
             <div class="formRow">
               <label for="phone">전화번호</label>
-              <div class="field"><input id="phone" name="phone" type="tel" placeholder="010-0000-0000" autocomplete="tel" /></div>
+              <div class="field">
+                <input id="phone" name="phone" type="tel" placeholder="010-0000-0000" th:field="*{phone}">
+              </div>
             </div>
 
-            <p class="hint">※ 기본 상태는 읽기 전용입니다. “수정”을 누르면 편집이 가능합니다.</p>
-
-            <!-- 폼 하단 액션 영역 -->
             <div class="actionRow">
-              <button type="button" id="editBtn" class="btn">수정</button>
-              <button type="button" id="cancelBtn" class="btn">취소</button>
-              <button type="submit"  id="saveBtn" class="btn primary">저장</button>
+              <button type="button" id="cancelBtn" class="btn" th:onclick="|location.href='@{/mypage/info}'|">변경사항 삭제</button>
+              <button type="submit" id="saveBtn" class="btn primary">변경사항 저장</button>
             </div>
-          </form>
-        </div>
-      </section>
+          </div>
         </section>
-        <th:block layout:fragment="script">
-        </th:block>
-    </body>
+      </form>
+      <!-- 단일 폼 끝 -->
+    </section>
+
+    <th:block layout:fragment="script">
+      <script>
+        /**
+         * initAvatarPicker
+         * - 기능: 펜 버튼 클릭 → 파일 선택 → 미리보기 표시
+         * - 파라미터: 없음
+         * - 리턴타입: void
+         * - 리턴: 없음
+         */
+        (function initAvatarPicker(){
+          const editAvatarBtn = document.getElementById('editAvatarBtn');
+          const avatarInput   = document.getElementById('avatar');
+          const avatarImg     = document.getElementById('avatarImg');
+          if (!editAvatarBtn || !avatarInput || !avatarImg) return;
+
+          editAvatarBtn.addEventListener('click', function openPicker(){
+            avatarInput.click();
+          });
+
+          avatarInput.addEventListener('change', function preview(){
+            const file = avatarInput.files && avatarInput.files[0];
+            if (!file) return;
+
+            // 간단한 클라이언트 검증(서버에서도 반드시 검증)
+            if (!file.type.startsWith('image/')) {
+              alert('이미지 파일만 업로드할 수 있습니다.');
+              avatarInput.value = '';
+              return;
+            }
+            if (file.size > 10 * 1024 * 1024) {
+              alert('파일 용량이 10MB를 초과했습니다.');
+              avatarInput.value = '';
+              return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = () => { avatarImg.src = reader.result; };
+            reader.readAsDataURL(file);
+          });
+        })();
+
+        /**
+         * validation
+         * - 기능: 필수 입력값 검증 후 통과 시 제출
+         * - 파라미터: e(SubmitEvent)
+         * - 리턴타입: void
+         * - 리턴: 없음
+         */
+        document.getElementById('profileForm').addEventListener('submit', function validation(e){
+          e.preventDefault();
+
+          const name   = document.getElementById('name').value.trim();
+          const gender = (document.querySelector('input[name="gender"]:checked') || {}).value || '';
+          const birth  = document.getElementById('birth').value;
+          const email  = document.getElementById('email').value.trim();
+          const phone  = document.getElementById('phone').value.trim();
+
+          let message = '';
+          if (!name || !gender || !birth || !email || !phone) {
+            message = '모든 항목을 입력해주세요.';
+          } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            message = '이메일 형식이 올바르지 않습니다.';
+          } else if (!/^\d{2,4}-?\d{3,4}-?\d{4}$/.test(phone)) {
+            message = '전화번호 형식을 확인해주세요.';
+          }
+
+          if (message) {
+            alert(message);
+            if (!name)      return document.getElementById('name')?.focus();
+            if (!gender)    return document.querySelector('input[name="gender"]')?.focus();
+            if (!birth)     return document.getElementById('birth')?.focus();
+            if (!email)     return document.getElementById('email')?.focus();
+            if (!phone)     return document.getElementById('phone')?.focus();
+            return;
+          }
+
+          alert('저장되었습니다.');
+          e.target.submit();
+        });
+      </script>
+    </th:block>
+  </body>
 </html>

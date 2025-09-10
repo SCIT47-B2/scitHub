@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layouts/defaultLayout}">
+    <head>
+        <title>companyReview</title>
+        <th:block layout:fragment="css">
+            <link rel="stylesheet" th:href="@{/css/home.css}">
+            <link rel="stylesheet" th:href="@{/css/archive.css}">
+        </th:block>
+    </head>
+    <body>
+        <section class="mainGrid" aria-label="메인 영역" layout:fragment="content">
+            <div class="container">
+                <!-- 검색바 -->
+                <div class="search-box">
+                    <form th:action="@{/archive/companyList}" method="get">
+                        <i class="fa fa-search"></i>
+                        <input type="text" name="name" placeholder="会社名で探す">
+                        <button type="submit" style="display: none;"></button>
+                    </form>
+                </div>
+
+                <!-- 테이블 -->
+                <div class="table-container">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>会社名</th>
+                        <th class="dropdown">
+                            <button>業種 ▼</button>
+                            <ul class="dropdown-menu">
+                                <li><a th:href="@{/archive/companyList(name=${name}, type=${type}, location=${location})}">全体</a></li>
+                                <li><a th:href="@{/archive/companyList(name=${name}, industry='IT', type=${type}, location=${location})}">IT</a></li>
+                                <li><a th:href="@{/archive/companyList(name=${name}, industry='MANUFACTURING', type=${type}, location=${location})}">製造</a></li>
+                                <li><a th:href="@{/archive/companyList(name=${name}, industry='FINANCE', type=${type}, location=${location})}">金融</a></li>
+                                <li><a th:href="@{/archive/companyList(name=${name}, industry='TELECOM', type=${type}, location=${location})}">通信</a></li>
+                                <li><a th:href="@{/archive/companyList(name=${name}, industry='SERVICE', type=${type}, location=${location})}">サービス</a></li>
+                                <li><a th:href="@{/archive/companyList(name=${name}, industry='OTHER', type=${type}, location=${location})}">その他</a></li>
+                            </ul>
+                        </th>
+                        <th class="dropdown">
+                            <button>類型 ▼</button>
+                            <ul class="dropdown-menu">
+                                <li><a th:href="@{/archive/companyList(name=${name}, industry=${industry}, location=${location})}">全体</a></li>
+                                <li><a th:href="@{/archive/companyList(name=${name}, industry=${industry}, type='IN_HOUSE_SI', location=${location})}">自社SI</a></li>
+                                <li><a th:href="@{/archive/companyList(name=${name}, industry=${industry}, type='EXTERNAL_SI', location=${location})}">他社SI</a></li>
+                                <li><a th:href="@{/archive/companyList(name=${name}, industry=${industry}, type='IN_HOUSE_DEV', location=${location})}">自社開発</a></li>
+                                <li><a th:href="@{/archive/companyList(name=${name}, industry=${industry}, type='SES', location=${location})}">SES(派遣)</a></li>
+                                <li><a th:href="@{/archive/companyList(name=${name}, industry=${industry}, type='OTHER', location=${location})}">その他</a></li>
+                            </ul>
+                        </th>
+                        <th class="dropdown">
+                            <button>位置 ▼</button>
+                            <ul class="dropdown-menu">
+                                <li><a th:href="@{/archive/companyList(name=${name}, industry=${industry}, type=${type})}">全体</a></li>
+                                <li><a th:href="@{/archive/companyList(name=${name}, industry=${industry}, type=${type}, location='関東')}">関東</a></li>
+                                <li><a th:href="@{/archive/companyList(name=${name}, industry=${industry}, type=${type}, location='北海道')}">北海道</a></li>
+                                <li><a th:href="@{/archive/companyList(name=${name}, industry=${industry}, type=${type}, location='東海')}">東海</a></li>
+                                <li><a th:href="@{/archive/companyList(name=${name}, industry=${industry}, type=${type}, location='近畿')}">近畿</a></li>
+                                <li><a th:href="@{/archive/companyList(name=${name}, industry=${industry}, type=${type}, location='中国・四国')}">中国、四国</a></li>
+                                <li><a th:href="@{/archive/companyList(name=${name}, industry=${industry}, type=${type}, location='九州・沖縄')}">九州、沖縄</a></li>
+                                <li><a th:href="@{/archive/companyList(name=${name}, industry=${industry}, type=${type}, location='北陸・甲信越')}">北陸、甲信越</a></li>
+                            </ul>
+                        </th>
+                        <th class="dropdown">
+                            <button>就業人員 ▼</button>
+                            <ul class="dropdown-menu">
+                                <li><a th:href="@{/archive/companyList(name=${name}, industry=${industry}, type=${type}, location=${location}, headcount='desc')}">降順</a></li>
+                                <li><a th:href="@{/archive/companyList(name=${name}, industry=${industry}, type=${type}, location=${location}, headcount='asc')}">昇順</a></li>
+                            </ul>
+                        </th>
+                        <th class="dropdown">
+                            <button>評点 ▼</button>
+                            <ul class="dropdown-menu">
+                                <li><a th:href="@{/archive/companyList(name=${name}, industry=${industry}, type=${type}, location=${location}, rating='desc')}">降順</a></li>
+                                <li><a th:href="@{/archive/companyList(name=${name}, industry=${industry}, type=${type}, location=${location}, rating='asc')}">昇順</a></li>
+                            </ul>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="c : ${companyList}">
+                            <td>
+                                <div style="display: inline-flex; align-items: center;">
+                                    <img th:src="@{${c.logoUrl}}" alt="logo"
+                                        style="width:40px; height:auto; margin-right:8px;">
+                                    <a th:href="@{/archive/companyReview(id=${c.companyId})}" class="company-name-link">
+                                        <span th:text="${c.name}"></span>
+                                    </a>
+                                </div>
+                            </td>
+                            <td th:text="${c.industry.displayName}"></td>
+                            <td th:text="${c.type.displayName}"></td>
+                            <td th:text="${c.location}"></td>
+                            <td th:text="${c.headcount}"></td>
+                            <td th:text="${c.averageRating}"></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- 페이지네이션 -->
+                <div class="pagination" th:if="${companyPage.totalPages > 0}">
+                    <a th:if="${companyPage.hasPrevious()}"
+                       th:href="@{/archive/companyList(page=${companyPage.number-1}, name=${name}, industry=${industry}, type=${type}, location=${location}, headcount=${headcount}, rating=${rating})}">
+                        <span>&lt;</span>
+                    </a>
+
+                    <th:block th:each="i : ${#numbers.sequence(0, companyPage.totalPages - 1)}">
+                        <a th:if="${i >= companyPage.number - 2 and i <= companyPage.number + 2}"
+                           th:href="@{/archive/companyList(page=${i}, name=${name}, industry=${industry}, type=${type}, location=${location}, headcount=${headcount}, rating=${rating})}">
+                            <span th:class="${i == companyPage.number} ? 'active'" th:text="${i + 1}"></span>
+                        </a>
+                    </th:block>
+
+                    <a th:if="${companyPage.hasNext()}"
+                       th:href="@{/archive/companyList(page=${companyPage.number+1}, name=${name}, industry=${industry}, type=${type}, location=${location}, headcount=${headcount}, rating=${rating})}">
+                        <span>&gt;</span>
+                    </a>
+                </div>
+                </div>
+            </div>
+        </section>
+        <th:block layout:fragment="script">
+        </th:block>
+    </body>
+</html>

@@ -1,0 +1,402 @@
+/* ===================================================================
+   Message (쪽지함) Page Styles
+   - Design aligns with tokens.css, base.css, home.css, sidebar.css
+   - Uses CSS variables with safe fallbacks to avoid clashes
+   - Scope: only elements inside .message-box and its modals
+   =================================================================== */
+
+/* -----------------------------
+   Tokens Bridge (fallbacks)
+   ----------------------------- */
+:root {
+  /* Color tokens (fallbacks in case tokens.css is missing) */
+  --brandPrimary: var(--primary, #4f46e5);
+  --brandPrimaryHover: var(--primaryHover, #4338ca);
+  --brandDanger: var(--danger, #e11d48);
+  --bgBody: var(--bg, #f7f7fb);
+  --bgSurface: var(--surface, #ffffff);
+  --bgMuted: var(--bgSubtle, #f2f3f7);
+  --textPrimary: var(--text, #1f2937);
+  --textSecondary: var(--textSubtle, #6b7280);
+  --borderColor: var(--border, #e5e7eb);
+  --focusRing: var(--focus, #93c5fd);
+
+  /* Radius / shadow */
+  --radiusSm: var(--radiusSm, 8px);
+  --radiusMd: var(--radiusMd, 12px);
+  --radiusLg: var(--radiusLg, 16px);
+  --shadowSm: var(--shadowSm, 0 1px 2px rgba(0,0,0,.04));
+  --shadowMd: var(--shadowMd, 0 4px 12px rgba(0,0,0,.08));
+
+  /* Spacing */
+  --space2: 8px;
+  --space3: 12px;
+  --space4: 16px;
+  --space5: 20px;
+  --space6: 24px;
+  --space8: 32px;
+
+  /* Typography */
+  --fontSizeSm: 0.875rem;
+  --fontSizeMd: 1rem;
+  --fontSizeLg: 1.125rem;
+  --fontWeightMedium: 600;
+}
+
+/* -----------------------------
+   Page Container
+   ----------------------------- */
+section.message-box {
+  padding: var(--space6);
+  color: var(--textPrimary);
+  flex: 1; /* 사이드바를 제외한 나머지 공간을 모두 차지하도록 설정 */
+  min-height: 100%;
+}
+
+section.message-box .header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space5);
+}
+
+section.message-box .header h1 {
+  font-size: 1.5rem;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  margin: 0;
+  color: var(--textPrimary);
+}
+
+/* Compose button adopts base .btn if present; add light tweak */
+section.message-box .btn.primary {
+  background: var(--brandPrimary);
+  border: 1px solid var(--brandPrimary);
+  color: #fff;
+  border-radius: var(--radiusMd);
+  padding: 10px 14px;
+  font-weight: var(--fontWeightMedium);
+  box-shadow: var(--shadowSm);
+  transition: transform .08s ease, background .15s ease;
+}
+section.message-box .btn.primary:hover { background: var(--brandPrimaryHover); transform: translateY(-1px); }
+section.message-box .btn.primary:focus { outline: 2px solid var(--focusRing); outline-offset: 2px; }
+
+/* -----------------------------
+   Tabs
+   ----------------------------- */
+section.message-box .tabs {
+  display: flex;
+  gap: var(--space2);
+  border-bottom: 1px solid var(--borderColor);
+  margin-bottom: var(--space4);
+}
+
+section.message-box .tab-item {
+  position: relative;
+  padding: 10px 16px;
+  cursor: pointer;
+  border-radius: var(--radiusSm) var(--radiusSm) 0 0;
+  color: var(--textSecondary);
+  background: transparent;
+  border: 1px solid transparent;
+  transition: color .15s ease, background .15s ease, border-color .15s ease;
+}
+
+section.message-box .tab-item:hover {
+  color: var(--textPrimary);
+  background: var(--bgMuted);
+}
+
+section.message-box .tab-item.active {
+  color: var(--textPrimary);
+  background: var(--bgSurface);
+  border-color: var(--borderColor);
+  border-bottom-color: var(--bgSurface);
+  font-weight: var(--fontWeightMedium);
+  box-shadow: 0 -1px 0 var(--bgSurface), var(--shadowSm);
+}
+
+/* -----------------------------
+   Message List
+   ----------------------------- */
+section.message-box .message-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  background: var(--bgSurface);
+  border: 1px solid var(--borderColor);
+  border-radius: var(--radiusMd);
+  overflow: hidden;
+  box-shadow: var(--shadowSm);
+}
+
+section.message-box .message-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px var(--space5);
+  gap: var(--space4);
+  border-bottom: 1px solid var(--borderColor);
+  cursor: pointer;
+  transition: background .12s ease;
+}
+
+section.message-box .message-item:last-child {
+  border-bottom: none;
+}
+
+section.message-box .message-item:hover {
+  background: var(--bgMuted);
+}
+
+section.message-box .message-item .info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+section.message-box .message-item .title {
+  font-weight: var(--fontWeightMedium);
+  color: var(--textPrimary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: clamp(240px, 40vw, 560px);
+}
+
+section.message-box .message-item .sender {
+  font-size: var(--fontSizeSm);
+  color: var(--textSecondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+section.message-box .message-item .date {
+  font-size: var(--fontSizeSm);
+  color: var(--textSecondary);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Empty / error state inside list */
+section.message-box .message-list > li:not(.message-item) {
+  padding: 24px;
+  text-align: center;
+  color: var(--textSecondary);
+}
+
+/* -----------------------------
+   Pagination
+   ----------------------------- */
+section.message-box .pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  margin-top: var(--space4);
+  flex-wrap: wrap;
+}
+
+section.message-box .pagination a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid var(--borderColor);
+  border-radius: var(--radiusSm);
+  background: var(--bgSurface);
+  color: var(--textPrimary);
+  text-decoration: none;
+  box-shadow: var(--shadowSm);
+  transition: background .12s ease, border-color .12s ease, transform .08s ease;
+}
+
+section.message-box .pagination a:hover {
+  transform: translateY(-1px);
+  background: var(--bgMuted);
+}
+
+section.message-box .pagination a.active {
+  background: var(--brandPrimary);
+  border-color: var(--brandPrimary);
+  color: #fff;
+}
+
+/* -----------------------------
+   Modals (Compose / View)
+   ----------------------------- */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  display: none;           /* toggled by JS to 'flex' */
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,.45);
+  z-index: 1000;
+  padding: var(--space4);
+}
+
+.modal-backdrop .modal-content {
+  background: var(--bgSurface);
+  width: 560px;
+  max-width: 100%;
+  border-radius: var(--radiusLg);
+  border: 1px solid var(--borderColor);
+  box-shadow: var(--shadowMd);
+  overflow: hidden;
+  transform: translateY(6px);
+  animation: modalIn .18s ease-out forwards;
+}
+
+@keyframes modalIn {
+  to { transform: translateY(0); }
+}
+
+.modal-backdrop .modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space4) var(--space5);
+  border-bottom: 1px solid var(--borderColor);
+}
+
+.modal-backdrop .modal-header h3 {
+  margin: 0;
+  font-size: var(--fontSizeLg);
+  color: var(--textPrimary);
+}
+
+.modal-backdrop .btn-close {
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--textSecondary);
+  padding: 2px 6px;
+  border-radius: var(--radiusSm);
+}
+.modal-backdrop .btn-close:hover { background: var(--bgMuted); color: var(--textPrimary); }
+
+.modal-backdrop .modal-body {
+  padding: var(--space5);
+}
+
+.modal-backdrop .modal-body input,
+.modal-backdrop .modal-body textarea {
+  width: 100%;
+  box-sizing: border-box; /* 너비 계산에 padding과 border를 포함시켜 오버플로우 방지 */
+  resize: none; /* 사용자가 크기를 조절할 수 없도록 고정 */
+  display: block;
+  border: 1px solid var(--borderColor);
+  border-radius: var(--radiusSm);
+  background: var(--bgBody);
+  color: var(--textPrimary);
+  padding: 10px 12px;
+  margin-bottom: var(--space4);
+  outline: none;
+  transition: border-color .12s ease, box-shadow .12s ease, background .12s ease;
+  font-size: var(--fontSizeMd);
+}
+
+.modal-backdrop .modal-body input:focus,
+.modal-backdrop .modal-body textarea:focus {
+  border-color: var(--focusRing);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--focusRing) 25%, transparent);
+  background: #fff;
+}
+
+.modal-backdrop .modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space3);
+  padding: var(--space4) var(--space5);
+  border-top: 1px solid var(--borderColor);
+}
+
+.modal-backdrop .btn {
+  border-radius: var(--radiusSm);
+  padding: 10px 14px;
+  border: 1px solid var(--borderColor);
+  background: var(--bgSurface);
+  color: var(--textPrimary);
+  cursor: pointer;
+  transition: transform .08s ease, background .12s ease, border-color .12s ease;
+}
+.modal-backdrop .btn:hover { transform: translateY(-1px); background: var(--bgMuted); }
+.modal-backdrop .btn:focus { outline: 2px solid var(--focusRing); outline-offset: 2px; }
+
+.modal-backdrop .btn.primary {
+  background: var(--brandPrimary);
+  border-color: var(--brandPrimary);
+  color: #fff;
+}
+.modal-backdrop .btn.primary:hover { background: var(--brandPrimaryHover); }
+
+.modal-backdrop .btn.danger {
+  background: var(--brandDanger);
+  border-color: var(--brandDanger);
+  color: #fff;
+}
+
+/* -----------------------------
+   Responsive
+   ----------------------------- */
+@media (max-width: 768px) {
+  section.message-box { padding: var(--space4); }
+
+  section.message-box .message-item {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  section.message-box .message-item .title {
+    max-width: 100%;
+  }
+
+  .modal-backdrop .modal-content {
+    width: 100%;
+  }
+}
+
+/* --- 검색창 스타일 --- */
+.search-bar {
+  max-width: 600px;
+  margin: 0 auto 20px;
+}
+
+.search-bar form {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.search-bar select,
+.search-bar input[type="text"] {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  /* 다른 입력 필드와 스타일 통일을 위해 상속받도록 설정 */
+  font-family: inherit;
+  font-size: inherit;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
+.search-bar input[type="text"] {
+  flex-grow: 1;
+}
+
+/* 포커스 스타일 (선택 사항, 통일성 부여) */
+.search-bar select:focus,
+.search-bar input[type="text"]:focus {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 1px;
+  border-color: var(--primary-color);
+}

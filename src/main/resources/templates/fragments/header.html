@@ -35,7 +35,7 @@
                             <span class="tabLabel">게시판</span>
                         </a>
                         <a class="tab"
-                            th:href="${ctx + '/archive/companyReview'}"
+                            th:href="${ctx + '/archive/companyList'}"
                             th:classappend="${#strings.startsWith(activeUri, ctx + '/archive')} ? 'active' : ''"
                             th:attr="aria-current=${#strings.startsWith(activeUri, ctx + '/archive')} ? 'page' : null">
                             <span class="tabIcon"><i class="fa-solid fa-folder fa-fw"></i></span>

@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="ko"
+xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SCIT Hub - 로그인</title>
+  <style>
+    /* =========================
+       Reset & Base
+       ========================= */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI','Roboto', sans-serif;
+      background: #fff; color:#333; min-height:100vh;
+    }
+
+    /* =========================
+       Layout
+       ========================= */
+    .mainContainer{
+      display:flex; min-height:100vh; width:100vw; justify-content:space-between;
+    }
+    .leftSection{
+      flex:0 0 auto; display:flex; flex-direction:column;
+      justify-content:flex-start; align-items:flex-start;
+      padding:60px 20px; margin-left:clamp(200px,10vw,220px); background:#fff;
+    }
+    .rightSection{
+      flex:0 0 auto; display:flex; flex-direction:column;
+      justify-content:flex-start; align-items:center;
+      padding:60px 20px; margin-right:clamp(200px,10vw,200px); background:#fff;
+    }
+
+    .logo{ font-size:64px; font-weight:700; color:#000; margin-bottom:16px; letter-spacing:-2px; }
+    .description{ font-size:18px; color:#666; line-height:1.5; max-width:420px; }
+
+    /* =========================
+       Auth Buttons
+       ========================= */
+    .authButtons{ display:flex; flex-direction:column; gap:32px; align-items:flex-end; }
+    .authBtn{
+      background:none; border:none; font-size:28px; font-weight:400; color:#111; cursor:pointer;
+      padding:12px 0; transition:all .3s ease; display:flex; align-items:center; justify-content:flex-end; gap:16px; min-width:120px;
+    }
+    .authBtn:hover{ transform:translateX(-8px); }
+    .loginBtn{ font-weight:400; color:#111; }
+    .signupBtn{ font-weight:400; color:#111; }
+
+    .btnIcon{
+      width:24px; height:24px; opacity:0; transform:translateX(-10px); transition:all .3s ease; filter: invert(.2);
+    }
+    .loginBtn:hover .btnIcon,
+    .loginBtn.active .btnIcon,
+    .signupBtn:hover .btnIcon,
+    .signupBtn.active .btnIcon{
+      opacity:1; transform:translateX(0);
+    }
+
+    /* =========================
+       Forms
+       ========================= */
+    .loginForm, .signupForm{
+      width:300px; margin-top:40px; opacity:0; max-height:0; overflow:hidden; transform:translateY(-20px); transition:all .4s ease;
+    }
+    .signupForm{ margin-top:24px; }
+    .loginForm.show, .signupForm.show{ opacity:1; max-height:800px; transform:translateY(0); }
+
+    :root{ --inputHeight:56px; --inputRadius:9999px; }
+    .formGroup{ margin-bottom:20px; position:relative; }
+
+    .formInput, .loginForm select, .signupForm select{
+      width:100%; height:var(--inputHeight); border-radius:var(--inputRadius);
+      padding:0 18px; border:2px solid #111; background:#fff; outline:none;
+      transition:border-color .25s ease, box-shadow .25s ease; -webkit-appearance:none; appearance:none;
+    }
+    .formInput:focus, .loginForm select:focus, .signupForm select:focus{
+      border-color:#111; 
+    }
+    .formInput::placeholder{ color:#999; }
+
+    .loginSubmitBtn{
+      height:var(--inputHeight); border-radius:var(--inputRadius);
+      width:100%; padding:14px; background:#333; color:#fff; border:none; font-size:16px; font-weight:800; letter-spacing:.02em; cursor:pointer;
+      transition:background-color .3s ease;
+    }
+    .loginSubmitBtn:hover{ background:#222; }
+
+    .loginForm select, .signupForm select{
+      padding-right:42px;
+      background-image:
+        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+      background-repeat:no-repeat; background-position:right 14px center; background-size:18px;
+    }
+    .loginForm select::-ms-expand, .signupForm select::-ms-expand{ display:none; }
+
+    /* =========================
+       Sign-up Stepper
+       ========================= */
+    .signupSteps .step{
+      opacity:0; max-height:0; overflow:hidden; transform:translateY(10px);
+      transition:opacity .35s ease, max-height .35s ease, transform .35s ease;
+    }
+    .signupSteps .step.show{ opacity:1; max-height:600px; transform:translateY(0); }
+
+    .genderGroup{ display:flex; gap:10px; }
+
+    /* =========================
+       Gender Radio Pills
+       ========================= */
+    .radioPill{
+      display:inline-flex; align-items:center; justify-content:center;
+      height:var(--inputHeight); padding:0; border:2px solid #111;
+      border-radius:var(--inputRadius); cursor:pointer; user-select:none; overflow:hidden;
+    }
+    .radioPill input{ display:none; }
+    .radioPill span{
+      display:flex; align-items:center; justify-content:center; height:100%;
+      padding:0 ; color:#111; background:transparent;
+      transition:background-color .2s ease, color .2s ease; border-radius:var(--inputRadius); pointer-events:none;
+    }
+    .radioPill input:checked + span{ background:#111; color:#fff; }
+    .addPadding { padding:0 20px; width: 80px;}
+    .nonAddPadding { padding:0 10px; width: 140px;}
+
+    /* ===== 기수 선택 셀렉트 박스 너비 ===== */
+    #classSelect { width: 100px; }
+
+    /* 반응형 */
+    @media (max-width:768px){
+      .mainContainer{ flex-direction:column; }
+      .leftSection{ padding:40px 30px; margin-left:0; text-align:center; align-items:center; }
+      .logo{ font-size:48px; }
+      .description{ font-size:16px; text-align:center; }
+      .rightSection{ flex:1; padding:30px; margin-right:0; }
+      .loginForm, .signupForm{ width:100%; max-width:300px; }
+    }
+    @media (max-width:480px){
+      .leftSection{ padding:30px 20px; margin-left:0; }
+      .logo{ font-size:36px; } .description{ font-size:14px; }
+      .rightSection{ padding:20px; margin-right:0; }
+      .authBtn{ font-size:16px; }
+      .btnIcon{ width:20px; height:20px; }
+      .loginForm{ width:100%; margin-top:30px; }
+      .signupForm{ width:100%; margin-top:20px; }
+    }
+
+    /* === 아이디 입력 + 버튼 한 줄 구성 === */
+    .inputWithBtn{
+      display:flex; align-items:center; gap:10px;
+      width:100%;
+    }
+    .checkBtn{
+      height:var(--inputHeight);
+      border-radius:var(--inputRadius);
+      border:2px solid #111;
+      background:#111; color:#fff;
+      font-size:14px; font-weight:800; letter-spacing:.02em;
+      padding:0 10px;
+      cursor:pointer;
+      flex:0 0 auto;
+      min-width:112px;
+      transition:background-color .3s ease;
+    }
+    .checkBtn:hover{ background:#222; }
+    @media (max-width:480px){
+      .inputWithBtn{ gap:8px; }
+      .checkBtn{ min-width:96px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="mainContainer">
+    <!-- 좌측 브랜딩 -->
+    <section class="leftSection">
+      <h1 class="logo">SCIT Hub</h1>
+      <p class="description">
+        SCIT 전용 일정 · 정보 · 커뮤니티 플랫폼<br/>
+        학습과 소통을 위한 통합 허브입니다.
+      </p>
+    </section>
+
+    <!-- 우측 인증 -->
+    <section class="rightSection">
+      <div class="authButtons">
+        <button class="authBtn loginBtn" id="loginBtn">
+          Login
+          <img src="icons/arrow_left_alt.svg" alt="arrow" class="btnIcon" id="loginArrow">
+        </button>
+        <button class="authBtn signupBtn" id="signupBtn">
+          Sign up
+          <img src="icons/arrow_left_alt.svg" alt="arrow" class="btnIcon" id="signArrow">
+        </button>
+      </div>
+
+      <!-- 로그인 폼 -->
+      <form class="loginForm" id="loginForm" method="post" th:action="@{/user/login}">
+        <div class="formGroup">
+          <input type="text" class="formInput" placeholder="아이디" id="username" name="username" required>
+        </div>
+        <div class="formGroup" id="loginPwGroup">
+          <input type="password" class="formInput" placeholder="비밀번호" id="password" name="password" required>
+        </div>
+        <div class="formGroup">
+          <button type="submit" class="loginSubmitBtn">로그인</button>
+        </div>
+      </form>
+
+      <!-- 회원가입 폼(2단계) -->
+      <form class="signupForm" id="signupForm" method="post" th:action="@{/user/signup}">
+        <div class="signupSteps">
+          <!-- 1단계 -->
+          <div class="step step-1 show" id="signupStep1">
+            <div class="formGroup">
+              <select id="classSelect" name="cohortNo" required></select>
+            </div>
+
+            <div class="formGroup">
+              <div class="inputWithBtn">
+                <input type="text" class="formInput" placeholder="아이디" id="id" name="userName" required>
+                <button type="button" class="checkBtn" id="idCheckBtn" th:data-url="@{/user/idCheck}">중복확인</button>
+              </div>
+              <!-- ▼ 추가: 중복확인 상태 저장용 히든 -->
+              <input type="hidden" id="idChecked" name="idChecked" value="false">
+              <input type="hidden" id="checkedId" name="checkedId" value="">
+            </div>
+
+            <div class="formGroup" id="signupPwGroup">
+              <input type="password" class="formInput" placeholder="비밀번호" id="pw" name="signupPassword" required>
+            </div>
+            <div class="formGroup" id="signupPwCheckGroup">
+              <input type="password" class="formInput" placeholder="비밀번호 확인" id="pwcheck" name="passwordConfirm" required>
+            </div>
+            <div class="formGroup">
+              <button type="button" class="loginSubmitBtn" id="signupNextBtn">다음</button>
+            </div>
+          </div>
+
+          <!-- 2단계 -->
+          <div class="step step-2" id="signupStep2">
+            <div class="formGroup">
+              <input type="text" class="formInput" placeholder="이름" id="name" name="name" required>
+            </div>
+            <div class="formGroup">
+              <div class="genderGroup" role="radiogroup" aria-label="성별">
+                <label class="radioPill addPadding"><input type="radio" name="gender" value="M" required><span>남</span></label>
+                <label class="radioPill addPadding"><input type="radio" name="gender" value="F" required><span>여</span></label>
+                <label class="radioPill nonAddPadding"><input type="radio" name="gender" value="N" required><span>선택하지 않음</span></label>
+              </div>
+            </div>
+            <div class="formGroup"><input type="date" class="formInput" id="birth" name="birth" required></div>
+            <div class="formGroup"><input type="email" class="formInput" placeholder="이메일" id="email" name="email" required></div>
+            <div class="formGroup"><input type="tel" class="formInput" placeholder="전화번호" id="phone" name="phone" required></div>
+            <div class="formGroup"><button type="submit" class="loginSubmitBtn">가입하기</button></div>
+          </div>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function(){
+      /** 버튼/폼 요소 */
+      const loginBtn = document.getElementById('loginBtn');
+      const signupBtn = document.getElementById('signupBtn');
+      const loginForm = document.getElementById('loginForm');
+      const signupForm = document.getElementById('signupForm');
+      const loginArrow = document.getElementById('loginArrow');
+      const signArrow  = document.getElementById('signArrow');
+
+      const classSelect = document.getElementById('classSelect');
+      const step1 = document.getElementById('signupStep1');
+      const step2 = document.getElementById('signupStep2');
+      const signupNextBtn = document.getElementById('signupNextBtn');
+
+      /* 반 번호 옵션 1회 생성(1~47, 기본 47기) */
+      if (classSelect && classSelect.options.length === 0) {
+        for (let i = 1; i <= 47; i++) {
+          const option = document.createElement('option');
+          option.value = i;
+          option.textContent = i + '기';
+          if (i === 47) option.selected = true;
+          classSelect.appendChild(option);
+        }
+      }
+
+      /* 로그인 버튼 토글 */
+      loginBtn.addEventListener('click', function() {
+        const willShow = !loginForm.classList.contains('show');
+        loginForm.classList.toggle('show', willShow);
+        loginArrow.classList.toggle('rotated', willShow);
+        loginBtn.classList.toggle('active', willShow);
+
+        // 서로 배타적으로 표시
+        signupBtn.style.display = willShow ? 'none' : '';
+        signupForm.classList.remove('show');
+        signArrow.classList.remove('rotated');
+        signupBtn.classList.remove('active');
+      });
+
+      /* 회원가입 버튼 토글 */
+      signupBtn.addEventListener('click', function() {
+        const willShow = !signupForm.classList.contains('show');
+        signupForm.classList.toggle('show', willShow);
+        signArrow.classList.toggle('rotated', willShow);
+        signupBtn.classList.toggle('active', willShow);
+
+        // 서로 배타적으로 표시
+        loginBtn.style.display = willShow ? 'none' : '';
+        loginForm.classList.remove('show');
+        loginArrow.classList.remove('rotated');
+        loginBtn.classList.remove('active');
+
+        if (willShow) {
+          step1.classList.add('show');
+          step2.classList.remove('show');
+        }
+      });
+
+      /**
+       * validateLoginForm
+       * @returns {string|null} 에러 메시지 또는 null
+       * 기능: 로그인 기본 유효성 검증
+       */
+      function validateLoginForm(){
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value;
+        if (!username) return '아이디를 입력해주세요.';
+        if (!password) return '비밀번호를 입력해주세요.';
+        if (password.length < 6) return '비밀번호는 6자 이상이어야 합니다.';
+        return null;
+      }
+
+      /**
+       * validateSignupStep1
+       * @returns {string|null} 에러 메시지 또는 null
+       * 기능: 회원가입 1단계 유효성 검증(아이디/비번/확인 + 아이디 중복확인 완료 여부)
+       */
+      function validateSignupStep1(){
+        const userId   = document.getElementById('id').value.trim();
+        const pw       = document.getElementById('pw').value;
+        const pwcheck  = document.getElementById('pwcheck').value;
+        const idChecked = document.getElementById('idChecked').value === 'true';
+        const checkedId = document.getElementById('checkedId').value;
+
+        if (!userId || !pw || !pwcheck) return '아이디와 비밀번호를 모두 입력해주세요.';
+        if (pw.length < 6) return '비밀번호는 6자 이상이어야 합니다.';
+        if (pw !== pwcheck) return '비밀번호가 일치하지 않습니다.';
+        // ▼ 추가: 중복확인 완료 + 현재 아이디와 일치해야 다음 단계 진행
+        if (!idChecked || checkedId !== userId) return '아이디 중복확인을 완료해 주세요.';
+        return null;
+      }
+
+      /**
+       * validateSignupFinal
+       * @returns {string|null} 에러 메시지 또는 null
+       * 기능: 회원가입 2단계 유효성 검증(이름/성별/생일/이메일/전화)
+       */
+      function validateSignupFinal(){
+        const name   = document.getElementById('name').value.trim();
+        const gender = (document.querySelector('input[name="gender"]:checked') || {}).value || '';
+        const birth  = document.getElementById('birth').value;
+        const email  = document.getElementById('email').value.trim();
+        const phone  = document.getElementById('phone').value.trim();
+
+        if (!name || !gender || !birth || !email || !phone) return '모든 항목을 입력해주세요.';
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return '이메일 형식이 올바르지 않습니다.';
+        if (!/^\d{2,4}-?\d{3,4}-?\d{4}$/.test(phone)) return '전화번호 형식을 확인해주세요.';
+        return null;
+      }
+
+      /* 1단계 → 2단계 (유효성 검증 후 전환) */
+      signupNextBtn?.addEventListener('click', function(){
+        const err = validateSignupStep1();
+        if (err) { alert(err); return; }
+        step1.classList.remove('show');
+        step2.classList.add('show');
+      });
+
+      /* 로그인 제출: 유효성만 검사 */
+      loginForm.addEventListener('submit', function(e) {
+        const err = validateLoginForm();
+        if (err) {
+          e.preventDefault();
+          alert(err);
+          return;
+        }
+      });
+
+      /* 회원가입 제출: 유효성만 검사 */
+      signupForm.addEventListener('submit', function(e) {
+        const step1Err = validateSignupStep1();
+        if (step1Err) {
+          e.preventDefault();
+          alert(step1Err);
+          step2.classList.remove('show');
+          step1.classList.add('show');
+          return;
+        }
+        const finalErr = validateSignupFinal();
+        if (finalErr) {
+          e.preventDefault();
+          alert(finalErr);
+          return;
+        }
+      });
+
+      /** 
+       * 아이디 중복확인 버튼 클릭
+       * - 현재 입력한 아이디를 쿼리로 붙여 팝업 오픈
+       * - 서버 컨트롤러: GET /user/idCheck?searchId=...
+       */
+      document.querySelector('#idCheckBtn')?.addEventListener('click', function(){
+        const baseUrl = this.dataset.url || 'user/idCheck';
+        const userId  = document.getElementById('id').value.trim();
+        if (userId.length < 3 || userId.length > 11) {
+          alert('아이디를 3~10자로 입력해주세요.');
+          document.getElementById('id').focus();
+          return;
+        }
+        const url = `${baseUrl}?searchId=${encodeURIComponent(userId)}`;
+        window.open(url, 'idwin', 'top=200,left=600,width=300,height=300');
+      });
+
+      /**
+       * 아이디 입력값이 변경되면 중복확인 상태 무효화
+       */
+      document.getElementById('id')?.addEventListener('input', function(){
+        document.getElementById('idChecked').value = 'false';
+        document.getElementById('checkedId').value = '';
+      });
+    });
+  </script>
+</body>
+</html>
