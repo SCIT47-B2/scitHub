@@ -83,7 +83,7 @@ public class MypageController {
 			log.debug("수정 실패..");
 		}
 		
-		return "redirect:/mypage";
+		return "redirect:/mypage/info";
 	}
     
 }
