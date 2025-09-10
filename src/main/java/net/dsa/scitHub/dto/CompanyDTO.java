@@ -1,6 +1,5 @@
 package net.dsa.scitHub.dto;
 
-import java.util.List;
 import java.util.OptionalDouble;
 
 import lombok.AllArgsConstructor;

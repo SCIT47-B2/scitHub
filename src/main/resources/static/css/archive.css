@@ -96,14 +96,14 @@ tbody tr:hover {
     border-radius: 5px;
     list-style: none;
     padding: 5px 0;
-    margin: 5px 0 0 0;
+    margin: 2px 0 0 0;
     z-index: 10;
     display: none;
     min-width: 120px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-.dropdown:hover .dropdown-menu {
+.dropdown:hover > .dropdown-menu {
     display: block;
 }
 
