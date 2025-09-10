@@ -13,10 +13,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dsa.scitHub.dto.MenuItem;
 import net.dsa.scitHub.dto.PostDTO;
+import net.dsa.scitHub.dto.PostDetailDTO;
 import net.dsa.scitHub.service.BoardService;
 import net.dsa.scitHub.service.PostService;
 import net.dsa.scitHub.service.UserService;
@@ -45,18 +47,29 @@ public class AdminController {
     int upperBoardId;          // 위쪽 공지 게시판 ID
     int lowerBoardId;          // 아래쪽 공지 게시판 ID
 
-    // 메뉴 항목
+    /**
+     * 운영실 메뉴 아이템
+     * @return 메뉴 아이템 리스트
+     */
     @ModelAttribute("menuItems")
     public List<MenuItem> menuItems() {
         return List.of(
-            new MenuItem("공지사항", "/admin/announcement"),
-            new MenuItem("문의", "/admin/inquiry"),
-            new MenuItem("신고", "/admin/report"),
-            new MenuItem("회원관리", "/admin/manageUser")
+            new MenuItem("お知らせ", "/admin/announcement"),
+            new MenuItem("お問い合わせ", "/admin/inquiry"),
+            new MenuItem("通報", "/admin/report"),
+            new MenuItem("会員管理", "/admin/manageUser")
         );
     }
 
-    // 운영실 페이지 요청
+    /**
+     * 운영실 공지사항 페이지
+     * @param model 모델
+     * @param page 페이지 번호
+     * @param searchType 검색 유형
+     * @param searchWord 검색어
+     * @param boardName 게시판 이름
+     * @return 뷰 이름
+     */
     @GetMapping({"", "/", "announcement"})
     public String adminPage(
         Model model,
@@ -101,6 +114,15 @@ public class AdminController {
         return "admin/announcement";
     }
 
+    /**
+     * 운영실 문의 페이지
+     * @param model 모델
+     * @param page 페이지 번호
+     * @param searchType 검색 유형
+     * @param searchWord 검색어
+     * @param boardName 게시판 이름
+     * @return 뷰 이름
+     */
     @GetMapping("inquiry")
     public String inquiryPage(
         Model model,
@@ -137,6 +159,12 @@ public class AdminController {
         return "admin/inquiry";
     }
 
+    /**
+     * 운영실 문의 글 제출 처리
+     * @param postDTO 글 정보
+     * @param userId 사용자 ID
+     * @return 리다이렉트 URL
+     */
     @PostMapping("inquiry/submit")
     public String submitInquiry(
         PostDTO postDTO,
@@ -158,6 +186,52 @@ public class AdminController {
 			log.debug("[예외 발생] 글 저장 실패: {}", e.getMessage());
 			return "redirect:/admin/inquiry?error=true";
 		}
+    }
+
+    /**
+     * 운영실 문의글 상세보기 페이지
+     * @param postId 조회할 문의글 ID
+     * @param model 뷰에 데이터를 전달할 객체
+     * @return "admin/inquiryRead" 뷰 템플릿
+     */
+    @GetMapping("inquiryRead")
+    public String inquiryRead(
+        @RequestParam("postId") int postId,
+        Model model
+    ) {
+        log.debug("운영실 문의글 상세보기 요청: postId={}", postId);
+
+        try {
+            PostDetailDTO postDetail = ps.findPostDetailById(postId);
+            log.debug("조회된 게시글 상세 정보: {}", postDetail);
+
+            model.addAttribute("post", postDetail);
+
+            return "admin/inquiryRead";
+        } catch (EntityNotFoundException e) {
+            log.error("[예외 발생] 게시글을 찾을 수 없습니다: {}", e.getMessage());
+
+            return "redirect:/admin/inquiry?error=true";
+        }
+    }
+
+    @PostMapping("inquiry/addComment")
+    public String addComment(
+        @RequestParam("postId") int postId,
+        @RequestParam("content") String content,
+        @AuthenticationPrincipal(expression = "userId") Integer userId
+    ) {
+        log.debug("댓글 등록 요청: postId={}, content={}, userId={}", postId, content, userId);
+        try {
+            ps.saveComment(postId, content, userId);
+            log.debug("댓글 저장 성공!");
+
+            return "redirect:/admin/inquiryRead?postId=" + postId;
+        } catch (EntityNotFoundException e) {
+            log.error("[예외 발생] 댓글 저장 실패: {}", e.getMessage());
+
+            return "redirect:/admin/inquiry?error=true";
+        }
     }
 
     @GetMapping("report")

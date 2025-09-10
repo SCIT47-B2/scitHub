@@ -12,6 +12,7 @@ import net.dsa.scitHub.entity.board.Post;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface PostRepository extends JpaRepository<Post, Integer> {
@@ -94,5 +95,19 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     @Query("SELECT p.board.boardId, COUNT(p) FROM Post p GROUP BY p.board.boardId")
     List<Object[]> countPostsByBoard();
 
+    /**
+     * 게시글 ID로 게시글, 작성자, 댓글, 댓글 작성자 정보를 한 번에 조회
+     * @param postId 게시글 ID
+     * @return Post 엔티티 Optional
+     */
+    @Query(
+        "SELECT p FROM Post p " +
+        "JOIN FETCH p.user " +
+        "LEFT JOIN FETCH p.comments c " +
+        "LEFT JOIN FETCH c.user " +
+        "WHERE p.postId = :postId " +
+        "ORDER BY c.createdAt ASC"
+    )
+    Optional<Post> findPostWithDetailsById(@Param("postId") Integer postId);
 
 }
