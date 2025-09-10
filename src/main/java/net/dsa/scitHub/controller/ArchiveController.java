@@ -7,8 +7,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import groovy.util.logging.Slf4j;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.dsa.scitHub.dto.CompanyDTO;
 import net.dsa.scitHub.dto.MenuItem;
 import net.dsa.scitHub.enums.CompanyType;
