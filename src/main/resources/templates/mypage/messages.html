@@ -8,7 +8,7 @@
     <link rel="stylesheet" th:href="@{/css/tokens.css}">
     <link rel="stylesheet" th:href="@{/css/base.css}">
     <link rel="stylesheet" th:href="@{/css/sidebar.css}">
-    <link rel="stylesheet" th:href="@{/css/mypage.css}">
+    <!--<link rel="stylesheet" th:href="@{/css/mypage.css}">--> 
     <!-- 아이콘 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- 쪽지함 전용 -->
@@ -19,11 +19,24 @@
 <!-- 사이드바 -->
 <div th:replace="~{fragments/sidebar :: sidebarFragment(${menuItems})}"></div>
 
-<!-- 메인 영역 (넓은 유동 폭 + 가운데) -->
-<section class="message-box layoutWide" aria-label="메인 영역" layout:fragment="content">
+<!-- 메인 영역 -->
+<section class="message-box" aria-label="메인 영역" layout:fragment="content">
     <div class="header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
         <h1>쪽지함</h1>
         <button id="composeBtn" class="btn primary">새 쪽지 작성</button>
+    </div>
+
+    <div class="search-bar">
+        <form id="searchForm">
+            <select id="searchType">
+                <option value="all">전체</option>
+                <option value="author">보낸 사람</option>
+                <option value="title">제목</option>
+                <option value="content">내용</option>
+            </select>
+            <input type="text" id="searchInput" placeholder="검색어를 입력하세요">
+            <button type="submit" class="btn">검색</button>
+        </form>
     </div>
 
     <div class="tabs">
@@ -72,6 +85,7 @@
     </div>
     <div class="modal-footer">
       <button type="button" id="deleteBtn" class="btn danger">삭제</button>
+      <button type="button" id="replyBtn" class="btn primary">답장</button>
       <button type="button" class="btn" onclick="closeViewModal()">닫기</button>
     </div>
   </div>
@@ -120,10 +134,14 @@
     const composeModal = document.getElementById('composeModal');
     const composeForm = document.getElementById('composeForm');
     const viewModal = document.getElementById('viewModal');
+    const searchForm = document.getElementById('searchForm');
+    const searchInput = document.getElementById('searchInput');
 
     // 상태
     let currentType = 'received';
     let currentPage = 0;
+    let currentSearchType = 'all';
+    let currentSearchKeyword = '';
 
     // API 기본 URL
     const API_BASE_URL = /*[[@{/mypage/api/messages}]]*/ '/mypage/api/messages';
@@ -134,9 +152,18 @@
         return date.toLocaleString('ko-KR');
     }
 
-    async function fetchMessages(type, page = 0) {
-        const url = `${API_BASE_URL}/${type}?page=${page}&size=10&sort=createdAt,desc`;
-        console.info('[fetchMessages] type:', type, 'page:', page, '→', url);
+    async function fetchMessages(type, page = 0, searchType = 'all', searchKeyword = '') {
+        const params = new URLSearchParams({
+            page: page,
+            size: 10,
+            sort: 'createdAt,desc',
+            searchType: searchType
+        });
+        if (searchKeyword) {
+            params.append('searchKeyword', searchKeyword);
+        }
+        const url = `${API_BASE_URL}/${type}?${params.toString()}`;
+        console.info('[fetchMessages] type:', type, 'page:', page, 'searchType:', searchType, 'searchKeyword:', searchKeyword, '→', url);
         try {
             const response = await debugFetch(url);
             if (!response.ok) throw new Error('메시지를 불러오는데 실패했습니다.');
@@ -186,7 +213,8 @@
             if (i === pageData.number) pageLink.classList.add('active');
             pageLink.addEventListener('click', (e) => {
                 e.preventDefault();
-                fetchMessages(currentType, i);
+                currentPage = i;
+                fetchMessages(currentType, currentPage, currentSearchType, currentSearchKeyword);
             });
             paginationContainer.appendChild(pageLink);
         }
@@ -195,9 +223,16 @@
     function switchTab(type) {
         currentType = type;
         currentPage = 0;
+        const authorOption = document.querySelector('#searchType option[value="author"]');
+        if (type === 'received') {
+            authorOption.textContent = '보낸 사람';
+        } else {
+            authorOption.textContent = '받는 사람';
+        }
         receivedTab.classList.toggle('active', type === 'received');
         sentTab.classList.toggle('active', type === 'sent');
-        fetchMessages(currentType, currentPage);
+        // 검색어 유지하며 탭 전환
+        fetchMessages(currentType, currentPage, currentSearchType, currentSearchKeyword);
     }
 
     // 모달 컨트롤
@@ -254,11 +289,29 @@
             document.getElementById('viewTimestamp').innerText = formatDateTime(msg.createdAt);
             document.getElementById('viewContent').innerText = msg.content;
 
-            document.getElementById('deleteBtn').onclick = () => deleteMessage(messageId);
+            const deleteBtn = document.getElementById('deleteBtn');
+            const replyBtn = document.getElementById('replyBtn');
+
+            deleteBtn.onclick = () => deleteMessage(messageId);
+
+            // 받은 쪽지함에서 열었을 때만 답장 버튼을 표시하고, 기능 연결
+            if (currentType === 'received' && msg.senderUsername) {
+                replyBtn.style.display = 'inline-block';
+                replyBtn.onclick = () => {
+                    closeViewModal();
+                    openComposeModal();
+                    document.getElementById('receiverUsername').value = msg.senderUsername;
+                    document.getElementById('messageTitle').value = msg.title.startsWith('Re: ') ? msg.title : `Re: ${msg.title}`;
+                    document.getElementById('messageContent').focus();
+                };
+            } else {
+                replyBtn.style.display = 'none';
+            }
+
             viewModal.style.display = 'flex';
 
             if (currentType === 'received' && !msg.isRead) {
-                fetchMessages(currentType, currentPage);
+                fetchMessages(currentType, currentPage, currentSearchType, currentSearchKeyword);
             }
         } catch (error) {
             alert('쪽지를 불러올 수 없습니다.');
@@ -276,7 +329,7 @@
             }
             alert('쪽지가 삭제되었습니다.');
             closeViewModal();
-            fetchMessages(currentType, currentPage);
+            fetchMessages(currentType, currentPage, currentSearchType, currentSearchKeyword);
         } catch (error) {
             alert('삭제 중 오류가 발생했습니다.');
         }
@@ -286,7 +339,16 @@
         receivedTab.addEventListener('click', () => switchTab('received'));
         sentTab.addEventListener('click', () => switchTab('sent'));
         composeBtn.addEventListener('click', openComposeModal);
-        fetchMessages(currentType, currentPage);
+
+        searchForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            currentSearchType = document.getElementById('searchType').value;
+            currentSearchKeyword = searchInput.value.trim();
+            currentPage = 0;
+            fetchMessages(currentType, currentPage, currentSearchType, currentSearchKeyword);
+        });
+
+        fetchMessages(currentType, currentPage, currentSearchType, currentSearchKeyword);
     });
 </script>
 </th:block>

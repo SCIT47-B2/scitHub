@@ -48,8 +48,8 @@
    ----------------------------- */
 section.message-box {
   padding: var(--space6);
-  background: var(--bgBody);
   color: var(--textPrimary);
+  flex: 1; /* 사이드바를 제외한 나머지 공간을 모두 차지하도록 설정 */
   min-height: 100%;
 }
 
@@ -290,6 +290,8 @@ section.message-box .pagination a.active {
 .modal-backdrop .modal-body input,
 .modal-backdrop .modal-body textarea {
   width: 100%;
+  box-sizing: border-box; /* 너비 계산에 padding과 border를 포함시켜 오버플로우 방지 */
+  resize: none; /* 사용자가 크기를 조절할 수 없도록 고정 */
   display: block;
   border: 1px solid var(--borderColor);
   border-radius: var(--radiusSm);
@@ -362,29 +364,39 @@ section.message-box .pagination a.active {
     width: 100%;
   }
 }
-/** =========================================
- *  Option 2: Wide, fluid center
- *  - 화면에 맞춰 넓게, 지나치게 넓지 않게 상한
- *  - 배경 투명, 가운데 정렬
- * ========================================= */
-section.message-box {
-  background: transparent;           /* 배경 제거 */
+
+/* --- 검색창 스타일 --- */
+.search-bar {
+  max-width: 600px;
+  margin: 0 auto 20px;
 }
 
-section.message-box.layoutWide {
-  width: clamp(960px, 86vw, 1440px); /* 화면에 맞춰 유동폭(최소/최대 한계) */
-  margin-inline: auto;               /* 가운데 정렬 */
-  padding-left: clamp(16px, 2.5vw, 32px);
-  padding-right: clamp(16px, 2.5vw, 32px);
+.search-bar form {
+  display: flex;
+  gap: 8px;
+  align-items: center;
 }
 
-/* 모바일에서는 100% 폭으로 */
-@media (max-width: 768px) {
-  section.message-box.layoutWide {
-    width: 100%;
-    padding-left: 16px;
-    padding-right: 16px;
-  }
+.search-bar select,
+.search-bar input[type="text"] {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  /* 다른 입력 필드와 스타일 통일을 위해 상속받도록 설정 */
+  font-family: inherit;
+  font-size: inherit;
+  background-color: var(--bg-color);
+  color: var(--text-color);
 }
 
+.search-bar input[type="text"] {
+  flex-grow: 1;
+}
 
+/* 포커스 스타일 (선택 사항, 통일성 부여) */
+.search-bar select:focus,
+.search-bar input[type="text"]:focus {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 1px;
+  border-color: var(--primary-color);
+}
