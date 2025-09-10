@@ -7,17 +7,17 @@ public enum Industry {
     /** IT 업계 */
     IT("IT"),
     /** 제조업 */
-    MANUFACTURING("제조"),
+    MANUFACTURING("製造"),
     /** 금융업 */
-    FINANCE("금융"),
+    FINANCE("金融"),
     /** 산업 */
-    INDUSTRIAL("산업"),
+    INDUSTRIAL("産業"),
     /** 통신업 */
-    TELECOM("통신"),
+    TELECOM("通信"),
     /** 서비스업 */
-    SERVICE("서비스"),
+    SERVICE("サービス"),
     /** 기타 */
-    OTHER("그 외");
+    OTHER("その他");
     
     private final String displayName;
     
