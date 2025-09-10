@@ -42,26 +42,66 @@ public class MessageService {
     /**
      * 특정 사용자가 받은 메시지 목록을 페이징하여 조회합니다.
      *
-     * @param receiverUsername String - 수신자 아이디
+     * @param receiverUsername String - 수신자 아이디 
+     * @param searchType       String - 검색 유형
+     * @param searchKeyword    String - 검색어
      * @param pageable         Pageable - 페이징 정보
      * @return Page<MessageResponseDto> - 받은 메시지 목록 페이지
      */
-    public Page<MessageResponseDto> getReceivedMessages(String receiverUsername, Pageable pageable) {
+    public Page<MessageResponseDto> getReceivedMessages(String receiverUsername, String searchType, String searchKeyword, Pageable pageable) {
         User receiver = findUserByUsername(receiverUsername);
-        Page<Message> messages = messageRepository.findByReceiver_UserId(receiver.getUserId(), pageable);
+        Page<Message> messages;
+        if (searchKeyword == null || searchKeyword.trim().isEmpty()) {
+            messages = messageRepository.findByReceiver_UserId(receiver.getUserId(), pageable);
+        } else {
+            switch (searchType) {
+                case "author":
+                    messages = messageRepository.findReceivedMessagesBySenderName(receiver.getUserId(), searchKeyword, pageable);
+                    break;
+                case "title":
+                    messages = messageRepository.findByReceiver_UserIdAndTitleContaining(receiver.getUserId(), searchKeyword, pageable);
+                    break;
+                case "content":
+                    messages = messageRepository.findByReceiver_UserIdAndContentContaining(receiver.getUserId(), searchKeyword, pageable);
+                    break;
+                default: // "all"
+                    messages = messageRepository.findReceivedMessagesWithKeyword(receiver.getUserId(), searchKeyword, pageable);
+                    break;
+            }
+        }
         return messages.map(MessageResponseDto::from);
     }
 
     /**
      * 특정 사용자가 보낸 메시지 목록을 페이징하여 조회합니다.
      *
-     * @param senderUsername String - 발신자 아이디
+     * @param senderUsername String - 발신자 아이디 
+     * @param searchType     String - 검색 유형
+     * @param searchKeyword  String - 검색어
      * @param pageable       Pageable - 페이징 정보
      * @return Page<MessageResponseDto> - 보낸 메시지 목록 페이지
      */
-    public Page<MessageResponseDto> getSentMessages(String senderUsername, Pageable pageable) {
+    public Page<MessageResponseDto> getSentMessages(String senderUsername, String searchType, String searchKeyword, Pageable pageable) {
         User sender = findUserByUsername(senderUsername);
-        Page<Message> messages = messageRepository.findBySender_UserId(sender.getUserId(), pageable);
+        Page<Message> messages;
+        if (searchKeyword == null || searchKeyword.trim().isEmpty()) {
+            messages = messageRepository.findBySender_UserId(sender.getUserId(), pageable);
+        } else {
+            switch (searchType) {
+                case "author":
+                    messages = messageRepository.findSentMessagesByReceiverName(sender.getUserId(), searchKeyword, pageable);
+                    break;
+                case "title":
+                    messages = messageRepository.findBySender_UserIdAndTitleContaining(sender.getUserId(), searchKeyword, pageable);
+                    break;
+                case "content":
+                    messages = messageRepository.findBySender_UserIdAndContentContaining(sender.getUserId(), searchKeyword, pageable);
+                    break;
+                default: // "all"
+                    messages = messageRepository.findSentMessagesWithKeyword(sender.getUserId(), searchKeyword, pageable);
+                    break;
+            }
+        }
         return messages.map(MessageResponseDto::from);
     }
 
