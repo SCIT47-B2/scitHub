@@ -3,14 +3,12 @@
     xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
     layout:decorate="~{layouts/defaultLayout}">
     <head>
-        <title>Announcement</title>
+        <title>Inquiry</title>
         <th:block layout:fragment="css">
-            <!-- 이 페이지에만 적용될 CSS 파일을 여기에 추가합니다 -->
-            <link rel="stylesheet" th:href="@{/css/announcement.css}">
+            <link rel="stylesheet" th:href="@{/css/inquiry.css}">
         </th:block>
     </head>
     <body>
-        <!--// layout:fragment="content" : 이 부분이 메인 콘텐츠 영역이 됩니다. //-->
         <section class="mainGrid" layout:fragment="content">
 
             <!-- 전체 콘텐츠를 감싸는 컨테이너 -->
@@ -20,13 +18,12 @@
                 <div class="main-content">
                     <!-- 1. 검색 영역 -->
                     <div class="search-bar">
-                        <form id="pagingForm" method="get" th:action="@{/admin/announcement}">
+                        <form id="pagingForm" method="get" th:action="@{/admin/inquiry}">
                             <input type="hidden" name="page" id="page">
                             <input type="hidden" name="boardName" id="boardName" th:value="${boardName}">
                             <select id="type" name="searchType">
                                 <option value="all"     th:selected="${searchType == 'all'}">全て</option>
                                 <option value="title"   th:selected="${searchType == 'title'}">タイトル</option>
-                                <option value="tag"     th:selected="${searchType == 'tag'}">タグ</option>
                                 <option value="content" th:selected="${searchType == 'content'}">内容</option>
                                 <option value="user"    th:selected="${searchType == 'user'}">投稿者</option>
                             </select>
@@ -35,31 +32,31 @@
                         </form>
                     </div>
 
-                    <!-- 2. 중심 공지 테이블 영역 -->
-                    <div class="announcement-section">
-                        <h2 th:text="${boardName == 'announcement' ? 'お知らせ' : boardName == 'announcementIt' ? 'お知らせ - IT' : 'お知らせ - 日本語'}"></h2>
-                        <table class="announcement-table">
+                    <!-- 2. 중심 문의 테이블 영역 -->
+                    <div class="inquiry-section">
+                        <h2>お問い合わせ一覧</h2>
+                        <table class="inquiry-table">
                             <thead>
                                 <tr>
                                     <th>番号</th>
                                     <th>タイトル</th>
                                     <th>投稿者</th>
                                     <th>投稿日</th>
-                                    <th>閲覧数</th>
+                                    <th>回答状況</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td colspan="5" th:if="${postPage.isEmpty()}" class="no-data">お知らせはありません。</td>
+                                    <td colspan="5" th:if="${postPage.isEmpty()}" class="no-data">お問い合わせはありません。</td>
                                 </tr>
                                 <tr th:each="post, status : ${postPage}" th:unless="${postPage.isEmpty()}">
                                     <td th:text="${post.postId}"></td>
                                     <td>
-                                        <a th:text="${post.title}" th:href="@{/admin/announcementRead(postId=${post.postId})}"></a>
+                                        <a th:text="${post.title}" th:href="@{/admin/inquiryRead(postId=${post.postId})}"></a>
                                     </td>
                                     <td th:text="${post.userNameKor}" class="center"></td>
                                     <td th:text="${#temporals.format(post.createdAt, 'yy-MM-dd HH:mm')}"></td>
-                                    <td th:text="${post.viewCount}" class="center"></td>
+                                    <td th:text="${post.isComment ? 'Y' : 'N'}" class="center"></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -96,39 +93,21 @@
                     </nav>
                 </div>
 
-                <!-- 오른쪽 사이드 콘텐츠 (타 공지) -->
+                <!-- 오른쪽 사이드 콘텐츠 (문의하기 폼) -->
                 <aside class="side-content">
-                    <!-- 4. 위쪽 공지 패널 -->
-                    <div class="notice-panel" th:with="UpperBoardName=${boardName == 'announcement' ? 'announcementIt' : 'announcement'}">
-                        <a th:href="|javascript:changeBoard('${UpperBoardName}')|" class="panel-header">
-                            <h3 th:text="${boardName == 'announcement' ? 'お知らせ - IT' : 'お知らせ'}"></h3>
-                            <span>&gt;</span>
-                        </a>
-                        <ul class="notice-list">
-                            <li th:each="upperPost : ${upperPosts}">
-                                <a th:href="@{/admin/announcementRead(postId=${upperPost.postId})}">
-                                    <span class="title" th:text="${upperPost.title}"></span>
-                                    <span class="date" th:text="${#temporals.format(upperPost.createdAt, 'yyyy-MM-dd')}"></span>
-                                </a>
-
-                            </li>
-                        </ul>
-                    </div>
-
-                    <!-- 5. 아래쪽 공지 패널 -->
-                    <div class="notice-panel" th:with="lowerBoardName=${boardName == 'announcementJp' ? 'announcementIt' : 'announcementJp'}">
-                        <a th:href="|javascript:changeBoard('${lowerBoardName}')|" class="panel-header">
-                            <h3 th:text="${boardName == 'announcementJp' ? 'お知らせ - IT' : 'お知らせ - 日本語'}"></h3>
-                            <span>&gt;</span>
-                        </a>
-                        <ul class="notice-list">
-                            <li th:each="lowerPost : ${lowerPosts}">
-                                <a th:href="@{/admin/announcementRead(postId=${lowerPost.postId})}">
-                                    <span class="title" th:text="${lowerPost.title}"></span>
-                                    <span class="date" th:text="${#temporals.format(lowerPost.createdAt, 'yyyy-MM-dd')}"></span>
-                                </a>
-                            </li>
-                        </ul>
+                    <div class="inquiry-form-container">
+                        <h2><i class="fa-solid fa-pencil"></i> お問い合わせ</h2>
+                        <form th:action="@{/admin/inquiry/submit}" method="post">
+                            <div class="form-group">
+                                <label for="inquiry-title">タイトル</label>
+                                <input type="text" id="inquiry-title" name="title" placeholder="タイトル">
+                            </div>
+                            <div class="form-group">
+                                <label for="inquiry-content">内容</label>
+                                <textarea id="inquiry-content" name="content" rows="10" placeholder="内容"></textarea>
+                            </div>
+                            <button type="submit" class="submit-btn">投稿する</button>
+                        </form>
                     </div>
                 </aside>
             </div>
@@ -150,4 +129,3 @@
         </th:block>
     </body>
 </html>
-

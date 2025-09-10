@@ -10,12 +10,20 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dsa.scitHub.dto.PostDTO;
+import net.dsa.scitHub.dto.PostDetailDTO;
+import net.dsa.scitHub.entity.board.Board;
+import net.dsa.scitHub.entity.board.Comment;
 import net.dsa.scitHub.entity.board.Post;
+import net.dsa.scitHub.entity.user.User;
+import net.dsa.scitHub.repository.board.BoardRepository;
+import net.dsa.scitHub.repository.board.CommentRepository;
 import net.dsa.scitHub.repository.board.PostRepository;
+import net.dsa.scitHub.repository.user.UserRepository;
 
 @Service
 @Slf4j
@@ -23,6 +31,9 @@ import net.dsa.scitHub.repository.board.PostRepository;
 @Transactional
 public class PostService {
     private final PostRepository pr;
+    private final UserRepository ur;
+    private final BoardRepository br;
+    private final CommentRepository cr;
 
     /**
      * 게시판 ID와 검색 조건에 따른 게시글 목록 조회 (페이징)
@@ -85,5 +96,53 @@ public class PostService {
         }
 
         return postDTOList;
+    }
+
+    /**
+     * 게시글 저장
+     * @param postDTO   저장할 게시글 정보
+     */
+    public void savePost(PostDTO postDTO) {
+
+        User user = ur.findById(postDTO.getUserId())
+            .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다. ID: " + postDTO.getUserId()));
+        Board board = br.findById(postDTO.getBoardId())
+            .orElseThrow(() -> new EntityNotFoundException("게시판을 찾을 수 없습니다. ID: " + postDTO.getBoardId()));
+
+        Post post = PostDTO.convertToPostEntity(postDTO, user, board);
+        pr.save(post);
+    }
+
+    /**
+     * 게시글 상세 정보 조회 (작성자, 댓글, 댓글 작성자 포함)
+     * @param postId 조회할 게시글 ID
+     * @return PostDetailDTO
+     */
+    public PostDetailDTO findPostDetailById(Integer postId) {
+        Post post = pr.findPostWithDetailsById(postId)
+            .orElseThrow(() -> new EntityNotFoundException("게시글을 찾을 수 없습니다. ID: " + postId));
+
+        return PostDetailDTO.convertToPostDetailDTO(post);
+    }
+
+    /**
+     * 댓글 저장
+     * @param postId 댓글을 달 게시글 ID
+     * @param content 댓글 내용
+     * @param userId 댓글 작성자 ID
+     */
+    public void saveComment(Integer postId, String content, Integer userId) {
+        Post post = pr.findById(postId)
+            .orElseThrow(() -> new EntityNotFoundException("게시글을 찾을 수 없습니다. ID: " + postId));
+        User user = ur.findById(userId)
+            .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다. ID: " + userId));
+
+        Comment comment = Comment.builder()
+            .user(user)
+            .content(content)
+            .post(post)
+            .build();
+
+        cr.save(comment);
     }
 }

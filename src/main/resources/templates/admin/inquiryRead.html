@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layouts/defaultLayout}">
+    <head>
+        <title>Inquiry Details</title>
+        <th:block layout:fragment="css">
+            <link rel="stylesheet" th:href="@{/css/inquiryRead.css}">
+        </th:block>
+    </head>
+    <body>
+        <section class="mainGrid" layout:fragment="content">
+            <div class="detail-container" th:object="${post}">
+                <!-- 1. 상단 헤더 (목록으로 돌아가기) -->
+                <div class="detail-header">
+                    <a th:href="@{/admin/inquiry}" class="back-link">
+                        <i class="fa-solid fa-arrow-left"></i>
+                        <span>お問い合わせ一覧</span>
+                    </a>
+                </div>
+
+                <!-- 2. 원본 문의글 -->
+                <div class="post-box">
+                    <div class="post-header">
+                        <h2 th:text="*{title}">教室がとても寒いです。。</h2>
+                        <div class="post-meta">
+                            <span>投稿者</span>
+                            <b th:text="*{userNameKor}">コ・ギョンハン</b>
+                            <span th:text="${#temporals.format(post.createdAt, 'yyyy.MM.dd HH:mm')}">2025.04.18 15:28</span>
+                        </div>
+                    </div>
+                    <div class="post-content" th:text="*{content}">
+                        エアコンの温度調節が可能になればいいですね。
+                    </div>
+                </div>
+
+                <!-- 3. 답변(댓글) 목록 -->
+                <div class="comment-box" th:each="comment : *{comments}">
+                    <div class="post-header">
+                        <h3>回答完了</h3>
+                        <div class="post-meta">
+                            <span>投稿者</span>
+                            <b th:text="${comment.userNameKor}">管理者</b>
+                            <span th:text="${#temporals.format(comment.createdAt, 'yyyy.MM.dd HH:mm')}">2025.04.18 16:30</span>
+                        </div>
+                    </div>
+                    <div class="post-content" th:text="${comment.content}">
+                        中央制御のため各教室での調整はできませんが、温度調整をご希望の際は運営室までご連絡いただければ対応いたします。
+                    </div>
+                </div>
+
+                <!-- 4. 답변(댓글) 작성 폼 (댓글이 없을 경우에만 보이도록 할 수 있음) -->
+                <div class="comment-form-container" th:if="*{comments.isEmpty()}">
+                    <h3>回答作成</h3>
+                    <form th:action="@{/admin/inquiry/addComment}" method="post">
+                        <input type="hidden" name="postId" th:value="*{postId}">
+                        <textarea name="content" placeholder="回答を入力してください。。。"></textarea>
+                        <button type="submit">回答登録</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+        <th:block layout:fragment="script">
+        </th:block>
+    </body>
+</html>

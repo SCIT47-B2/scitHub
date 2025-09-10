@@ -44,17 +44,21 @@ public class MessageController {
     /**
      * 현재 로그인한 사용자가 받은 메시지 목록을 조회합니다.
      *
-     * @param userDetails UserDetails - 현재 로그인한 사용자 정보
+     * @param userDetails UserDetails - 현재 로그인한 사용자 정보 
+     * @param searchType  String - 검색 유형 (all, author, title, content)
+     * @param searchKeyword String - 검색어
      * @param pageable    Pageable - 페이징 정보 (size, sort 등)
      * @return ResponseEntity<Page<MessageResponseDto>> - 받은 메시지 목록 페이지
      */
     @GetMapping("/received")
     public ResponseEntity<Page<MessageResponseDto>> getReceivedMessages(
             @AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam(value = "searchType", defaultValue = "all") String searchType,
+            @RequestParam(value = "searchKeyword", required = false) String searchKeyword,
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         String receiverUsername = userDetails.getUsername();
-        Page<MessageResponseDto> messages = messageService.getReceivedMessages(receiverUsername, pageable);
+        Page<MessageResponseDto> messages = messageService.getReceivedMessages(receiverUsername, searchType, searchKeyword, pageable);
         return ResponseEntity.ok(messages);
     }
 
@@ -62,16 +66,20 @@ public class MessageController {
      * 현재 로그인한 사용자가 보낸 메시지 목록을 조회합니다.
      *
      * @param userDetails UserDetails - 현재 로그인한 사용자 정보
+     * @param searchType  String - 검색 유형 (all, author, title, content)
+     * @param searchKeyword String - 검색어
      * @param pageable    Pageable - 페이징 정보 (size, sort 등)
      * @return ResponseEntity<Page<MessageResponseDto>> - 보낸 메시지 목록 페이지
      */
     @GetMapping("/sent")
     public ResponseEntity<Page<MessageResponseDto>> getSentMessages(
             @AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam(value = "searchType", defaultValue = "all") String searchType,
+            @RequestParam(value = "searchKeyword", required = false) String searchKeyword,
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         String senderUsername = userDetails.getUsername();
-        Page<MessageResponseDto> messages = messageService.getSentMessages(senderUsername, pageable);
+        Page<MessageResponseDto> messages = messageService.getSentMessages(senderUsername, searchType, searchKeyword, pageable);
         return ResponseEntity.ok(messages);
     }
 
