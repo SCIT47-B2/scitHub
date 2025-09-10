@@ -1,0 +1,127 @@
+/* ================================== */
+/* 문의 상세 페이지 스타일              */
+/* ================================== */
+
+.detail-container {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    max-width: 900px;
+    margin: 0 auto; /* 중앙 정렬 */
+}
+
+/* 1. 상단 헤더 (목록으로) */
+.detail-header {
+    background-color: #4A67C5;
+    padding: 12px 24px;
+    border-radius: 12px;
+}
+
+.back-link {
+    color: white;
+    text-decoration: none;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 16px;
+    transition: opacity 0.2s;
+}
+.back-link:hover {
+    opacity: 0.8;
+}
+
+/* 2, 3. 게시글 & 댓글 공통 박스 */
+.post-box, .comment-box {
+    background-color: var(--bg);
+    padding: 24px 32px;
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.post-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 16px;
+}
+
+.post-header h2, .post-header h3 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+}
+.post-header h3 {
+    font-size: 16px;
+    color: var(--primary);
+}
+
+.post-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #6b7280;
+}
+.post-meta b {
+    color: #1f2937;
+    font-weight: 600;
+}
+
+.post-content {
+    font-size: 15px;
+    line-height: 1.7;
+    color: #374151;
+    padding: 8px 0;
+    white-space: pre-wrap; /* 줄바꿈 적용 */
+}
+
+/* 4. 댓글 작성 폼 */
+.comment-form-container {
+    background-color: var(--bg);
+    padding: 24px 32px;
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+}
+.comment-form-container h3 {
+    margin: 0 0 16px;
+    font-size: 16px;
+    font-weight: 700;
+}
+.comment-form-container form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.comment-form-container textarea {
+    width: 100%;
+    min-height: 120px;
+    padding: 12px 14px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    resize: vertical;
+    font-family: inherit;
+    font-size: 14px;
+}
+.comment-form-container textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+.comment-form-container button {
+    align-self: flex-end; /* 버튼을 오른쪽으로 정렬 */
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    background-color: var(--primary);
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+.comment-form-container button:hover {
+    background-color: #3b50b0;
+}
