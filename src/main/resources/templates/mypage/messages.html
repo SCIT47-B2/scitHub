@@ -20,7 +20,7 @@
 <div th:replace="~{fragments/sidebar :: sidebarFragment(${menuItems})}"></div>
 
 <!-- 메인 영역 -->
-<section class="message-box" aria-label="메인 영역" layout:fragment="content">
+<section class="message-box" layout:fragment="content">
     <div class="header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
         <h1>メッセージ</h1>
         <button id="composeBtn" class="btn primary">新規メッセージ作成</button>
