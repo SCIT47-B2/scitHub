@@ -56,7 +56,7 @@ public class AdminController {
         return List.of(
             new MenuItem("お知らせ", "/admin/announcement"),
             new MenuItem("お問い合わせ", "/admin/inquiry"),
-            new MenuItem("通報", "/admin/report"),
+            // new MenuItem("신고", "/admin/report"),
             new MenuItem("会員管理", "/admin/manageUser")
         );
     }
