@@ -1,5 +1,8 @@
 /* 사이드바 컴포넌트 */
 .sidebar{
+  position: fixed;
+  top:0;
+  left:0;
   width:var(--sidebar-w);
   min-height:100vh;
   background:var(--bg);

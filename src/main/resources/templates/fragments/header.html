@@ -11,35 +11,35 @@
                             th:classappend="${#strings.startsWith(activeUri, ctx + '/classroom')} ? 'active' : ''"
                             th:attr="aria-current=${#strings.startsWith(activeUri, ctx + '/classroom')} ? 'page' : null">
                             <span class="tabIcon"><i class="fa-solid fa-house fa-fw"></i></span>
-                            <span class="tabLabel">클래스룸</span>
+                            <span class="tabLabel">クラスルーム</span>
                         </a>
                         <a class="tab"
                             th:href="${ctx + '/calendar/schedule'}"
                             th:classappend="${#strings.startsWith(activeUri, ctx + '/calendar')} ? 'active' : ''"
                             th:attr="aria-current=${#strings.startsWith(activeUri, ctx + '/calendar')} ? 'page' : null">
                             <span class="tabIcon"><i class="fa-solid fa-calendar-days fa-fw"></i></span>
-                            <span class="tabLabel">캘린더</span>
+                            <span class="tabLabel">カレンダー</span>
                         </a>
                         <a class="tab"
                             th:href="${ctx + '/admin/announcement'}"
                             th:classappend="${#strings.startsWith(activeUri, ctx + '/admin')} ? 'active' : ''"
                             th:attr="aria-current=${#strings.startsWith(activeUri, ctx + '/admin')} ? 'page' : null">
                             <span class="tabIcon"><i class="fa-solid fa-briefcase fa-fw"></i></span>
-                            <span class="tabLabel">운영실</span>
+                            <span class="tabLabel">運営室</span>
                         </a>
                         <a class="tab"
                             th:href="${ctx + '/community/home'}"
                             th:classappend="${#strings.startsWith(activeUri, ctx + '/community')} ? 'active' : ''"
                             th:attr="aria-current=${#strings.startsWith(activeUri, ctx + '/community')} ? 'page' : null">
                             <span class="tabIcon"><i class="fa-solid fa-clipboard-list fa-fw"></i></span>
-                            <span class="tabLabel">게시판</span>
+                            <span class="tabLabel">掲示板</span>
                         </a>
                         <a class="tab"
                             th:href="${ctx + '/archive/companyList'}"
                             th:classappend="${#strings.startsWith(activeUri, ctx + '/archive')} ? 'active' : ''"
                             th:attr="aria-current=${#strings.startsWith(activeUri, ctx + '/archive')} ? 'page' : null">
                             <span class="tabIcon"><i class="fa-solid fa-folder fa-fw"></i></span>
-                            <span class="tabLabel">자료실</span>
+                            <span class="tabLabel">資料室</span>
                         </a>
                     </div>
                 </nav>

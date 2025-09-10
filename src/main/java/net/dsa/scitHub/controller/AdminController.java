@@ -49,10 +49,10 @@ public class AdminController {
     @ModelAttribute("menuItems")
     public List<MenuItem> menuItems() {
         return List.of(
-            new MenuItem("공지사항", "/admin/announcement"),
-            new MenuItem("문의", "/admin/inquiry"),
-            new MenuItem("신고", "/admin/report"),
-            new MenuItem("회원관리", "/admin/manageUser")
+            new MenuItem("お知らせ", "/admin/announcement"),
+            new MenuItem("お問い合わせ", "/admin/inquiry"),
+            // new MenuItem("신고", "/admin/report"),
+            new MenuItem("会員管理", "/admin/manageUser")
         );
     }
 

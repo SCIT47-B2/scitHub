@@ -35,8 +35,8 @@ public class MypageController {
     public String myPage(@AuthenticationPrincipal UserDetails user, Model model) {
         // 사이드바 메뉴 아이템 설정
         List<MenuItem> menuItems = List.of(
-            new MenuItem("기본 정보", "/mypage/info"),
-            new MenuItem("쪽지함", "/mypage/messages")
+            new MenuItem("基本情報", "/mypage/info"),
+            new MenuItem("メッセージ", "/mypage/messages")
         );
         model.addAttribute("menuItems", menuItems);
 
@@ -57,8 +57,8 @@ public class MypageController {
     public String messagesPage(Model model) {
         // 사이드바 메뉴 아이템 설정
         List<MenuItem> menuItems = List.of(
-            new MenuItem("기본 정보", "/mypage/info"),
-            new MenuItem("쪽지함", "/mypage/messages")
+            new MenuItem("基本情報", "/mypage/info"),
+            new MenuItem("メッセージ", "/mypage/messages")
         );
         model.addAttribute("menuItems", menuItems);
         return "mypage/messages";
