@@ -177,6 +177,15 @@
   border-radius:50%;
 }
 
+/* 로그아웃 메뉴 아이콘 전용 */
+.sidebar .menu-bottom a img {
+  width:18px;          /* 사이즈 통일 */
+  height:18px;
+  object-fit:contain;  /* 비율 유지 */
+  vertical-align:middle;
+  margin-right:6px;    /* 텍스트와 간격 */
+}
+
 /* 접근성: 사이드바만 단독 사용 시 main 없는 페이지 대비 */
 @media (max-width: 920px){
   main{padding:20px;}
