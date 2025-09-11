@@ -24,9 +24,11 @@ import lombok.ToString;
 @AllArgsConstructor
 @Data
 public class AuthenticatedUser implements UserDetails {
-	
+
 	private static final long serialVersionUID = -2757521351355190L;
-	
+
+	private Integer userId;
+
 	//인증 관련 정보
 	String id;
 	String password;

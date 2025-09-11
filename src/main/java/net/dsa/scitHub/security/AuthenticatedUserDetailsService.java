@@ -20,29 +20,30 @@ import net.dsa.scitHub.repository.user.UserRepository;
 public class AuthenticatedUserDetailsService implements UserDetailsService {
 
 	private final UserRepository userRepository;
-	
+
 	@Override
 	public UserDetails loadUserByUsername(String id) throws UsernameNotFoundException {
         log.info("로그인 시도 : {}", id);
 
         User userEntity = userRepository.findByUsername(id)
                 .orElseThrow(() -> {
-                    return new UsernameNotFoundException(id + " : 없는 ID입니다.");
+                        return new UsernameNotFoundException(id + " : 없는 ID입니다.");
                 });
 
         log.debug("조회정보 : {}", userEntity);
 
         // 인증정보 생성
         AuthenticatedUser user = AuthenticatedUser.builder()
+                .userId(userEntity.getUserId())
                 .id(userEntity.getUsername())
                 .password(userEntity.getPasswordHash())
                 .name(userEntity.getNameKor())
                 .enabled(userEntity.getIsActive())
                 .roleName(userEntity.getRole().getDisplayName())
                 .build();
-		
+
 		log.debug("인증정보 : {}", user);
-	
+
 		return user;
 	}
 

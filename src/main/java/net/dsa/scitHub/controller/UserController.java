@@ -37,17 +37,26 @@ public class UserController {
 			log.debug("가입실패..");
 		}
 		
-		return "redirect:/user/landingPage";
+		return "redirect:/user/loginPage";
 	}
 
 	/**
-	 * 로그인 페이지로 이동
+	 * 로그인/회원가입 선택 페이지로 이동
 	 * 시큐리티에서 인증하기 위해서 보내는 경로값과 일치해야 함.
 	 * @return loginForm.html
 	 */
 	@GetMapping("landingPage")
 	public String landingPage() {
 		return "user/landingPage";
+	}
+
+	/**
+	 * 로그인 전용 페이지로 이동
+	 * @return login.html
+	 */
+	@GetMapping("loginPage")
+	public String loginPage() {
+		return "user/login";
 	}
     
 	/** 아이디 중복확인(팝업: 결과만 표시) */

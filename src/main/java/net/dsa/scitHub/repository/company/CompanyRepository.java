@@ -32,6 +32,18 @@ public interface CompanyRepository extends JpaRepository<Company, Integer> {
     @Query("SELECT c FROM Company c WHERE TRIM(c.location) IN :locations")
     List<Company> findByLocationIn(@Param("locations") List<String> locations);
 
+    @Query("SELECT c FROM Company c " +
+           "LEFT JOIN c.reviews cr " +
+           "WHERE (:name IS NULL OR c.name LIKE %:name%) " +
+           "AND (:industry IS NULL OR c.industry = :industry) " +
+           "AND (:type IS NULL OR c.type = :type) " +
+           "AND (:locations IS NULL OR c.location IN :locations) " +
+           "GROUP BY c.companyId")
+    Page<Company> findWithFilters(@Param("name") String name,
+                                  @Param("industry") Industry industry,
+                                  @Param("type") CompanyType type,
+                                  @Param("locations") List<String> locations,
+                                  Pageable pageable);
     /** 직원 수 범위로 조회 */
     @Query("SELECT c FROM Company c WHERE c.headcount BETWEEN :min AND :max")
     List<Company> findByHeadcountBetween(@Param("min") Integer min, @Param("max") Integer max);
