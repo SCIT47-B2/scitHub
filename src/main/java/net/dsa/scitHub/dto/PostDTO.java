@@ -11,6 +11,7 @@ import net.dsa.scitHub.entity.board.Board;
 import net.dsa.scitHub.entity.board.Comment;
 import net.dsa.scitHub.entity.board.Post;
 import net.dsa.scitHub.entity.user.User;
+import net.dsa.scitHub.entity.user.User;
 
 @Builder
 @Data
@@ -43,13 +44,32 @@ public class PostDTO {
                 .postId(post.getPostId())
                 .boardId(post.getBoard().getBoardId())
                 .userId(post.getUser().getUserId())
+                .userId(post.getUser().getUserId())
                 .userNameKor(post.getUser().getNameKor())
                 .title(post.getTitle())
                 .content(post.getContent())
                 .viewCount(post.getViewCount())
                 .isComment(!post.getComments().isEmpty())
+                .isComment(!post.getComments().isEmpty())
                 .createdAt(post.getCreatedAt())
                 .updatedAt(post.getUpdatedAt())
+                .build();
+    }
+
+    public static Post convertToPostEntity(PostDTO postDTO, User user, Board board) {
+        if (postDTO == null) {
+            return null;
+        }
+
+        return Post.builder()
+                .postId(postDTO.getPostId())
+                .board(board)
+                .user(user)
+                .title(postDTO.getTitle())
+                .content(postDTO.getContent())
+                .viewCount(postDTO.getViewCount())
+                .createdAt(postDTO.getCreatedAt())
+                .updatedAt(postDTO.getUpdatedAt())
                 .build();
     }
 
