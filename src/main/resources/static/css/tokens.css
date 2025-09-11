@@ -6,7 +6,7 @@
   --muted:#666;
   --primary:#4258BE;
   --secondary:#7599CB;
-  --shadow:0 4px 20px rgba(0,0,0,.08);
+  --shadow:0 4px 15px rgba(0, 0, 0, 0.19);
   --sidebar-w:240px;
   --radius:20px;
   --progress:56; /* 기본 진행률(필요 시 페이지에서 override) */

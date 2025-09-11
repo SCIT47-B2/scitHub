@@ -22,9 +22,6 @@
   --focusRing: var(--focus, #93c5fd);
 
   /* Radius / shadow */
-  --radiusSm: var(--radiusSm, 8px);
-  --radiusMd: var(--radiusMd, 12px);
-  --radiusLg: var(--radiusLg, 16px);
   --shadowSm: var(--shadowSm, 0 1px 2px rgba(0,0,0,.04));
   --shadowMd: var(--shadowMd, 0 4px 12px rgba(0,0,0,.08));
 
@@ -73,7 +70,7 @@ section.message-box .btn.primary {
   background: var(--brandPrimary);
   border: 1px solid var(--brandPrimary);
   color: #fff;
-  border-radius: var(--radiusMd);
+  border-radius: 8px;
   padding: 10px 14px;
   font-weight: var(--fontWeightMedium);
   box-shadow: var(--shadowSm);
@@ -96,7 +93,7 @@ section.message-box .tab-item {
   position: relative;
   padding: 10px 16px;
   cursor: pointer;
-  border-radius: var(--radiusSm) var(--radiusSm) 0 0;
+  border-radius: 8px 8px 0 0;
   color: var(--textSecondary);
   background: transparent;
   border: 1px solid transparent;
@@ -126,7 +123,7 @@ section.message-box .message-list {
   margin: 0;
   background: var(--bgSurface);
   border: 1px solid var(--borderColor);
-  border-radius: var(--radiusMd);
+  border-radius: 12px;
   overflow: hidden;
   box-shadow: var(--shadowSm);
 }
@@ -208,7 +205,7 @@ section.message-box .pagination a {
   height: 36px;
   padding: 0 10px;
   border: 1px solid var(--borderColor);
-  border-radius: var(--radiusSm);
+  border-radius: 8px;
   background: var(--bgSurface);
   color: var(--textPrimary);
   text-decoration: none;
@@ -245,7 +242,7 @@ section.message-box .pagination a.active {
   background: var(--bgSurface);
   width: 560px;
   max-width: 100%;
-  border-radius: var(--radiusLg);
+  border-radius: 16px;
   border: 1px solid var(--borderColor);
   box-shadow: var(--shadowMd);
   overflow: hidden;
@@ -279,7 +276,7 @@ section.message-box .pagination a.active {
   cursor: pointer;
   color: var(--textSecondary);
   padding: 2px 6px;
-  border-radius: var(--radiusSm);
+  border-radius: 8px;
 }
 .modal-backdrop .btn-close:hover { background: var(--bgMuted); color: var(--textPrimary); }
 
@@ -294,7 +291,7 @@ section.message-box .pagination a.active {
   resize: none; /* 사용자가 크기를 조절할 수 없도록 고정 */
   display: block;
   border: 1px solid var(--borderColor);
-  border-radius: var(--radiusSm);
+  border-radius: 8px;
   background: var(--bgBody);
   color: var(--textPrimary);
   padding: 10px 12px;
@@ -320,7 +317,7 @@ section.message-box .pagination a.active {
 }
 
 .modal-backdrop .btn {
-  border-radius: var(--radiusSm);
+  border-radius: 8px;
   padding: 10px 14px;
   border: 1px solid var(--borderColor);
   background: var(--bgSurface);
@@ -381,7 +378,7 @@ section.message-box .pagination a.active {
 .search-bar input[type="text"] {
   padding: 8px;
   border: 1px solid #ccc;
-  border-radius: 4px;
+  border-radius: 8px;
   /* 다른 입력 필드와 스타일 통일을 위해 상속받도록 설정 */
   font-family: inherit;
   font-size: inherit;
