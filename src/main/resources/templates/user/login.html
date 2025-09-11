@@ -2,7 +2,7 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
     xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
     <head>
-        <title>Home</title>
+        <title>LogIn Page</title>
         <th:block layout:fragment="css">
             <link rel="stylesheet" th:href="@{/css/login.css}">
         </th:block>
@@ -15,7 +15,7 @@
                 <!-- /** 상단 Hero: 서비스 타이틀/서브텍스트 */ -->
                 <header class="hero" aria-label="인트로">
                 <h1 class="siteTitle">SCIT Hub</h1>
-                <p class="siteSub">회원이 되신 것을 축하드립니다!</p>
+                <p class="siteSub">ご登録ありがとうございます!</p>
                 </header>
 
                 <!-- /** 로그인 카드: Login 타이틀 + 폼 */ -->
@@ -30,13 +30,13 @@
                     */ -->
                 <form id="loginForm" class="loginForm" method="post" th:action="@{/user/login}">
                     <div class="formGroup">
-                    <input class="formInput" type="text" name="username" placeholder="아이디" autocomplete="username" required />
+                    <input class="formInput" type="text" name="username" placeholder="ID" autocomplete="username" required />
                     </div>
                     <div class="formGroup">
-                    <input class="formInput" type="password" name="password" placeholder="비밀번호" autocomplete="current-password" required />
+                    <input class="formInput" type="password" name="password" placeholder="パスワード" autocomplete="current-password" required />
                     </div>
                     <div class="formGroup">
-                    <button type="submit" class="submitBtn">로그인</button>
+                    <button type="submit" class="submitBtn">ログイン</button>
                     </div>
                 </form>
                 </section>

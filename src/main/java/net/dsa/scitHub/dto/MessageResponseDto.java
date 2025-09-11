@@ -13,7 +13,7 @@ public class MessageResponseDto {
     private Integer messageId;
     private Integer senderId;
     private String senderName;
-    private String senderUsername; // 답장 기능을 위해 발신자 username 추가
+    private String senderUsername; // 답장 기능을 위해 보낸 사람의 로그인 ID 추가
     private Integer receiverId;
     private String receiverName;
     private String title;

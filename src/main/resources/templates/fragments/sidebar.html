@@ -37,22 +37,95 @@
                 </div>
 
                 <div class="menu-bottom">
-                    <a href="#"><i class="fa-solid fa-bell"></i>알림</a>
-                    <a href="#"><i class="fa-solid fa-gear"></i>설정</a>
+                    <a th:href="@{/member/logout}"><img th:src="@{/icons/lets-icons_out-light.png}" src="/icons/lets-icons_out-light.png">ログアウト</a>
                 </div>
             </nav>
             <div class="bottom">
-                <div class="study-card" role="status" aria-label="학습 현황 56%">
-                    <div class="study-head">
-                        <span class="title">학습 현황</span>
-                        <span class="subtitle">SCIT 과정</span>
-                    </div>
-                    <div class="study-bottom">
-                        <span class="big-percent">56%</span>
-                        <div class="ring" style="--progress:56" aria-hidden="true"></div>
-                    </div>
+            <div class="study-card"
+                role="status"
+                aria-label="학습 현황"
+                data-start="2025-03-31"
+                data-end="2025-11-21">
+                <div class="study-head">
+                <span class="title">学習現況</span>
+                <span class="subtitle">SCIT 課程</span>
+                </div>
+                <div class="study-bottom">
+                <span class="big-percent">0%</span>
+                <div class="ring" style="--progress:0" aria-hidden="true"></div>
                 </div>
             </div>
+            </div>
+
+            <script th:inline="javascript">
+            /*<![CDATA[*/
+            /** 날짜 문자열(YYYY-MM-DD)을 로컬타임 Date로 변환
+             * @param {string} ymd - 'YYYY-MM-DD' 형식
+             * @returns {Date} - 로컬 시간대 기준 Date
+             */
+            function parseDateLocal(ymd) {
+              /** 예외 처리: 값 없음 */
+              if (!ymd || typeof ymd !== 'string') return null;
+              const [y, m, d] = ymd.split('-').map(Number);
+              /** JS Date: month는 0부터 시작 */
+              return new Date(y, (m || 1) - 1, d || 1, 0, 0, 0, 0);
+            }
+
+            /** 진행도 퍼센트 계산 (0~100 사이로 클램프)
+             * @param {Date} startDate - 시작일(로컬)
+             * @param {Date} endDate - 종료일(로컬)
+             * @param {Date} nowDate - 기준일(기본값=오늘)
+             * @returns {number} - 퍼센트 (정수)
+             */
+            function calcProgressPercent(startDate, endDate, nowDate = new Date()) {
+              /** 잘못된 입력 방어 */
+              if (!(startDate instanceof Date) || isNaN(startDate)) return 0;
+              if (!(endDate instanceof Date) || isNaN(endDate)) return 0;
+
+              /** 구간 길이(ms) */
+              const total = endDate - startDate;
+              if (total <= 0) return 100; // 시작 ≥ 종료인 경우 완료로 간주
+
+              /** 진행 경과(ms) */
+              const elapsed = Math.min(Math.max(nowDate - startDate, 0), total);
+              const ratio = elapsed / total;
+              /** 소수점 반올림 */
+              return Math.round(ratio * 100);
+            }
+
+            /** DOM의 study-card에서 data-start/end를 읽어 UI 갱신
+             * @param {HTMLElement} cardEl - .study-card 요소
+             * @returns {void}
+             */
+            function updateStudyProgress(cardEl) {
+              if (!cardEl) return;
+
+              const startStr = cardEl.getAttribute('data-start');
+              const endStr   = cardEl.getAttribute('data-end');
+
+              const start = parseDateLocal(startStr);
+              const end   = parseDateLocal(endStr);
+
+              let percent = calcProgressPercent(start, end);
+              /** 0~100 보정 */
+              percent = Math.min(100, Math.max(0, percent));
+
+              /** 텍스트, 도넛 변수 반영 */
+              const percentTextEl = cardEl.querySelector('.big-percent');
+              const ringEl        = cardEl.querySelector('.ring');
+
+              if (percentTextEl) percentTextEl.textContent = `${percent}%`;
+              if (ringEl) ringEl.style.setProperty('--progress', String(percent));
+            }
+
+            /** 페이지 로드 시 1회 계산 */
+            document.addEventListener('DOMContentLoaded', function onReady() {
+              /** 사이드바가 여러 개일 수 있으니 모두 처리 */
+              const cards = document.querySelectorAll('.sidebar .study-card[data-start][data-end]');
+              cards.forEach(updateStudyProgress);
+            });
+            /*]]>*/
+            </script>
         </aside>
     </body>
 </html>
