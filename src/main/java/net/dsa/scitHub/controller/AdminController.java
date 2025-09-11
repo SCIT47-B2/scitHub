@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,11 +13,15 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.criteria.CriteriaBuilder.In;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.dsa.scitHub.dto.CommentDTO;
 import net.dsa.scitHub.dto.MenuItem;
+import net.dsa.scitHub.dto.MypageDTO;
 import net.dsa.scitHub.dto.PostDTO;
 import net.dsa.scitHub.dto.PostDetailDTO;
 import net.dsa.scitHub.service.BoardService;
@@ -215,22 +220,157 @@ public class AdminController {
         }
     }
 
+    /**
+     * 운영실 문의글 수정 (AJAX)
+     * @param postDTO 수정할 게시글 정보
+     * @param currentUser 현재 로그인한 사용자 정보
+     * @return ResponseEntity with updated post or error message
+     */
+    @PostMapping("inquiry/updatePost")
+    @ResponseBody
+    public ResponseEntity<?> updatePost(
+        PostDTO postDTO,
+        @ModelAttribute("currentUser") MypageDTO currentUser
+    ) {
+        log.debug("AJAX 문의글 수정 요청: postDTO={}, userId={}", postDTO, currentUser.getUserId());
+        try {
+            PostDTO updatedPost = ps.updatePost(postDTO, currentUser.getUserId(), currentUser.getRole());
+            log.debug("게시글 수정 성공: {}", updatedPost);
+
+            return ResponseEntity.ok(updatedPost);
+        } catch (EntityNotFoundException e) {
+            log.error("[예외 발생] 게시글 수정 실패: {}", e.getMessage());
+
+            return ResponseEntity.status(404).body("게시글을 찾을 수 없습니다.");
+        } catch (SecurityException e) {
+            log.error("[예외 발생] 게시글 수정 권한 없음: {}", e.getMessage());
+
+            return ResponseEntity.status(403).body("게시글 수정 권한이 없습니다.");
+        } catch (Exception e) {
+            log.error("[예외 발생] 게시글 수정 중 오류: {}", e.getMessage());
+
+            return ResponseEntity.status(500).body("게시글 수정 중 오류가 발생했습니다.");
+        }
+    }
+
+    /**
+     * 운영실 문의글 삭제
+     * @param postId 삭제할 문의글 ID
+     * @param currentUser 현재 로그인한 사용자 정보
+     * @return 리다이렉트 URL
+     */
+    @PostMapping("inquiry/deletePost")
+    public String deleteInquiryPost(
+        @RequestParam("postId") int postId,
+        @ModelAttribute("currentUser") MypageDTO currentUser
+    ) {
+        log.debug("운영실 문의글 삭제 요청: postId={}", postId);
+
+        try {
+            ps.deletePost(postId, currentUser.getUserId(), currentUser.getRole());
+            log.debug("게시글 삭제 성공!");
+
+            return "redirect:/admin/inquiry";
+        } catch (EntityNotFoundException e) {
+            log.error("[예외 발생] 게시글 삭제 실패: {}", e.getMessage());
+
+            return "redirect:/admin/inquiry?error=true";
+        } catch (SecurityException e) {
+            log.error("[예외 발생] 게시글 삭제 권한 없음: {}", e.getMessage());
+
+            return "redirect:/admin/inquiry?accessDenied=true";
+        }
+    }
+
+    /**
+     * 운영실 문의글에 답변 추가
+     * @param postId 답변을 추가할 문의글 ID
+     * @param content 답변 내용
+     * @param userId 답변 작성자 ID
+     * @return 리다이렉트 URL
+     */
     @PostMapping("inquiry/addComment")
     public String addComment(
         @RequestParam("postId") int postId,
         @RequestParam("content") String content,
         @AuthenticationPrincipal(expression = "userId") Integer userId
     ) {
-        log.debug("댓글 등록 요청: postId={}, content={}, userId={}", postId, content, userId);
+        log.debug("답변 등록 요청: postId={}, content={}, userId={}", postId, content, userId);
         try {
             ps.saveComment(postId, content, userId);
-            log.debug("댓글 저장 성공!");
+            log.debug("답변 저장 성공!");
 
             return "redirect:/admin/inquiryRead?postId=" + postId;
         } catch (EntityNotFoundException e) {
-            log.error("[예외 발생] 댓글 저장 실패: {}", e.getMessage());
+            log.error("[예외 발생] 답변 저장 실패: {}", e.getMessage());
 
             return "redirect:/admin/inquiry?error=true";
+        }
+    }
+
+    /**
+     * 운영실 문의글 답변 수정 (AJAX)
+     * @param commentId 수정할 답변 ID
+     * @param content 수정된 답변 내용
+     * @param currentUser 현재 로그인한 사용자 정보
+     * @return ResponseEntity with updated comment or error message
+     */
+    @PostMapping("inquiry/updateComment")
+    @ResponseBody
+    public ResponseEntity<?> updateComment(
+        @RequestParam("commentId") Integer commentId,
+        @RequestParam("content") String content,
+        @ModelAttribute("currentUser") MypageDTO currentUser
+    ) {
+        log.debug("AJAX 답변 수정 요청: commentId={}, content={}, userId={}", commentId, content, currentUser.getUserId());
+        try {
+            CommentDTO updatedComment = ps.updateComment(commentId, content, currentUser.getUserId(), currentUser.getRole());
+            log.debug("답변 수정 성공: {}", updatedComment);
+
+            return ResponseEntity.ok(updatedComment);
+        } catch (EntityNotFoundException e) {
+            log.error("[예외 발생] 답변 수정 실패: {}", e.getMessage());
+
+            return ResponseEntity.status(404).body("답변을 찾을 수 없습니다.");
+        } catch (SecurityException e) {
+            log.error("[예외 발생] 답변 수정 권한 없음: {}", e.getMessage());
+
+            return ResponseEntity.status(403).body("답변 수정 권한이 없습니다.");
+        } catch (Exception e) {
+            log.error("[예외 발생] 답변 수정 중 오류: {}", e.getMessage());
+
+            return ResponseEntity.status(500).body("답변 수정 중 오류가 발생했습니다.");
+        }
+    }
+
+    /**
+     * 운영실 문의글 답변 삭제
+     * @param commentId 삭제할 답변 ID
+     * @param postId 답변이 달린 문의글 ID (리다이렉트용)
+     * @param currentUser 현재 로그인한 사용자 정보
+     * @return 리다이렉트 URL
+     */
+    @PostMapping("inquiry/deleteComment")
+    public String deleteComment(
+        @RequestParam("commentId") int commentId,
+        @RequestParam("postId") int postId,
+        @ModelAttribute("currentUser") MypageDTO currentUser
+    ) {
+        log.debug("운영실 문의글 답변 삭제 요청: commentId={}", commentId);
+
+        try {
+            ps.deleteComment(commentId, currentUser.getUserId(), currentUser.getRole());
+            log.debug("답변 삭제 성공!");
+
+            return "redirect:/admin/inquiryRead?postId=" + postId;
+        } catch (EntityNotFoundException e) {
+            log.error("[예외 발생] 답변 삭제 실패: {}", e.getMessage());
+
+            return "redirect:/admin/inquiry?error=true";
+        } catch (SecurityException e) {
+            log.error("[예외 발생] 답변 삭제 권한 없음: {}", e.getMessage());
+
+            return "redirect:/admin/inquiry?accessDenied=true";
         }
     }
 

@@ -2,6 +2,7 @@ package net.dsa.scitHub.entity.board;
 
 import jakarta.persistence.*;
 import lombok.*;
+import net.dsa.scitHub.entity.interfaces.Authorizable;
 import net.dsa.scitHub.entity.user.User;
 
 import org.springframework.data.annotation.CreatedDate;
@@ -21,7 +22,7 @@ import java.util.Objects;
 @AllArgsConstructor
 @Builder
 @ToString(exclude = {"board", "user", "comments", "attachmentFiles", "tags", "likes"})
-public class Post {
+public class Post implements Authorizable{
 
     /** 게시글 고유 식별자 */
     @Id

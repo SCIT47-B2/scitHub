@@ -12,7 +12,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MypageDTO {
-    
     private Integer userId;         // hidden name="userId"
     private Integer cohortNo;     // select name="cohortNo"
     private String userName;           // input name="userName"
@@ -22,4 +21,5 @@ public class MypageDTO {
     private LocalDate birth;         // input name="birth"
     private String email;            // input name="email"
     private String phone;            // input name="phone"
+    private String role;
 }

@@ -97,8 +97,8 @@
               <label for="birth">生年月日</label>
               <div class="field">
                 <input id="birth" name="birth" type="date"
-                       th:value="${#temporals.format(user.birth, 'yyyy-MM-dd')}"
-                       th:attr="max=${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}">
+                      th:value="${#temporals.format(user.birth, 'yyyy-MM-dd')}"
+                      th:attr="max=${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}">
               </div>
             </div>
 
