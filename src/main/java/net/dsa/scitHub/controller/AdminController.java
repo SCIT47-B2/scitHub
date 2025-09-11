@@ -1,6 +1,7 @@
 package net.dsa.scitHub.controller;
 
 import java.util.List;
+import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -16,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.persistence.criteria.CriteriaBuilder.In;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dsa.scitHub.dto.CommentDTO;
@@ -37,7 +37,6 @@ public class AdminController {
     private final PostService ps;
     private final BoardService bs;
     private final UserService us;
-    static private boolean readFlag = false; // 글 읽기 플래그
 
 	@Value("${board.uploadPath}")
 	String uploadPath;			// 첨부파일 저장 경로
@@ -57,13 +56,17 @@ public class AdminController {
      * @return 메뉴 아이템 리스트
      */
     @ModelAttribute("menuItems")
-    public List<MenuItem> menuItems() {
-        return List.of(
-            new MenuItem("お知らせ", "/admin/announcement"),
-            new MenuItem("お問い合わせ", "/admin/inquiry"),
-            // new MenuItem("신고", "/admin/report"),
-            new MenuItem("会員管理", "/admin/manageUser")
-        );
+    public List<MenuItem> menuItems(@AuthenticationPrincipal(expression = "roleName") String role) {
+        List<MenuItem> menuItems = new ArrayList<>();
+
+        menuItems.add(new MenuItem("お知らせ", "/admin/announcement"));
+        menuItems.add(new MenuItem("お問い合わせ", "/admin/inquiry"));
+
+        if ("ROLE_ADMIN".equals(role)) {
+            menuItems.add(new MenuItem("会員管理", "/admin/manageUser"));
+        }
+
+        return menuItems;
     }
 
     /**
