@@ -4,19 +4,20 @@
   <head>
     <title>マイページ</title>
     <th:block layout:fragment="css">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+      <link rel="stylesheet" th:href="@{/css/tokens.css}">
+      <link rel="stylesheet" th:href="@{/css/base.css}">
+      <link rel="stylesheet" th:href="@{/css/sidebar.css}">
       <link rel="stylesheet" th:href="@{/css/mypage.css}">
     </th:block>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" th:href="@{/css/tokens.css}">
-    <link rel="stylesheet" th:href="@{/css/base.css}">
-    <link rel="stylesheet" th:href="@{/css/sidebar.css}">
+    
   </head>
   <body>
-
+    <!-- 좌측: 사이드바 -->
     <div th:replace="~{fragments/sidebar :: sidebarFragment(${menuItems})}"></div>
 
-    <section class="" aria-label="메인 영역" layout:fragment="content" style="margin-left: 250px; padding: 1.5rem; max-width: 80%;">
-
+    <!-- 우측: 콘텐츠 -->
+    <main class="profilePage" aria-label="메인 영역" layout:fragment="content">
       <!-- /** 단일 폼
            * @desc   좌측(아바타 업로드) + 우측(정보 입력) 한 번에 저장
            * @action /mypage/info  (POST, multipart/form-data)
@@ -32,10 +33,13 @@
         <!-- 좌측: 아바타 + 표시용 정보 -->
         <section class="profileLeft" aria-label="프로필 요약">
           <div class="avatar" id="avatarBox" aria-label="프로필 이미지" role="img">
-            <!-- DB에는 파일명만 저장된다고 가정: /uploads/avatar/{fileName} 로 서빙 -->
-            <img id="avatarImg"
-                 th:src="${#strings.isEmpty(user.avatarUrl)} ? @{/images/chiikawaPuzzle.png} : @{/uploads/avatar/{f}(f=${user.avatarUrl})}"
-                 alt="프로필 이미지">
+            <!-- 이미지만 감싸는 내부 래퍼: 프레임 안에 정확히 클리핑 -->
+            <div class="avatarClip">
+              <img id="avatarImg"
+                   th:src="${#strings.isEmpty(user.avatarUrl)} ? @{/images/chiikawaPuzzle.png} : @{/uploads/avatar/{f}(f=${user.avatarUrl})}"
+                   alt="프로필 이미지">
+            </div>
+
             <button class="editAvatarBtn" id="editAvatarBtn" title="プロフィール画像を変更" type="button">
               <i class="fa-solid fa-pen" aria-hidden="true"></i>
               <span class="sr-only">프로필 이미지 변경</span>
@@ -53,7 +57,7 @@
             <span id="badgeCourse" class="pill">Smart Cloud IT Master</span>
           </div>
           <div class="miniBadges">
-            <span id="badgeCohort" class="pill" th:text="${user.cohortNo + '기 서울'}">47기 서울</span>
+            <span id="badgeCohort" class="pill" th:text="${user.cohortNo + '期 ソウル'}">47期 ソウル</span>
           </div>
         </section>
 
@@ -113,16 +117,15 @@
         </section>
       </form>
       <!-- 단일 폼 끝 -->
-    </section>
+    </main>
 
     <th:block layout:fragment="script">
       <script>
         /**
          * initAvatarPicker
-         * - 기능: 펜 버튼 클릭 → 파일 선택 → 미리보기 표시
-         * - 파라미터: 없음
-         * - 리턴타입: void
-         * - 리턴: 없음
+         * @desc   펜 버튼 클릭 → 파일 선택 → 미리보기 표시
+         * @param  없음
+         * @return void (화면 미리보기만 갱신)
          */
         (function initAvatarPicker(){
           const editAvatarBtn = document.getElementById('editAvatarBtn');
@@ -158,10 +161,9 @@
 
         /**
          * validation
-         * - 기능: 필수 입력값 검증 후 통과 시 제출
-         * - 파라미터: e(SubmitEvent)
-         * - 리턴타입: void
-         * - 리턴: 없음
+         * @desc   필수 입력값 검증 후 통과 시 제출
+         * @param  e {SubmitEvent}
+         * @return void
          */
         document.getElementById('profileForm').addEventListener('submit', function validation(e){
           e.preventDefault();

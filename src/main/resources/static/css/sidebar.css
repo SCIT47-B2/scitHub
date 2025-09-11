@@ -12,6 +12,8 @@
   box-sizing:border-box;
   display:flex;
   flex-direction:column;
+  box-shadow: var(--shadow); /* 그림자 효과 추가 */
+  z-index: 10; /* 다른 콘텐츠 위에 표시되도록 z-index 추가 */
 }
 
 /* 로고 */
