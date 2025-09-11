@@ -1,6 +1,9 @@
 /* ================================== */
-/* 문의 상세 페이지 스타일              */
+/* 문의 상세 페이지 스타일 (색상 테마 개선) */
 /* ================================== */
+
+/* --color-primary는 레이아웃의 defaultLayout.html 등에서 정의될 것으로 예상 */
+/* 예: :root { --primary: #4A67C5; --secondary: #6c757d; --bg: #f8f9fa; --shadow: 0 4px 8px rgba(0,0,0,0.05); } */
 
 .detail-container {
     display: flex;
@@ -12,11 +15,10 @@
 
 /* 1. 상단 헤더 (목록으로) */
 .detail-header {
-    background-color: #4A67C5;
+    background-color: var(--primary); /* 기본 파란색 헤더 */
     padding: 12px 24px;
     border-radius: 12px;
 }
-
 .back-link {
     color: white;
     text-decoration: none;
@@ -44,8 +46,8 @@
 
 .post-header {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    align-items: center; /* 세로 중앙 정렬 */
+    gap: 16px; /* 요소 간 간격 */
     border-bottom: 1px solid #e5e7eb;
     padding-bottom: 16px;
 }
@@ -54,6 +56,7 @@
     margin: 0;
     font-size: 20px;
     font-weight: 700;
+    white-space: nowrap; /* 제목이 길어도 줄바꿈 방지 */
 }
 .post-header h3 {
     font-size: 16px;
@@ -66,21 +69,116 @@
     gap: 8px;
     font-size: 14px;
     color: #6b7280;
+    flex-grow: 1; /* 남은 공간을 모두 차지하여 actions를 오른쪽으로 밀어냄 */
 }
 .post-meta b {
     color: #1f2937;
     font-weight: 600;
 }
 
+/* --- 버튼 스타일 통일 및 색상 테마 적용 --- */
+.actions {
+    display: flex;
+    gap: 8px;
+    white-space: nowrap; /* 버튼들이 줄바꿈되지 않도록 */
+}
+
+/* 공통 버튼 스타일 */
+.actions button,
+.edit-actions button {
+    padding: 6px 14px; /* 스크린샷과 유사하게 패딩 조절 */
+    font-size: 14px; /* 폰트 크기 조절 */
+    font-weight: 500;
+    border-radius: 6px; /* 둥근 모서리 */
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+    border: none; /* 기본적으로 테두리 없음 */
+}
+
+/* 편집 및 등록(저장) 버튼 (파란색 계열) */
+.actions .btn-edit-post, /* 문의글 편집 버튼 */
+.actions .btn-edit-comment, /* 댓글 편집 버튼 */
+.edit-actions .btn-save-post, /* 문의글 저장 버튼 */
+.edit-actions .btn-save-comment { /* 댓글 저장 버튼 */
+    color: var(--primary); /* 기본 파란색 */
+    border-color: var(--secondary); /* 연한 파란색 테두리 */
+}
+.actions .btn-edit-post:hover,
+.actions .btn-edit-comment:hover,
+.edit-actions .btn-save-post:hover,
+.edit-actions .btn-save-comment:hover {
+    color: #1e40af; /* 진한 파란색 */
+    background-color: #e0e7ff; /* 연한 파란색 배경 */
+    border-color: #a5b4fc; /* 중간 파란색 테두리 */
+}
+
+/* 삭제 및 취소 버튼 (빨간색 계열) */
+.actions .btn-delete, /* 문의글 및 댓글 삭제 버튼 */
+.edit-actions .btn-cancel-post, /* 문의글 취소 버튼 */
+.edit-actions .btn-cancel-comment { /* 댓글 취소 버튼 */
+    color: #ef4444;
+    border-color: #fecaca;
+}
+.actions .btn-delete:hover,
+.edit-actions .btn-cancel-post:hover,
+.edit-actions .btn-cancel-comment:hover {
+    color: #b91c1c;
+    background-color: #fee2e2;
+    border-color: #fca5a5;
+}
+
+/* --- 콘텐츠 및 수정 폼 스타일 --- */
 .post-content {
     font-size: 15px;
     line-height: 1.7;
     color: #374151;
     padding: 8px 0;
-    white-space: pre-wrap; /* 줄바꿈 적용 */
+    white-space: pre-wrap;
 }
 
-/* 4. 댓글 작성 폼 */
+/* 수정 모드 입력창/텍스트 영역 공통 */
+.edit-input,
+.edit-textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 14px;
+    box-sizing: border-box; /* 패딩 포함 크기 계산 */
+}
+.edit-input:focus,
+.edit-textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(74, 103, 197, 0.2);
+}
+
+.edit-mode {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.edit-textarea {
+    min-height: 150px;
+    resize: vertical;
+}
+.edit-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 8px; /* 버튼 위 여백 추가 */
+}
+.edited-timestamp {
+    color: #888; /* 약간 연한 회색 */
+    font-size: 13px; /* 약간 작은 글씨 */
+    margin-left: 4px; /* 왼쪽과 살짝 띄우기 */
+}
+.post-box > #post-edit-mode > .edit-textarea {
+    margin-top: 16px;
+}
+
+/* 4. 새 답변(댓글) 작성 폼 */
 .comment-form-container {
     background-color: var(--bg);
     padding: 24px 32px;
@@ -111,17 +209,19 @@
     outline: none;
     border-color: var(--primary);
 }
-.comment-form-container button {
-    align-self: flex-end; /* 버튼을 오른쪽으로 정렬 */
+/* 메인 등록 버튼 (Primary Button) */
+.comment-form-container button[type="submit"] { /* type="submit"으로 정확히 지정 */
+    align-self: flex-end;
     padding: 10px 20px;
     border: none;
     border-radius: 8px;
     background-color: var(--primary);
     color: white;
+    font-size: 15px;
     font-weight: 600;
     cursor: pointer;
     transition: background-color 0.2s;
 }
-.comment-form-container button:hover {
+.comment-form-container button[type="submit"]:hover {
     background-color: #3b50b0;
 }

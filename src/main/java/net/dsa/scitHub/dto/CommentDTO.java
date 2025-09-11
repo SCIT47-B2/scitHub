@@ -7,7 +7,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import net.dsa.scitHub.entity.board.Comment;
-import net.dsa.scitHub.entity.board.Post;
 import net.dsa.scitHub.entity.user.User;
 
 @Builder
@@ -21,4 +20,21 @@ public class CommentDTO {
     private String content;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    public static CommentDTO convertToCommentDTO(Comment comment) {
+        if (comment == null) {
+            return null;
+        }
+
+        User user = comment.getUser();
+
+        return CommentDTO.builder()
+                .commentId(comment.getCommentId())
+                .userId(user != null ? user.getUserId() : null)
+                .userNameKor(user != null ? user.getNameKor() : null)
+                .content(comment.getContent())
+                .createdAt(comment.getCreatedAt())
+                .updatedAt(comment.getUpdatedAt())
+                .build();
+    }
 }

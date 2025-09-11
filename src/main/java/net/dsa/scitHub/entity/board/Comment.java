@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import net.dsa.scitHub.entity.album.Photo;
 import net.dsa.scitHub.entity.company.CompanyReview;
+import net.dsa.scitHub.entity.interfaces.Authorizable;
 import net.dsa.scitHub.entity.user.User;
 
 import org.springframework.data.annotation.CreatedDate;
@@ -22,7 +23,7 @@ import java.util.Objects;
 @AllArgsConstructor
 @Builder
 @ToString(exclude = {"user", "post", "companyReview", "photo"})
-public class Comment {
+public class Comment implements Authorizable {
 
     /** 댓글 고유 식별자 */
     @Id

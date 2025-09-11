@@ -1,6 +1,7 @@
 package net.dsa.scitHub.service;
 
 import java.util.List;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 import org.springframework.data.domain.Page;
@@ -14,11 +15,13 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.dsa.scitHub.dto.CommentDTO;
 import net.dsa.scitHub.dto.PostDTO;
 import net.dsa.scitHub.dto.PostDetailDTO;
 import net.dsa.scitHub.entity.board.Board;
 import net.dsa.scitHub.entity.board.Comment;
 import net.dsa.scitHub.entity.board.Post;
+import net.dsa.scitHub.entity.interfaces.Authorizable;
 import net.dsa.scitHub.entity.user.User;
 import net.dsa.scitHub.repository.board.BoardRepository;
 import net.dsa.scitHub.repository.board.CommentRepository;
@@ -126,6 +129,51 @@ public class PostService {
     }
 
     /**
+     * 게시글 수정 (관리자 또는 작성자만 가능)
+     * @param postDTO 수정할 게시글 정보
+     * @param currentUserId 현재 로그인한 사용자 ID
+     * @param currentUserRole 현재 로그인한 사용자 역할
+     * @return 수정된 게시글 DTO
+     */
+    @Transactional
+    public PostDTO updatePost(PostDTO postDTO, Integer currentUserId, String currentUserRole) {
+        Post post = pr.findById(postDTO.getPostId())
+            .orElseThrow(() -> new EntityNotFoundException("게시글을 찾을 수 없습니다. ID: " + postDTO.getPostId()));
+
+        if (!isAuthority(currentUserRole, currentUserId, post)) {
+            throw new SecurityException("게시글 수정 권한이 없습니다.");
+        }
+
+        // 게시글 정보 업데이트
+        post.setTitle(postDTO.getTitle());
+        post.setContent(postDTO.getContent());
+        post.setUpdatedAt(LocalDateTime.now());
+
+        // 변경 사항을 저장(flush)하고 갱신된 엔티티를 반환
+        Post updatedPost = pr.save(post);
+
+        // 갱신된 엔티티로 PostDTO 생성 및 반환
+        return PostDTO.convertToPostDTO(updatedPost);
+    }
+
+    /**
+     * 게시글 삭제 (관리자 또는 작성자만 가능)
+     * @param postId 삭제할 게시글 ID
+     * @param currentUserId 현재 로그인한 사용자 ID
+     * @param currentUserRole 현재 로그인한 사용자 역할
+     */
+    public void deletePost(Integer postId, Integer currentUserId, String currentUserRole) {
+        Post post = pr.findById(postId)
+            .orElseThrow(() -> new EntityNotFoundException("게시글을 찾을 수 없습니다. ID: " + postId));
+
+        if (!isAuthority(currentUserRole, currentUserId, post)) {
+            throw new SecurityException("게시글 삭제 권한이 없습니다.");
+        }
+
+        pr.delete(post);
+    }
+
+    /**
      * 댓글 저장
      * @param postId 댓글을 달 게시글 ID
      * @param content 댓글 내용
@@ -144,5 +192,60 @@ public class PostService {
             .build();
 
         cr.save(comment);
+    }
+
+    /**
+     * 댓글 수정 (관리자 또는 작성자만 가능)
+     * @param commentId 수정할 댓글 ID
+     * @param content 수정할 내용
+     * @param currentUserId 현재 로그인한 사용자 ID
+     * @param currentUserRole 현재 로그인한 사용자 역할
+     * @return 수정된 댓글 DTO
+     */
+    @Transactional
+    public CommentDTO updateComment(Integer commentId, String content, Integer currentUserId, String currentUserRole) {
+        Comment comment = cr.findById(commentId)
+            .orElseThrow(() -> new EntityNotFoundException("답변을 찾을 수 없습니다. ID: " + commentId));
+
+        if (!isAuthority(currentUserRole, currentUserId, comment)) {
+            throw new SecurityException("답변 수정 권한이 없습니다.");
+        }
+
+        // 댓글 내용 업데이트
+        comment.setContent(content);
+        comment.setUpdatedAt(LocalDateTime.now());
+
+        // 변경 사항을 저장(flush)하고 갱신된 엔티티를 반환
+        Comment updatedComment = cr.save(comment);
+
+        return CommentDTO.convertToCommentDTO(updatedComment);
+    }
+
+    /**
+     * 댓글 삭제 (관리자 또는 작성자만 가능)
+     * @param commentId 삭제할 댓글 ID
+     * @param currentUserId 현재 로그인한 사용자 ID
+     * @param currentUserRole 현재 로그인한 사용자 역할
+     */
+    public void deleteComment(Integer commentId, Integer currentUserId, String currentUserRole) {
+        Comment comment = cr.findById(commentId)
+            .orElseThrow(() -> new EntityNotFoundException("댓글을 찾을 수 없습니다. ID: " + commentId));
+
+        if (!isAuthority(currentUserRole, currentUserId, comment)) {
+            throw new SecurityException("댓글 삭제 권한이 없습니다.");
+        }
+
+        cr.delete(comment);
+    }
+
+    /**
+     * 권한 확인 (관리자 또는 작성자인지)
+     * @param role 현재 사용자 역할
+     * @param userId 현재 사용자 ID
+     * @param target 권한을 확인할 대상
+     * @return 권한 여부
+     */
+    private boolean isAuthority(String role, Integer userId, Authorizable target) {
+        return "ROLE_ADMIN".equals(role) || target.getUser().getUserId().equals(userId);
     }
 }

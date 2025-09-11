@@ -10,7 +10,7 @@
     </head>
     <body>
         <section class="mainGrid" layout:fragment="content">
-            <div class="detail-container" th:object="${post}">
+            <div class="detail-container" th:object="${post}" th:data-update-post-url="@{/admin/inquiry/updatePost}" th:data-update-comment-url="@{/admin/inquiry/updateComment}">
                 <!-- 1. 상단 헤더 (목록으로 돌아가기) -->
                 <div class="detail-header">
                     <a th:href="@{/admin/inquiry}" class="back-link">
@@ -22,30 +22,76 @@
                 <!-- 2. 원본 문의글 -->
                 <div class="post-box">
                     <div class="post-header">
-                        <h2 th:text="*{title}">教室がとても寒いです。。</h2>
+                        <h2 th:id="|post-title-*{postId}|" th:text="*{title}">教室がとても寒いです..</h2>
                         <div class="post-meta">
                             <span>投稿者</span>
                             <b th:text="*{userNameKor}">コ・ギョンハン</b>
                             <span th:text="${#temporals.format(post.createdAt, 'yyyy.MM.dd HH:mm')}">2025.04.18 15:28</span>
+
+                            <span class="edited-timestamp"
+                                th:if="${post.updatedAt != null and post.updatedAt != post.createdAt}"
+                                th:text="| (編集済み: ${#temporals.format(post.updatedAt, 'yyyy.MM.dd HH:mm')}) |">
+                                (編集済み: 2025.04.18 16:00)
+                            </span>
+                        </div>
+                        <div class="actions" th:if="${post.userId == currentUser.userId or currentUser.role == 'ROLE_ADMIN'}">
+                            <button type="button" class="btn-edit-post" th:data-post-id="*{postId}">編集</button>
+                            <form th:action="@{/admin/inquiry/deletePost}" method="post" style="display: inline;">
+                                <input type="hidden" name="postId" th:value="*{postId}">
+                                <button type="submit" class="btn-delete" onclick="return confirm('本当にこのお問い合わせを削除しますか？');">削除</button>
+                            </form>
                         </div>
                     </div>
-                    <div class="post-content" th:text="*{content}">
-                        エアコンの温度調節が可能になればいいですね。
+
+                    <div id="post-view-mode">
+                        <div class="post-content" th:id="|post-content-*{postId}|" th:text="*{content}">
+                            エアコンの温度調節が可能になればいいですね。
+                        </div>
+                    </div>
+                    <div id="post-edit-mode" style="display:none;">
+                        <input type="text" class="edit-input" id="edit-post-title" th:value="*{title}">
+                        <textarea class="edit-textarea" id="edit-post-content" th:text="*{content}"></textarea>
+                        <div class="edit-actions">
+                            <button type="button" class="btn-cancel-post">キャンセル</button>
+                            <button type="button" class="btn-save-post" th:data-post-id="*{postId}">登録</button>
+                        </div>
                     </div>
                 </div>
 
                 <!-- 3. 답변(댓글) 목록 -->
-                <div class="comment-box" th:each="comment : *{comments}">
-                    <div class="post-header">
-                        <h3>回答完了</h3>
-                        <div class="post-meta">
-                            <span>投稿者</span>
-                            <b th:text="${comment.userNameKor}">管理者</b>
-                            <span th:text="${#temporals.format(comment.createdAt, 'yyyy.MM.dd HH:mm')}">2025.04.18 16:30</span>
+                <div id="comment-list">
+                    <div class="comment-box" th:each="comment : *{comments}" th:data-comment-id="${comment.commentId}">
+                        <div class="post-header">
+                            <h3>回答完了</h3>
+                            <div class="post-meta">
+                                <span>投稿者</span>
+                                <b th:text="${comment.userNameKor}">管理者</b>
+                                <span th:text="${#temporals.format(comment.createdAt, 'yyyy.MM.dd HH:mm')}">2025.04.18 16:30</span>
+                                <span class="edited-timestamp"
+                                    th:if="${comment.updatedAt != null and comment.updatedAt != comment.createdAt}"
+                                    th:text="| (編集済み: ${#temporals.format(comment.updatedAt, 'yyyy.MM.dd HH:mm')}) |">
+                                    (編集済み: 2025.04.18 17:00)
+                                </span>
+                            </div>
+                            <div class="actions" th:if="${comment.userId == currentUser.userId or currentUser.role == 'ROLE_ADMIN'}">
+                                <button type="button" class="btn-edit-comment" th:data-comment-id="${comment.commentId}">編集</button>
+                                <form th:action="@{/admin/inquiry/deleteComment}" method="post" style="display: inline;">
+                                    <input type="hidden" name="commentId" th:value="${comment.commentId}">
+                                    <input type="hidden" name="postId" th:value="${post.postId}">
+                                    <button type="submit" class="btn-delete" onclick="return confirm('本当にこの回答を削除しますか？');">削除</button>
+                                </form>
+                            </div>
                         </div>
-                    </div>
-                    <div class="post-content" th:text="${comment.content}">
-                        中央制御のため各教室での調整はできませんが、温度調整をご希望の際は運営室までご連絡いただければ対応いたします。
+                        <div class="post-content view-mode" th:id="|comment-content-${comment.commentId}|" th:text="${comment.content}">
+                            中央制御のため各教室での調整はできませんが、温度調整をご希望の際は運営室までご連絡いただければ対応いたします。
+                        </div>
+                        <div class="edit-mode" th:id="|comment-edit-form-${comment.commentId}|" style="display:none;">
+                            <textarea class="edit-textarea" th:text="${comment.content}"></textarea>
+                            <div class="edit-actions">
+                                <button type="button" class="btn-cancel-comment" th:data-comment-id="${comment.commentId}">キャンセル</button>
+                                <button type="button" class="btn-save-comment" th:data-comment-id="${comment.commentId}">登録</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -54,13 +100,118 @@
                     <h3>回答作成</h3>
                     <form th:action="@{/admin/inquiry/addComment}" method="post">
                         <input type="hidden" name="postId" th:value="*{postId}">
-                        <textarea name="content" placeholder="回答を入力してください。。。"></textarea>
+                        <textarea name="content" placeholder="回答を入力してください..."></textarea>
                         <button type="submit">回答登録</button>
                     </form>
                 </div>
             </div>
         </section>
         <th:block layout:fragment="script">
+            <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+            <script th:inline="javascript">
+            $(document).ready(function() {
+                const container = $('.detail-container');
+
+                // --- 문의글 수정 관련 이벤트 ---
+                container.on('click', '.btn-edit-post', () => togglePostEditMode(true));
+                container.on('click', '.btn-cancel-post', () => togglePostEditMode(false));
+                container.on('click', '.btn-save-post', function() {
+                    savePost($(this).data('post-id'));
+                });
+
+                // --- 댓글 수정 관련 이벤트 ---
+                container.on('click', '.btn-edit-comment', function() {
+                    toggleCommentEditMode($(this).data('comment-id'), true);
+                });
+                container.on('click', '.btn-cancel-comment', function() {
+                    toggleCommentEditMode($(this).data('comment-id'), false);
+                });
+                container.on('click', '.btn-save-comment', function() {
+                    saveComment($(this).data('comment-id'));
+                });
+            });
+
+            // --- 공통 헬퍼 함수 ---
+            // 날짜 포맷팅 함수 (YYYY.MM.DD HH:MM)
+            function formatDate(date) {
+                if (!date) return '';
+                const d = new Date(date);
+                const pad = (num) => ('0' + num).slice(-2);
+                return `${d.getFullYear()}.${pad(d.getMonth() + 1)}.${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+            }
+
+            // --- 문의글 수정 함수 ---
+            function togglePostEditMode(isEdit) {
+                $('#post-view-mode').toggle(!isEdit);
+                $('#post-edit-mode').toggle(isEdit);
+            }
+
+            function savePost(postId) {
+                const url = $('.detail-container').data('update-post-url');
+                const newTitle = $('#edit-post-title').val();
+                const newContent = $('#edit-post-content').val();
+
+                $.ajax({
+                    url: url, type: 'POST',
+                    data: { postId: postId, title: newTitle, content: newContent },
+                    success: function(updatedPost) {
+                        // 내용 업데이트
+                        $('#post-title-' + postId).text(updatedPost.title);
+                        $('#post-content-' + postId).text(updatedPost.content);
+
+                        // ✨ '수정됨' 타임스탬프 처리 로직 추가
+                        const metaDiv = $(`#post-title-${postId}`).siblings('.post-meta');
+                        let timestampSpan = metaDiv.find('.edited-timestamp');
+                        const formattedDate = formatDate(updatedPost.updatedAt);
+                        const newTimestampText = `(編集済み: ${formattedDate})`;
+
+                        if (timestampSpan.length === 0) { // 기존에 '수정됨'이 없었다면
+                            metaDiv.append(`<span class="edited-timestamp">${newTimestampText}</span>`);
+                        } else { // 이미 있다면 내용만 업데이트
+                            timestampSpan.text(newTimestampText);
+                        }
+
+                        togglePostEditMode(false);
+                    },
+                    error: (xhr) => alert('お問い合わせの編集に失敗しました: ' + xhr.responseText)
+                });
+            }
+
+            // --- 댓글 수정 함수 ---
+            function toggleCommentEditMode(commentId, isEdit) {
+                $(`#comment-content-${commentId}`).toggle(!isEdit);
+                $(`#comment-edit-form-${commentId}`).toggle(isEdit);
+            }
+
+            function saveComment(commentId) {
+                const url = $('.detail-container').data('update-comment-url');
+                const newContent = $(`#comment-edit-form-${commentId}`).find('.edit-textarea').val();
+
+                $.ajax({
+                    url: url, type: 'POST',
+                    data: { commentId: commentId, content: newContent },
+                    success: function(updatedComment) {
+                        // 내용 업데이트
+                        $(`#comment-content-${commentId}`).text(updatedComment.content);
+
+                        // ✨ '수정됨' 타임스탬프 처리 로직 추가
+                        const metaDiv = $(`#comment-content-${commentId}`).closest('.comment-box').find('.post-meta');
+                        let timestampSpan = metaDiv.find('.edited-timestamp');
+                        const formattedDate = formatDate(updatedComment.updatedAt);
+                        const newTimestampText = `(編集済み: ${formattedDate})`;
+
+                        if (timestampSpan.length === 0) { // 기존에 '수정됨'이 없었다면
+                            metaDiv.append(`<span class="edited-timestamp">${newTimestampText}</span>`);
+                        } else { // 이미 있다면 내용만 업데이트
+                            timestampSpan.text(newTimestampText);
+                        }
+
+                        toggleCommentEditMode(commentId, false);
+                    },
+                    error: (xhr) => alert('回答の編集に失敗しました: ' + xhr.responseText)
+                });
+            }
+            </script>
         </th:block>
     </body>
 </html>

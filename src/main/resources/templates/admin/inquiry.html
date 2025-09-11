@@ -47,7 +47,7 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td colspan="5" th:if="${postPage.isEmpty()}" class="no-data">お問い合わせはありません。</td>
+                                    <td colspan="5" th:if="${postPage.isEmpty()}" class="no-data">お問い合わせがありません。</td>
                                 </tr>
                                 <tr th:each="post, status : ${postPage}" th:unless="${postPage.isEmpty()}">
                                     <td th:text="${post.postId}"></td>
