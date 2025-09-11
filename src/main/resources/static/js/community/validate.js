@@ -1,5 +1,5 @@
  // 게시판 폼에 입력한 데이터를 서버 사이드에 비동기 제출
-function submitPost() {
+function validateForm() {
     //유효성 검사
     const board = $('#boardDropdown').val();
     const title = $('#title').val();
@@ -27,18 +27,5 @@ function submitPost() {
     formData.append('content', content);
     formData.append('tagList', tagList);
 
-    // 비동기 요청으로 게시글 데이터 전달
-    $.ajax({
-        url: 'write',
-        method: 'POST',
-        data: formData,
-        processData: false,
-        contentType: false
-    });
-
-    // 데이터 전달 후 이동할 페이지
-    location.href = "home";
+    return formData;
 }
-$('#submitPostBtn').click(function() {
-    submitPost();
-});

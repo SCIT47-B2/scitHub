@@ -3,6 +3,7 @@ package net.dsa.scitHub.service;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -18,13 +19,15 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dsa.scitHub.dto.CommentDTO;
-import net.dsa.scitHub.dto.community.PostDTO;
+import net.dsa.scitHub.dto.PostDTO;
 import net.dsa.scitHub.entity.board.Comment;
 import net.dsa.scitHub.entity.board.Post;
+import net.dsa.scitHub.entity.board.PostLike;
 import net.dsa.scitHub.entity.board.Tag;
 import net.dsa.scitHub.entity.user.User;
 import net.dsa.scitHub.repository.board.BoardRepository;
 import net.dsa.scitHub.repository.board.CommentRepository;
+import net.dsa.scitHub.repository.board.PostLikeRepository;
 import net.dsa.scitHub.repository.board.PostRepository;
 import net.dsa.scitHub.repository.board.TagRepository;
 import net.dsa.scitHub.repository.user.UserRepository;
@@ -42,12 +45,13 @@ public class CommunityService {
     private final BoardRepository br;
     private final TagRepository tr;
     private final CommentRepository cr;
+    private final PostLikeRepository plr;
     private final FileManager fileManager;
 
     /** 새 게시글 등록
      *  @param PostDTO
      */
-    public void makeNewPost(PostDTO postDTO) {
+    public int makeNewPost(PostDTO postDTO) {
 
         // DTO log
         log.debug("postDTO : {}", postDTO);
@@ -57,14 +61,14 @@ public class CommunityService {
                     .board(br.findByName(postDTO.getBoard()).orElseThrow(
                         () -> new EntityNotFoundException("해당 게시판을 찾을 수 없습니다.")
                     ))
-                    .user(ur.findByUsername(null).orElseThrow(
+                    .user(ur.findByUsername(postDTO.getUsername()).orElseThrow(
                         () -> new EntityNotFoundException("해당 회원을 찾을 수 없습니다.")
                     ))
                     .title(postDTO.getTitle())
                     .content(postDTO.getContent())
                     .build();
         // 게시글 저장
-        pr.save(post);
+        Post persistedPost = pr.save(post);
 
         // 태그 추가
         List<Tag> tagArray = new ArrayList<>();
@@ -76,42 +80,9 @@ public class CommunityService {
         }
         // 태그 저장
         tr.saveAll(tagArray);
-    }
 
-    /**
-     * 게시글 등록 데모 메서드
-     * 추후 주석 처리나 삭제 필요
-     * @param postDTO
-     */
-    public void makeNewPostDemo(PostDTO postDTO) {
-
-        // DTO log
-        log.debug("postDTO : {}", postDTO);
-
-        // DTO -> Entity
-        Post post = Post.builder()
-                    .board(br.findByName("자유게시판").orElseThrow(
-                        () -> new EntityNotFoundException("해당 게시판을 찾을 수 없습니다.")
-                    ))
-                    .user(ur.findByUsername("DemoUser").orElseThrow(
-                        () -> new EntityNotFoundException("해당 회원을 찾을 수 없습니다.")
-                    ))
-                    .title(postDTO.getTitle())
-                    .content(postDTO.getContent())
-                    .build();
-        // 게시글을 리포지토리에 저장
-        pr.save(post);
-
-        // 태그 추가
-        List<Tag> tagArray = new ArrayList<>();
-        for (String tag : postDTO.getTagList()) {
-            Tag tagEntity = Tag.builder()
-                            .post(post)
-                            .name(tag).build();
-            tagArray.add(tagEntity);
-        }
-        // 태그를 리포지토리에 저장
-        tr.saveAll(tagArray);
+        // 생성된 게시글의 식별자 반환
+        return persistedPost.getPostId();
     }
 
     /**
@@ -120,13 +91,15 @@ public class CommunityService {
      * @param viewCheck
      * @return PostDTO
      */
-    public PostDTO getPost(int postId, boolean viewCheck) {
-        // 받아온 값 로그
-        log.debug("postId : {}, viewCheck : {}", postId, viewCheck);
+    public PostDTO getPost(int postId, boolean viewCheck, String username) {
 
         // 해당 게시물 가져오기
         Post post = pr.findById(postId).orElseThrow(
             () -> new EntityNotFoundException("해당 게시글을 찾을 수 없습니다.")
+        );
+        // 현재 로그인 계정의 User 엔티티 탐색
+        User userEntity = ur.findByUsername(username).orElseThrow(
+            () -> new EntityNotFoundException("해당 회원을 찾을 수 없습니다.")
         );
 
         // viewCheck = true일 시 조회수 1 증가
@@ -147,6 +120,9 @@ public class CommunityService {
                           .updatedAt(post.getUpdatedAt())
                           .commentList(post.getComments())
                           .build();
+        // 현재 유저가 좋아요를 눌렀었는지 체크
+        boolean isLiked = plr.existsByPost_PostIdAndUser_UserId(post.getPostId(), userEntity.getUserId());
+        postDTO.setIsLiked(isLiked);
 
         // 태그 리스트를 List<Tag> -> List<String> 변환
         List<Tag> tags = post.getTags();
@@ -162,38 +138,24 @@ public class CommunityService {
     }
 
     /**
-     * 게시글 수정 처리 데모
-     * @param postDTO
-     */
-    public void updatePostDemo(PostDTO postDTO) {
-        // DB에서 해당 엔티티 탐색
-        Post post = pr.findById(postDTO.getPostId()).orElseThrow(
-            () -> new EntityNotFoundException("해당 게시글을 찾을 수 없습니다.")
-        );
-
-        // 수정 폼에서 받아온 데이터 반영
-        post.setTitle(postDTO.getTitle());
-        post.setContent(postDTO.getContent());
-        // 태그 데이터 반영
-        // updateTagList(postDTO.getPostId(), postDTO.getTagList());
-    }
-
-    /**
      * 게시글 수정 처리
      * @param postDTO
      * @param User
      */
-    public void updatePost(PostDTO postDTO, AuthenticatedUser user)
+    public void updatePost(PostDTO postDTO, String username)
         throws Exception {
         // DB에서 해당 엔티티 탐색
         Post post = pr.findById(postDTO.getPostId()).orElseThrow(
             () -> new EntityNotFoundException("해당 게시글을 찾을 수 없습니다.")
         );
         // 현재 로그인 계정의 User 엔티티 탐색
-        User userEntity = ur.findByUsername(user.getUsername()).orElseThrow(
+        User userEntity = ur.findByUsername(username).orElseThrow(
             () -> new EntityNotFoundException("해당 회원을 찾을 수 없습니다.")
         );
 
+        // 수정 권한 체크
+        log.debug("게시글 작성자 : {}", post.getUser().getUserId());
+        log.debug("현재 로그인 유저 : {}", userEntity.getUserId());
         if (post.getUser().getUserId() != userEntity.getUserId()) {
             throw new Exception("수정 권한이 없습니다.");
         }
@@ -206,98 +168,68 @@ public class CommunityService {
     }
 
     /**
-     * 댓글 목록 출력
+     * 게시글 삭제 처리
      * @param postId
-     * @return List<CommentDTO>
+     * @param userId
      */
-    public List<CommentDTO> getCommentList(int postId) throws Exception {
-        // 게시글 실존 여부 확인
-        if(pr.existsById(postId)) {
-            // 해당 게시글에 연결된 댓글을 등록 날짜순으로 검색
-            List<Comment> comments = cr.findByPost_PostIdOrderByCreatedAtDesc(postId);
-            List<CommentDTO> commentList = new ArrayList<>();
-            for (Comment comment : comments) {
-                CommentDTO commentDTO = CommentDTO.builder()
-                                                  .commentId(comment.getCommentId())
-                                                  .userId(comment.getUser().getUserId())
-                                                  .userName(comment.getUser().getUsername())
-                                                  .content(comment.getContent())
-                                                  .createdAt(comment.getCreatedAt())
-                                                  .updatedAt(comment.getUpdatedAt())
-                                                  .build();
-                commentList.add(commentDTO);
-            }
-            return commentList;
-        } else {
-            throw new EntityNotFoundException("해당 게시글이 존재하지 않습니다.");
-        }
-    }
-
-    /**
-     * 새 댓글 작성
-     * @param CommentDTO
-     */
-    public void makeNewComment(CommentDTO commentDTO) throws Exception {
-        // 댓글이 달릴 원 게시글이 존재 시
-        if (pr.existsById(commentDTO.getPostId())) {
-            // 회원, 게시글 엔티티 조회
-            User user = ur.findByUsername(commentDTO.getUserName()).orElseThrow(
-                () -> new EntityNotFoundException("해당 회원이 존재하지 않습니다.")
-            );
-            Post post = pr.findById(commentDTO.getPostId()).orElseThrow(
-                () -> new EntityNotFoundException("해당 게시글이 존재하지 않습니다.")
-            );
-            // 댓글 엔티티 작성
-            Comment comment = Comment.builder()
-                                     .user(user)
-                                     .content(commentDTO.getContent())
-                                     .post(post)
-                                     .build();
-            // DB에 댓글 저장
-            cr.save(comment);
-        } else { // 없으면
-            // 에러 발생
-            throw new Exception("해당 게시글이 존재하지 않습니다.");
-        }
-    }
-
-    /**
-     * 댓글 삭제
-     * @param CommentId
-     */
-    public void deleteComment(Integer commentId, UserDetails user) throws Exception {
-        // 삭제할 댓글을 DB에서 찾기
-        Comment comment = cr.findById(commentId).orElseThrow(
-            () -> new EntityNotFoundException("해당 댓글이 존재하지 않습니다.")
+    public void deletePost(Integer postId, String username)
+        throws Exception {
+        // DB에서 해당 엔티티 탐색
+        Post post = pr.findById(postId).orElseThrow(
+            () -> new EntityNotFoundException("해당 게시글을 찾을 수 없습니다.")
+        );
+        // 현재 로그인 계정의 User 엔티티 탐색
+        User userEntity = ur.findByUsername(username).orElseThrow(
+            () -> new EntityNotFoundException("해당 회원을 찾을 수 없습니다.")
         );
         // 삭제 권한 체크
-        /*
-        User loginUser = ur.findByUsername(user.getUsername());
-        if (loginUser.getUserId() != comment.getUser().getUserId()) {
-            throw new Exception("삭제 권한이 없습니다.");
+        log.debug("게시글 작성자 : {}", post.getUser().getUserId());
+        log.debug("현재 로그인 유저 : {}", userEntity.getUserId());
+        if (post.getUser().getUserId() != userEntity.getUserId()) {
+            throw new Exception("수정 권한이 없습니다.");
         }
-        */
-        cr.delete(comment);
 
+        // 게시글 삭제 처리
+        pr.delete(post);
     }
+
+    // 게시글 부가 기능 관련 --------------------------------------------------------------------------------
+
     /**
-     * 댓글 수정
+     * 좋아요 토글 처리
+     * @param postId
+     * @param username
      */
-    public void updateComment(CommentDTO commentDTO, UserDetails user) throws Exception {
-        // 수정할 댓글을 DB에서 찾기
-        Comment comment = cr.findById(commentDTO.getCommentId()).orElseThrow(
-            () -> new EntityNotFoundException("해당 댓글이 존재하지 않습니다.")
+    public void toggleLikePost(Integer postId, String username) {
+        // DB에서 해당 엔티티 탐색
+        Post post = pr.findById(postId).orElseThrow(
+            () -> new EntityNotFoundException("해당 게시글을 찾을 수 없습니다.")
         );
-        // 수정 권한 체크
-        /*
-        User loginUser = ur.findByUsername(user.getUsername());
-        if (loginUser.getUserId() != comment.getUser().getUserId()) {
-            throw new Exception("삭제 권한이 없습니다.");
-        }
-        */
-        comment.setContent(commentDTO.getContent());
-    }
+        // 현재 로그인 계정의 User 엔티티 탐색
+        User userEntity = ur.findByUsername(username).orElseThrow(
+            () -> new EntityNotFoundException("해당 회원을 찾을 수 없습니다.")
+        );
 
+        // 좋아요 엔티티 작성
+        PostLike postLike = PostLike.builder().user(userEntity).post(post).build();
+        // 해당 좋아요 존재 여부 확인
+        Optional<PostLike> postLikeExisting = plr.findByPost_PostIdAndUser_UserId(post.getPostId(), userEntity.getUserId());
+        
+        if (postLikeExisting.isPresent()) {
+            // 이미 존재하는 좋아요면 삭제
+            plr.delete(postLikeExisting.get());
+        } else {
+            // 없으면 추가
+            plr.save(postLike);
+        }
+    }
+    /** 게시글의 좋아요 개수 받아오기
+     * @param postId
+     * @return likeCount
+     */
+    public int getLikeCount(int postId) {
+        return plr.countByPost_PostId(postId);
+    }
 
     /**
      * 게시글의 태그 데이터 갱신
@@ -339,4 +271,121 @@ public class CommunityService {
         }
     }
     */
+
+    // 댓글 관련 기능 관련 ----------------------------------------------------------------------------------
+
+    /**
+     * 댓글 목록 출력
+     * @param postId
+     * @return List<CommentDTO>
+     */
+    public List<CommentDTO> getCommentList(int postId, String username) throws Exception {
+        // 게시글 실존 여부 확인
+        if(pr.existsById(postId)) {
+            // 해당 게시글에 연결된 댓글을 등록 날짜순으로 검색
+            List<Comment> comments = cr.findByPost_PostIdOrderByCreatedAtDesc(postId);
+            List<CommentDTO> commentList = new ArrayList<>();
+            for (Comment comment : comments) {
+                CommentDTO commentDTO = CommentDTO.builder()
+                                                  .commentId(comment.getCommentId())
+                                                  .userId(comment.getUser().getUserId())
+                                                  .userName(comment.getUser().getUsername())
+                                                  .content(comment.getContent())
+                                                  .createdAt(comment.getCreatedAt())
+                                                  .updatedAt(comment.getUpdatedAt())
+                                                  .build();
+                // 수정 가능 여부 추가
+                commentDTO.setCanEdit(  username != null
+                                        && comment.getUser().getUsername().equals(username)
+                                        ? true : false);
+                commentList.add(commentDTO);
+            }
+            return commentList;
+        } else {
+            throw new EntityNotFoundException("해당 게시글이 존재하지 않습니다.");
+        }
+    }
+
+    /**
+     * 새 댓글 작성
+     * @param CommentDTO
+     */
+    public void makeNewComment(CommentDTO commentDTO, String username) throws Exception {
+        // 댓글이 달릴 원 게시글이 존재 시
+        if (pr.existsById(commentDTO.getPostId())) {
+            // 회원, 게시글 엔티티 조회
+            User user = ur.findByUsername(username).orElseThrow(
+                () -> new EntityNotFoundException("해당 회원이 존재하지 않습니다.")
+            );
+            Post post = pr.findById(commentDTO.getPostId()).orElseThrow(
+                () -> new EntityNotFoundException("해당 게시글이 존재하지 않습니다.")
+            );
+            // 댓글 엔티티 작성
+            Comment comment = Comment.builder()
+                                     .user(user)
+                                     .content(commentDTO.getContent())
+                                     .post(post)
+                                     .build();
+            // DB에 댓글 저장
+            cr.save(comment);
+        } else { // 없으면
+            // 에러 발생
+            throw new Exception("해당 게시글이 존재하지 않습니다.");
+        }
+    }
+
+    /**
+     * 댓글 삭제
+     * @param CommentId
+     */
+    public void deleteComment(Integer commentId, String username) throws Exception {
+        // 삭제할 댓글을 DB에서 찾기
+        Comment comment = cr.findById(commentId).orElseThrow(
+            () -> new EntityNotFoundException("해당 댓글이 존재하지 않습니다.")
+        );
+        // 삭제 권한 체크
+         User loginUser = ur.findByUsername(username).orElseThrow(
+                () -> new EntityNotFoundException("해당 회원이 존재하지 않습니다.")
+        );
+        if ( (loginUser.getUserId() != comment.getUser().getUserId())) {
+            throw new Exception("삭제 권한이 없습니다.");
+        }
+        cr.delete(comment);
+
+    }
+    /**
+     * 댓글 수정
+     */
+    public void updateComment(CommentDTO commentDTO, String username) throws Exception {
+        // 수정할 댓글을 DB에서 찾기
+        Comment comment = cr.findById(commentDTO.getCommentId()).orElseThrow(
+            () -> new EntityNotFoundException("해당 댓글이 존재하지 않습니다.")
+        );
+        // 수정 권한 체크
+        User loginUser = ur.findByUsername(username).orElseThrow(
+                () -> new EntityNotFoundException("해당 회원이 존재하지 않습니다.")
+        );
+        if (loginUser.getUserId() != comment.getUser().getUserId()) {
+            throw new Exception("수정 권한이 없습니다.");
+        }
+        comment.setContent(commentDTO.getContent());
+    }
+
+    /**
+     * 게시글 하나의 태그 모두 가져오기
+     */
+    public List<String> getTagList(Integer postId) {
+        // 게시글 실존 여부 체크
+        Post post = pr.findById(postId).orElseThrow(
+            () -> new EntityNotFoundException("해당 게시글이 존재하지 않습니다.")
+        );
+        List<Tag> tagList = post.getTags();
+        List<String> tagNames = new ArrayList<>();
+        // List<Tag> -> List<String> 변환
+        for (Tag tag : tagList) {
+            String tagName = tag.getName();
+            tagNames.add(tagName);
+        }
+        return tagNames;
+    }
 }

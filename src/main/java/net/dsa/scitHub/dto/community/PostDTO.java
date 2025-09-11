@@ -27,4 +27,5 @@ public class PostDTO {
     private LocalDateTime updatedAt;
     private List<String> tagList;
     private List<Comment> commentList;
+
 }

@@ -19,4 +19,6 @@ public class CommentDTO {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private Integer postId;
+    // 수정 가능 여부 - DB엔 없음
+    private boolean canEdit;
 }

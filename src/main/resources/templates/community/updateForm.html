@@ -10,7 +10,6 @@
         <link rel="stylesheet" th:href="@{/css/searchBar.css}">
         <link rel="stylesheet" th:href="@{/css/ckeditor5/editorStyle.css}">
 		<link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/46.0.3/ckeditor5.css" crossorigin>
-        <link rel="stylesheet" th:href="@{/css/community/writeForm.css}">
     </head>
     <body>
         <section class="mainField" aria-label="메인 영역" layout:fragment="content">
@@ -35,13 +34,14 @@
                 </div>
 
                 <button class="writeBtn" type="button" id="quitBtn">돌아가기</button>
-                <button class="writeBtn" type="button" id="submitPostBtn">수정하기 ✏️</button>
+                <button class="writeBtn" type="button" id="updatePostBtn">수정하기 ✏️</button>
             </div>
             <div class="decoration">
                 <div class="formField">
+                    <input type="hidden" id="postId" th:value="${post.postId}">
                     <form th:action="@{write}" method="post" id="postForm">
                         <div class="boardSelectSection">
-                            <select name="board" id="boardDropdown">
+                            <select name="board" id="boardDropdown" th:field="${post.board}">
                                 <option value="">게시판을 선택해주세요</option>
                                 <option value="자유게시판">자유게시판</option>
                                 <option value="IT">IT</option>
@@ -56,10 +56,12 @@
                         <input type="text" name="title" id="title" th:value="${post.title}">
                         <div class="main-container">
                             <div class="editor-container editor-container_classic-editor" id="editor-container">
-                                <div class="editor-container__editor"><div id="editor"></div></div>
+                                <div class="editor-container__editor">
+                                    <div id="editor" th:utext="${post.content}"></div>
+                                </div>
                             </div>
                         </div>
-                        <input type="hidden" name="tagList" id="tagsData" th:value="${post.tagList}">
+                        <input type="hidden" name="tagList" id="tagsData" th:value="${tagList}">
                         <div class="tagArea">
                             <input type="text" placeholder="#태그 입력" id="tagInput">
                             <div id="tagContainer"></div>
@@ -73,9 +75,10 @@
 		    <script src="https://cdn.ckeditor.com/ckeditor5/46.0.3/translations/ko.umd.js" crossorigin></script>
             <script th:src="@{/js/ckeditor5/ckeditor5.js}"></script>
             <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
-            <script th:src="@{/js/community/writeFormJS.js}"></script>
             <script th:src="@{/js/community/makeTag.js}"></script>
+            <script th:src="@{/js/community/getTag.js}"></script>
             <script th:src="@{/js/community/validate.js}"></script>
+            <script th:src="@{/js/community/updatePost.js}"></script>
         </th:block>
     </body>
 </html>
