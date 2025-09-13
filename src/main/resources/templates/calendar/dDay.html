@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layouts/defaultLayout}">
+    <head>
+        <title>Home</title>
+        <th:block layout:fragment="css">
+            <!-- 밑에 줄 home.css는 지워야 하는 부분 -->
+        </th:block>
+        <!-- 아이콘 -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <style>
+            /* 모달 보이기, 숨기기 */
+            .modal-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.5);
+                display: none;
+                align-items: center;
+                justify-content: center;
+                z-index: 1000;
+            }
+            .modal-overlay.show {
+                display: flex;
+            }
+        </style>
+    </head>
+    <body>
+        <section class="mainGrid" aria-label="메인 영역" layout:fragment="content">
+            <!-- 이곳에 작성하면 메인 영역에 내용이 추가됩니다. -->
+                 <!-- 메인 디데이 영역 -->
+            <main class="main-content">
+                <div class="dday-container">
+                    <div class="dday-header">
+                    <h1 class="dday-title">디데이 관리</h1>
+                    </div>
+                    
+                    <!-- D-Day Cards Grid -->
+                    <div class="dday-grid" id="ddayGrid">
+                    <!-- D-Day cards will be rendered here -->
+                    </div>
+                </div>
+            </main>
+
+            <!-- 디데이 추가/수정 모달 -->
+            <div class="modal-overlay" id="ddayModal">
+                <div class="modal">
+                <h3 id="modalTitle">디데이 추가</h3>
+                <form id="ddayForm">
+                    <div class="form-group">
+                    <label for="ddayTitle">제목</label>
+                    <input type="text" id="ddayTitle" name="title" placeholder="예: 프로젝트 발표" required>
+                    </div>
+                    
+                    <div class="form-group">
+                    <label for="ddayDate">목표 날짜</label>
+                    <input type="date" id="ddayDate" name="date" required>
+                    </div>
+                    
+                    <div class="form-group">
+                    <label for="ddayDescription">설명 (선택)</label>
+                    <textarea id="ddayDescription" name="description" placeholder="디데이에 대한 간단한 설명을 입력하세요"></textarea>
+                    </div>
+                    
+                    <div class="modal-buttons">
+                    <button type="button" class="btn btn-secondary" id="cancelBtn">취소</button>
+                    <button type="button" class="btn btn-danger" id="deleteBtn" style="display: none;">삭제</button>
+                    <button type="submit" class="btn btn-primary">저장</button>
+                    </div>
+                </form>
+                </div>
+            </div>
+        </section>
+        <th:block layout:fragment="script">
+            <script>
+            </script>
+        </th:block>
+    </body>
+</html>
