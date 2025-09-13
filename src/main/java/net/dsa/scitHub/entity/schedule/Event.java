@@ -53,7 +53,7 @@ public class Event {
     
     /** 종일 이벤트 여부 */
     @Builder.Default
-    @Column(name = "is_all_day", nullable = false)
+    @Column(name = "is_all_day", nullable = false, columnDefinition = "TINYINT(1)")
     private Boolean isAllDay = false;
     
     @Override
