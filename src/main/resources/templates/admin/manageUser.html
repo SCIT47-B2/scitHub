@@ -3,14 +3,86 @@
     xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
     layout:decorate="~{layouts/defaultLayout}">
     <head>
-        <title>회원관리</title>
+        <title>Manage Users</title>
         <th:block layout:fragment="css">
+            <link rel="stylesheet" th:href="@{/css/manageUser.css}">
         </th:block>
     </head>
     <body>
-        <section class="mainGrid" aria-label="메인 영역" layout:fragment="content">
-            <!-- 이곳에 작성하면 메인 영역에 내용이 추가됩니다. -->
-            <img th:src="@{/images/bluePeople.png}" alt="파란색 사람들">
+        <section class="mainGrid" layout:fragment="content">
+            <div class="search-filter-bar">
+                <form id="searchForm" method="get" th:action="@{/admin/manageUser}">
+                    <select name="searchType">
+                        <option value="all" th:selected="${searchType == 'all'}">全て</option>
+                        <option value="name" th:selected="${searchType == 'name'}">名前</option>
+                        <option value="id" th:selected="${searchType == 'id'}">ID</option>
+                    </select>
+                    <input type="text" name="searchWord" th:value="${searchWord}" placeholder="検索キーワードを入力してください">
+
+                    <select name="cohortNo">
+                        <option value="0">全ての期</option>
+                        <option th:each="cohort : ${cohortList}" th:value="${cohort}" th:text="${cohort} + '期'" th:selected="${cohort == cohortNo}"></option>
+                    </select>
+
+                    <select name="role">
+                        <option value="ALL" th:selected="${role == 'ALL'}">全ての権限</option>
+                        <option value="ROLE_ADMIN" th:selected="${role == 'ROLE_ADMIN'}">管理者</option>
+                        <option value="ROLE_USER" th:selected="${role == 'ROLE_USER'}">ユーザー</option>
+                    </select>
+
+                    <button type="submit" class="btn-search">検索</button>
+                </form>
+            </div>
+
+            <div class="content-box">
+                <table class="user-table">
+                    <thead>
+                    <tr>
+                        <th>会員番号</th><th>ID</th><th>名前</th><th>期</th>
+                        <th>生年月日</th><th>性別</th><th>携帯電話番号</th><th>状態</th><th>権限</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${userPage.isEmpty()}">
+                            <td colspan="9" class="no-data">該当する会員がいません。</td>
+                        </tr>
+                        <tr th:each="user : ${userPage.content}">
+                            <td th:text="${user.userId}"></td>
+                            <td th:text="${user.username}"></td>
+                            <td th:text="${user.nameKor}"></td>
+                            <td th:text="${user.cohortNo}"></td>
+                            <td th:text="${user.birthDate}"></td>
+                            <td th:text="${user.gender == 'Man' ? '男性' : user.gender == 'Woman' ? '女性' : '指定なし'}"></td>
+                            <td th:text="${user.phone}"></td>
+                            <td th:text="${user.isActive ? 'アクティブ' : '非アクティブ'}"></td>
+                            <td th:text="${user.role}"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <nav class="pagination-container" th:if="${userPage.totalPages > 1}"
+                th:with="startPage=${T(java.lang.Math).floor(userPage.number / linkSize) * linkSize + 1},
+                        endPage=${(userPage.totalPages == 0) ? 1 : T(java.lang.Math).min(startPage + linkSize - 1, userPage.totalPages)}">
+                <ul class="pagination">
+                    <li th:if="${userPage.hasPrevious()}">
+                        <a th:href="@{/admin/manageUser(page=1, searchType=${searchType}, searchWord=${searchWord}, cohortNo=${cohortNo}, role=${role})}">|&lt;</a>
+                    </li>
+                    <li th:if="${startPage > 1}">
+                        <a th:href="@{/admin/manageUser(page=${startPage - 1}, searchType=${searchType}, searchWord=${searchWord}, cohortNo=${cohortNo}, role=${role})}">&lt;</a>
+                    </li>
+                    <li th:each="p : ${#numbers.sequence(startPage, endPage)}">
+                        <b th:if="${p == userPage.number + 1}" th:text="${p}"></b>
+                        <a th:unless="${p == userPage.number + 1}" th:href="@{/admin/manageUser(page=${p}, searchType=${searchType}, searchWord=${searchWord}, cohortNo=${cohortNo}, role=${role})}" th:text="${p}"></a>
+                    </li>
+                    <li th:if="${endPage < userPage.totalPages}">
+                        <a th:href="@{/admin/manageUser(page=${endPage + 1}, searchType=${searchType}, searchWord=${searchWord}, cohortNo=${cohortNo}, role=${role})}">&gt;</a>
+                    </li>
+                    <li th:if="${userPage.hasNext()}">
+                        <a th:href="@{/admin/manageUser(page=${userPage.totalPages}, searchType=${searchType}, searchWord=${searchWord}, cohortNo=${cohortNo}, role=${role})}">&gt;|</a>
+                    </li>
+                </ul>
+            </nav>
         </section>
         <th:block layout:fragment="script">
         </th:block>

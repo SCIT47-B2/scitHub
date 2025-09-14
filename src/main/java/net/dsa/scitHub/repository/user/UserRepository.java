@@ -78,5 +78,35 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     /** 생일이 특정 월인 사용자들 조회 */
     @Query("SELECT u FROM User u WHERE MONTH(u.birthDate) = :month AND u.isActive = true")
     List<User> findUsersByBirthMonth(@Param("month") Integer month);
+
+    /**
+     * 회원 관리를 위한 동적 검색 및 필터링 쿼리
+     * @param searchType 검색 타입 ('all', 'username', 'nameKor')
+     * @param searchWord 검색어
+     * @param cohortNo 기수 번호 (0이면 전체)
+     * @param role 사용자 역할 (null이면 전체)
+     * @param pageable 페이징 정보
+     * @return 페이징된 사용자 목록
+     */
+    @Query("SELECT u FROM User u WHERE " +
+            "(:cohortNo = 0 OR u.cohortNo = :cohortNo) AND " +
+            "(:role IS NULL OR u.role = :role) AND " +
+            "(" +
+                "(:searchType = 'all' AND (LOWER(u.username) LIKE LOWER(CONCAT('%', :searchWord, '%')) OR " +
+                "LOWER(u.nameKor) LIKE LOWER(CONCAT('%', :searchWord, '%')))) OR"+
+                "(:searchType = 'username' AND LOWER(u.username) LIKE LOWER(CONCAT('%', :searchWord, '%'))) OR " +
+                "(:searchType = 'nameKor' AND LOWER(u.nameKor) LIKE LOWER(CONCAT('%', :searchWord, '%')))" +
+            ")")
+    Page<User> findByCriteria(
+        @Param("searchType") String searchType,
+        @Param("searchWord") String searchWord,
+        @Param("cohortNo") Integer cohortNo,
+        @Param("role") Role role,
+        Pageable pageable
+    );
+
+    // 기수 목록을 조회하기 위한 쿼리 (필터 드롭다운 용)
+    @Query("SELECT DISTINCT u.cohortNo FROM User u WHERE u.cohortNo IS NOT NULL ORDER BY u.cohortNo DESC")
+    List<Integer> findDistinctCohortNos();
 }
 

@@ -24,6 +24,7 @@ import net.dsa.scitHub.dto.MenuItem;
 import net.dsa.scitHub.dto.MypageDTO;
 import net.dsa.scitHub.dto.PostDTO;
 import net.dsa.scitHub.dto.PostDetailDTO;
+import net.dsa.scitHub.dto.UserManageDTO;
 import net.dsa.scitHub.service.BoardService;
 import net.dsa.scitHub.service.PostService;
 import net.dsa.scitHub.service.UserService;
@@ -383,7 +384,35 @@ public class AdminController {
     }
 
     @GetMapping("manageUser")
-    public String manageUserPage(Model model) {
+    public String manageUserPage(
+        Model model,
+        @RequestParam(name = "page", defaultValue = "1") int page,
+        @RequestParam(name = "searchType", defaultValue = "all") String searchType,
+        @RequestParam(name = "searchWord", defaultValue = "") String searchWord,
+        @RequestParam(name = "cohortNo", defaultValue = "0") int cohortNo,
+        @RequestParam(name = "role", defaultValue = "ALL") String role
+    ) {
+        log.debug("회원 관리 페이지 요청: page={}, searchType={}, searchWord={}, cohortNo={}, role={}", page, searchType, searchWord, cohortNo, role);
+        Page<UserManageDTO> userPage = us.findUsersByCriteria(page, pageSize, searchType, searchWord, cohortNo, role);
+        List<Integer> cohortList = us.findAllCohorts();
+
+        log.debug("페이징된 사용자 목록: {}", userPage.getContent());
+        log.debug("현재 페이지: {}", userPage.getNumber());
+        log.debug("전체 개수: {}", userPage.getTotalElements());
+        log.debug("전체 페이지 수: {}", userPage.getTotalPages());
+        log.debug("기수 목록: {}", cohortList);
+
+        model.addAttribute("userPage", userPage);   // 페이징된 사용자 목록
+        model.addAttribute("cohortList", cohortList); // 기수 목록
+
+        // 검색 및 필터링 파라미터 유지
+        model.addAttribute("page", page);
+        model.addAttribute("searchType", searchType);
+        model.addAttribute("searchWord", searchWord);
+        model.addAttribute("cohortNo", cohortNo);
+        model.addAttribute("role", role);
+        model.addAttribute("linkSize", linkSize);
+
         return "admin/manageUser";
     }
 
