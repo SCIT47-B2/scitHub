@@ -136,10 +136,14 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    padding-top: 8px;
+    gap: 16px;
     margin-top: 24px;
 }
 
-.pagination {
+.leftPagination,
+.pagination,
+.rightPagination {
     display: flex;
     list-style: none;
     padding: 0;
@@ -165,9 +169,7 @@
     background-color: #e5e7eb;
     color: var(--ink);
 }
-
-.pagination-container b {
+.pagination-container b.active {
     background-color: var(--primary);
     color: white;
-    cursor: default;
 }
