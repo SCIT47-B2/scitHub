@@ -178,9 +178,9 @@
                  <div class="custom-calendar-header">
                     <div class="header-left">
                         <button id="prevBtn" class="nav-btn">‹</button>
-                        <h2 id="calendarTitle">2024년 12월</h2>
+                        <h2 id="calendarTitle">2024年 12月</h2>
                         <button id="nextBtn" class="nav-btn">›</button>
-                        <button id="todayBtn" class="today-btn">오늘</button>
+                        <button id="todayBtn" class="today-btn">今日</button>
                     </div>
                     <div class="header-right">
                         <div class="view-buttons">
@@ -198,15 +198,15 @@
                 <div class="personalToggleSection"
                 th:classappend="${#authentication.principal.roleName == 'ROLE_ADMIN'} ? 'invisible' : ''">
                     <input type="checkbox" id="personalToggle" checked>
-                    <span>개인일정</span>
+                    <span>個人の予定</span>
                 </div>
                 <div class="adminToggle">
                     <input type="checkbox" id="adminToggle" checked>
-                    <span>전체일정</span>
+                    <span>全体の予定</span>
                 </div>
                 <div class="buttonSection">
                     <button class="eventAddBtn" id="eventAddBtn">
-                        일정 등록
+                        スケジュール登録
                     </button>
                 </div>
             </div>
@@ -399,6 +399,9 @@
                     switch(mode) {
                         case 'create' :
                             modalTitle.textContent = '일정 등록';
+                            
+                            // 새로운 일정을 등록하는 것이므로, 숨겨진 eventId 값을 비움.
+                            document.querySelector('#eventId').value='';
                             // 1. info 객체나 startStr이 없는 경우
                             if(!info || !info.dateStr) {
                                 // 모든 날짜/ 시간 입력 필드를 깨끗하게 비웁니다.
@@ -615,6 +618,25 @@
                         calendar.refetchEvents();
                     }
                 }
+
+                /**
+                 * JavaScript Date 객체를 'YYYY-MM-DDTHH:mm' 형식의 로컬 시간 문자열로 변환
+                 * @param {Date} date  변환할 Date 객체
+                 * @return {string|null} 변환된 문자열 또는 null
+                */
+                function formatDateForServer(date) {
+                    if(!date) return null;
+
+                    const year = date.getFullYear(); // 2025
+                    const month = String(date.getMonth() + 1).padStart(2, '0'); // 3월이라면 2+1해서 03
+                    const day = String(date.getDate()).padStart(2, '0'); // 5일이라면 05
+                    const hours = String(date.getHours()).padStart(2, '0'); // 5시라면 05
+                    const minutes = String(date.getMinutes()).padStart(2, '0'); // 5분이라면 05
+                    const seconds = String(date.getSeconds()).padStart(2, '0'); // 5초라면 05
+
+                    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+
+                }
                 // FullCalendar 초기화
                 document.addEventListener('DOMContentLoaded', function() {
 
@@ -625,7 +647,7 @@
                     calendar = new FullCalendar.Calendar(calendarEl, {
                         // 기본 뷰 월별 달력으로 보도록 함.
                         initialView: 'dayGridMonth',
-                        locale: 'ko',
+                        locale: 'ja',
 
                         // 드래그 활성화
                         editable: true,
@@ -758,8 +780,8 @@
                             
                             //  info에서 필요한 정보 추출
                             const eventId = info.event.id;
-                            const newStart = info.event.start.toISOString().slice(0,19);
-                            const newEnd = info.event.end ? info.event.end.toISOString().slice(0,19) : null;
+                            const newStart = formatDateForServer(info.event.start);
+                            const newEnd = info.event.end ? formatDateForServer(info.event.end) : null;
                             const isAllDay = info.event.allDay;
 
                             // 서버에 전송할 데이터 준비 (서버의 DTO와 필드명 맞추기)
@@ -960,7 +982,7 @@
                         // 수정
                         // eventId가 있으면 -> 수정
                         if(eventId) {
-                            console.log("eventId 없는 분기에 진입!")
+                            console.log("eventId 있는 분기에 진입!")
                             fetch(`/scitHub/api/calendar/events/${eventId}`, { // URL에 eventId 포함
                                 method : 'PUT', // HTTP 요청 메소드 ( PUT -> 전체 교체)
                                 headers : { 'Content-Type' : 'application/json'},

@@ -25,8 +25,8 @@ public class CalendarController {
     @ModelAttribute("menuItems")
     public List<MenuItem> menuItems() {
         return List.of(
-            new MenuItem("일정", "/calendar/schedule"),
-            new MenuItem("디데이", "/calendar/dDay")
+            new MenuItem("スケジュール", "/calendar/schedule"),
+            new MenuItem("D-Day", "/calendar/dDay")
         );
     }
 

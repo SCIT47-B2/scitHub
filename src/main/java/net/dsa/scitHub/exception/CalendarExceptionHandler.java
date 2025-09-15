@@ -7,13 +7,18 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
+import net.dsa.scitHub.controller.CalendarApiController;
+import net.dsa.scitHub.controller.CalendarController;
 
 // 이 클래스는 "net.dsa.scitHub.controller.calendar" 패키지와
 // 그 하위 패키지에 있는 컨트롤러에만 적용됩니다.
 @Slf4j
 // 예외 처리 코드를 한 곳으로 모아 관리하기 위한 어노테이션
-// basePackages 어떤 컨트롤러에서 발생한 예외를 처리할지 범위 지정
-@RestControllerAdvice(basePackages = "net.dsa.scitHub.controller.calendar")
+// assignableTypes 어떤 컨트롤러에서 발생한 예외를 처리할지 범위 지정
+@RestControllerAdvice(assignableTypes = {
+    CalendarApiController.class,
+    CalendarController.class
+})
 public class CalendarExceptionHandler {
     
 
