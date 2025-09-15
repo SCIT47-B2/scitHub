@@ -148,6 +148,15 @@
 .block.blue{ background:#cfe0ff; }                 /* 파란 톤 다운 */
 .block.label{ background:#f3f4f6; color:#6b7280; border-style:dashed; }
 
+/* 클릭 가능한 블록에 대한 스타일 추가 */
+.clickable-block {
+    cursor: pointer;
+    transition: filter 0.2s;
+}
+.clickable-block:hover {
+    filter: brightness(0.95);
+}
+
 /** 상단 슬림 라벨 바(대강의실/다목적라운지) */
 .labelBar{
   background:linear-gradient(#eef2ff,#eef2ff);
@@ -162,6 +171,57 @@
   background:#f3f6fb;
   border:1px dashed rgba(0,0,0,.08);
   border-radius:12px;
+}
+
+/* Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6); /* 배경을 약간 더 어둡게 */
+    display: none; /* 기본적으로 숨김. JS로 'flex'로 변경하여 표시 */
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Ensure it's on top */
+}
+
+.modal-content {
+    position: relative;
+    background: #fff;
+    padding: 16px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    max-width: min(800px, 80vw); /* 최대 너비를 1000px 또는 화면의 85% 중 작은 값으로 제한 */
+    max-height: 85vh; /* 화면 높이의 85%를 넘지 않도록 */
+}
+
+.modal-content img {
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain; /* 이미지 비율을 유지하며 컨테이너에 맞춤 */
+}
+
+.modal-content .close-button {
+    position: absolute;
+    top: -15px;   /* 모달 박스 바깥 상단 */
+    right: -15px; /* 모달 박스 바깥 우측 */
+    width: 36px;
+    height: 36px;
+    background: white;
+    border: none;
+    border-radius: 50%;
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* 반응형: 좌석 내부 간격 축소 */
