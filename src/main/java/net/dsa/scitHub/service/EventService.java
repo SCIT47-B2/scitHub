@@ -35,7 +35,7 @@ public class EventService {
      * 일정 등록 처리 함수
      */
     public EventDTO createEvent(EventDTO eventDTO, AuthenticatedUser user) {
-
+        log.debug("createEvent 서비스 메서드 호출됨. 전달받은 DTO 내용: {}", eventDTO.toString());
 
         // ADMIN -> PUBLIC 일정, USER -> PRIVATE 일정
         if(user.getRoleName().equals("ROLE_ADMIN")){
@@ -61,7 +61,7 @@ public class EventService {
                         .isAllDay(eventDTO.getAllDay())
                         .build();
         Event savedEvent = er.save(event);
-
+        log.debug("ENTITY최종 저장될 eventENTITY: {}", savedEvent.toString());
         return EventDTO.convertToEventDTO(savedEvent);
     }
 
