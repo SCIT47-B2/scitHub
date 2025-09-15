@@ -124,6 +124,25 @@ public class AdminController {
     }
 
     /**
+     * 공지사항 글 작성 페이지
+     * @return 뷰 이름
+     */
+    @GetMapping("announcement/write")
+    public String announcementWriteForm(
+        @RequestParam(name = "boardName", defaultValue = "announcement") String boardName,
+        Model model
+    ) {
+        int boardId = bs.getBoardIdFromName(boardName);
+
+        PostDTO postDTO = new PostDTO();
+        postDTO.setBoardId(boardId);
+
+        model.addAttribute("postDTO", postDTO);
+
+        return "admin/announcementWrite";
+    }
+
+    /**
      * 운영실 문의 페이지
      * @param model 모델
      * @param page 페이지 번호
