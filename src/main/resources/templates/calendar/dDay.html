@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layouts/defaultLayout}">
+    <head>
+        
+        <title>Home</title>
+        <th:block layout:fragment="css">
+            <!-- 밑에 줄 home.css는 지워야 하는 부분 -->
+        </th:block>
+        <!-- 아이콘 -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <style>
+    /* ===== 리셋 & 기본 설정 ===== */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+
+    }
+    /* ===== 메인 컨텐츠 영역 ===== */
+    .main-content {
+        padding: 24px;
+        background-color: var(--bg); /* 흰색 배경 */
+        box-shadow: var(--shadow);   /* 그림자(음영) */
+        min-height: 100vh;
+    }
+
+    .dday-container {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .dday-header {
+        margin-bottom: 32px;
+    }
+
+    .dday-title {
+        font-size: 28px;
+        font-weight: 700;
+        color: #1e293b;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    /* ===== D-Day 그리드 레이아웃 ===== */
+    .dday-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+        gap: 20px;
+        align-items: start;
+    }
+
+    /* ===== D-Day 카드 공통 스타일 ===== */
+    .dday-card,
+    .add-dday-card {
+        border-radius: 16px;
+        padding: 24px;
+        min-height: 160px;
+        height: 160px;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        transition: all 0.3s ease;
+    }
+
+    /* ===== 일반 D-Day 카드 ===== */
+    .dday-card {
+        background: white;
+        border: 2px solid #e2e8f0;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+
+    .dday-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+    }
+
+    /* D-Day 카드 색상 테마 */
+    .dday-card.positive {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        border-color: #3b82f6;
+        color: white;
+    }
+
+    .dday-card.negative {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        border-color: #ef4444;
+        color: white;
+    }
+
+    .dday-card.today {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        border-color: #f59e0b;
+        color: white;
+    }
+
+    /* 카드 헤더 영역 */
+    .dday-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: auto;
+    }
+
+    .dday-number {
+        font-size: 36px;
+        font-weight: 800;
+        line-height: 1;
+        letter-spacing: -0.5px;
+    }
+
+    /* 액션 버튼들 */
+    .dday-actions {
+        display: flex;
+        gap: 8px;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+    }
+
+    .dday-card:hover .dday-actions {
+        opacity: 1;
+    }
+
+    .dday-action-btn {
+        width: 32px;
+        height: 32px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+        font-size: 14px;
+    }
+
+    /* 색상별 액션 버튼 스타일 */
+    .dday-card.positive .dday-action-btn,
+    .dday-card.negative .dday-action-btn,
+    .dday-card.today .dday-action-btn {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+    }
+
+    .dday-card.positive .dday-action-btn:hover,
+    .dday-card.negative .dday-action-btn:hover,
+    .dday-card.today .dday-action-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+    }
+
+    .dday-card:not(.positive):not(.negative):not(.today) .dday-action-btn {
+        background: #f1f5f9;
+        color: #64748b;
+    }
+
+    .dday-card:not(.positive):not(.negative):not(.today) .dday-action-btn:hover {
+        background: #e2e8f0;
+        color: #334155;
+    }
+
+    /* 카드 콘텐츠 영역 */
+    .dday-title-text {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 8px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .dday-date {
+        font-size: 14px;
+        opacity: 0.8;
+        margin-top: auto;
+    }
+
+    /* ===== 추가 버튼 카드 ===== */
+    .add-dday-card {
+        background: white;
+        border: 2px dashed #cbd5e1;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: #94a3b8;
+    }
+
+    .add-dday-card:hover {
+        border-color: #3b82f6;
+        background: #f0f9ff;
+        transform: translateY(-4px);
+        box-shadow: 0 8px 16px rgba(59, 130, 246, 0.15);
+    }
+
+    .add-dday-card .add-icon {
+        font-size: 36px;
+        margin-bottom: 12px;
+        opacity: 0.5;
+        transition: all 0.3s ease;
+    }
+
+    .add-dday-card:hover .add-icon {
+        opacity: 1;
+        color: #3b82f6;
+        transform: scale(1.1) rotate(90deg);
+    }
+
+    .add-dday-card .add-text {
+        font-size: 16px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+
+    .add-dday-card:hover .add-text {
+        color: #3b82f6;
+    }
+
+    /* ===== 모달 스타일 ===== */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(4px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        animation: fadeIn 0.2s ease;
+    }
+
+    .modal-overlay.show {
+        display: flex;
+    }
+
+    .modal {
+        background: white;
+        border-radius: 20px;
+        padding: 32px;
+        width: 90%;
+        max-width: 480px;
+        max-height: 85vh;
+        overflow-y: auto;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        animation: slideUp 0.3s ease;
+    }
+
+    .modal h3 {
+        font-size: 24px;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 24px;
+    }
+
+    /* 폼 스타일 */
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: #475569;
+        font-weight: 600;
+        font-size: 14px;
+    }
+
+    .form-group input {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        font-size: 15px;
+        transition: all 0.2s ease;
+        font-family: inherit;
+    }
+
+    .form-group input:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    /* 버튼 스타일 */
+    .modal-buttons {
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+        margin-top: 28px;
+        padding-top: 20px;
+        border-top: 1px solid #f1f5f9;
+    }
+
+    .btn {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        min-width: 80px;
+    }
+
+    .btn-primary {
+        background: #3b82f6;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #2563eb;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+
+    .btn-secondary {
+        background: #f1f5f9;
+        color: #64748b;
+    }
+
+    .btn-secondary:hover {
+        background: #e2e8f0;
+        color: #475569;
+    }
+
+    .btn-danger {
+        background: #ef4444;
+        color: white;
+    }
+
+    .btn-danger:hover {
+        background: #dc2626;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    }
+
+    /* ===== 애니메이션 ===== */
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* ===== 반응형 디자인 ===== */
+    @media (max-width: 768px) {
+        .main-content {
+            padding: 16px;
+        }
+
+        .dday-grid {
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        .dday-card,
+        .add-dday-card {
+            height: 160px;
+            min-height: 160px;
+        }
+
+        .modal {
+            width: 95%;
+            padding: 24px;
+        }
+
+        .dday-actions {
+            opacity: 1;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .dday-title {
+            font-size: 24px;
+        }
+
+        .dday-number {
+            font-size: 32px;
+        }
+
+        .modal-buttons {
+            flex-direction: column;
+        }
+
+        .btn {
+            width: 100%;
+        }
+    }
+        </style>
+    </head>
+    <body>
+        <section class="mainGrid" aria-label="메인 영역" layout:fragment="content">
+                 <!-- 메인 디데이 영역 -->
+            <main class="main-content">
+                <div class="dday-container">
+                    <div class="dday-header">
+                        <h1 class="dday-title">D-Day 管理</h1>
+                    </div>
+                    
+                    <!-- D-Day Cards Grid -->
+                    <div class="dday-grid" id="ddayGrid">
+                    <!-- D-Day cards will be rendered here -->
+                    </div>
+                </div>
+            </main>
+
+            <!-- 디데이 추가/수정 모달 -->
+            <div class="modal-overlay" id="ddayModal">
+                <div class="modal">
+                <h3 id="modalTitle">디데이 추가</h3>
+                <form id="ddayForm">
+                    <div class="form-group">
+                        <label for="ddayTitle">제목</label>
+                        <input type="text" id="ddayTitle" name="title" placeholder="예: 프로젝트 발표" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="ddayDate">목표 날짜</label>
+                        <input type="date" id="ddayDate" name="date" required>
+                    </div>
+                    
+                    <div class="modal-buttons">
+                        <button type="button" class="btn btn-secondary" id="cancelBtn">취소</button>
+                        <button type="button" class="btn btn-danger" id="deleteBtn" style="display: none;">삭제</button>
+                        <button type="submit" class="btn btn-primary">저장</button>
+                    </div>
+                </form>
+                </div>
+            </div>
+        </section>
+        <th:block layout:fragment="script">
+            <script>
+                document.addEventListener('DOMContentLoaded', function(){
+                    // 각 요소들 지정하기
+                    const ddayGrid = document.querySelector('#ddayGrid');
+                    const ddayModal = document.querySelector('#ddayModal');
+                    const ddayForm = document.getElementById('ddayForm');
+                    const modalTitle = document.getElementById('modalTitle');
+                    const cancelBtn = document.getElementById('cancelBtn');
+                    const deleteBtn = document.getElementById('deleteBtn');
+
+                    let currentDday = null;
+
+                    /**
+                     * 날짜 차이를 계산해주는 함수.
+                    */
+                    function calculateDday(targetDate) {
+                        const today = new Date();
+                        const target = new Date(targetDate);
+
+                        // 시간을 00:00:00으로 설정하여 날짜만 비교
+                        today.setHours(0, 0, 0, 0);
+                        target.setHours(0, 0, 0, 0);
+
+                        // 두 날짜의 시간 차이를 밀리초(ms) 단위로 계산합니다.
+                        const diffTime = target.getTime() - today.getTime();
+                        // 밀리초 단위의 시간 차이를 일(day) 단위로 변환하고, 계산된 값을 올림하여 정수로 만듦.
+                            // ex) 6.xx 남은 것은 7일이 남은 것이므로 올림을 하는 것이 맞다.
+                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                        return diffDays;
+                    }
+
+                    /**
+                     * 플러스(+) 디데이 카드 생성
+                    */
+                    function createAddDdayCard() {
+                        return `
+                            <div class="add-dday-card" onclick="openModal('add')">
+                                <div class="add-icon">
+                                    <i class="fa-solid fa-plus"></i>
+                                </div>
+                                <div class="add-text">D-day</div>
+                            </div>
+                        `
+                    }
+
+                    /**
+                     * 디데이 데이터 객체 하나를 받아, 화면에 표시될 HTML 카드 문자열 생성
+                     * @param {object} dday 서버로부터 받은 디데이 데이터 객체
+                     * @return {string} 화면에 표시될 HTML 카드 문자열
+                    */
+                    function createDdayCard(dday) {
+                        // D-day를 계산
+                        const daysLeft = calculateDday(dday.dday);
+
+                        // 날짜를 보기 좋은 형식으로 변환
+                        const formattedDate = new Date(dday.dday).toLocaleDateString('ja-JP', {
+                            year: 'numeric',    // 2025
+                            month: 'long',      // 10月
+                            day: 'numeric'      // 05
+                        });
+
+                        // 남은 날짜에 따라 카드 스타일(CSS)과 D-day 텍스트를 결정
+                        let ddayClass = '';
+                        let ddayText = '';
+
+                        if(daysLeft > 0 ){
+                            ddayClass = 'positive'; // 미래
+                            ddayText = `D-${daysLeft}`;
+                        } else if(daysLeft < 0) {
+                            ddayClass = 'negative'; // 과거
+                            // 과거의 일정은 음수값이 포함되므로 절댓값.
+                            ddayText = `D+${Math.abs(daysLeft)}`;
+                        } else {
+                            ddayClass = 'today';    // 오늘
+                            ddayText = 'D-Day';
+                        } 
+
+                        // 최종적으로 생성될 카드의 HTML 구조를 반환합니다.
+                        return `
+                            <div class="dday-card ${ddayClass}"
+                                data-dday-id="${dday.ddayId}"
+                                data-title="${dday.title}"
+                                data-date="${dday.dday.split('T')[0]}">
+
+                                <div class="dday-card-header">
+                                    <div class="dday-number">${ddayText}</div>
+                                    <div class="dday-actions">
+                                        <button class="dday-action-btn btn-edit" title="수정"><i class="fa-solid fa-edit"></i></button>
+                                        <button class="dday-action-btn btn-delete" title="삭제"><i class="fa-solid fa-trash"></i></button>
+                                    </div>
+                                </div>
+
+                                <div class="dday-title-text">${dday.title}</div>
+                                <div class="dday-date">${formattedDate}</div>
+                            </div>
+                        `;
+                    }
+
+                    /**
+                     * 모달 열기
+                     * @param String mode - 모달의 작동 모드. 'create' 또는 'edit'
+                     * @param String ddayId=null 수정할 디데이의 고유 데이터. 'edit' 모드에서만 사용.
+                    */
+                    function openModal(mode, ddayData = null) {
+                        currentDday = ddayData;
+
+                        if (mode === 'create') {
+                            // 모달의 제목을 '디데이 추가'로 설정합니다.
+                            modalTitle.textContent = 'D-Day 追加';
+
+                            // 폼에 이전에 입력했을 수 있는 값들을 초기화
+                            ddayForm.reset();
+
+                            // 생성 시에는 삭제 버튼이 필요 없으므로 숨김.
+                            deleteBtn.style.display = 'none';
+                        }
+
+                        if (mode === 'edit' && ddayData) {
+                            // 모달의 제목을 '디데이 수정'으로 변경합니다.
+                            modalTitle.textContent = 'D-Day 編集'
+
+                            // 폼의 각 입력 필드에 전달받은 데이터의 값을 채워 넣음
+                            document.querySelector('#ddayTitle').value = ddayData.title;
+                            document.querySelector('#ddayDate').value = ddayData.date;
+
+                            // 수정 시에는 삭제도 가능해야 하니까
+                            deleteBtn.style.display = 'inline-block';
+                        }
+
+                        ddayModal.classList.add('show');
+                    }
+
+
+                    /**
+                     * 서버에서 모든 디데이 목록을 가져와 화면에 렌더링
+                    */
+                    async function fetchAndRenderDdays() {
+                        try { 
+                            const response = await fetch('/scitHub/api/ddays') // 명시하지 않으면 기본 GET 요청
+                            if (!response.ok) {
+                                throw new Error('디데이 목록을 불러오는데 실패했습니다.');
+                            }
+
+                            // JSON 문자열을 JavaScript가 사용할 수 있는 데이터 구조로 파싱
+                            const ddays = await response.json();
+
+                            const ddayCards = ddays.map(dday => createDdayCard(dday)).join('');
+                            const addCard = createAddDdayCard();
+                            ddayGrid.innerHTML = ddayCards + addCard;
+                        } catch (error) {
+                            console.error('Render Error:', error);
+                            alert(error.message);
+                        }
+                    }
+
+                    /**
+                     * [생성/수정] 폼 제출 이벤트를 처리합니다.
+                     * currentDday 변수의 상태에 따라 생성(POST) 또는 수정(PUT) 요청을 보냅니다.
+                     * @param {SubmitEvent} event - 폼 제출 이벤트 객체
+                     * 기존 fetch .then 방식을 개선해서 나온 async/await 방식
+                     */
+                    async function handleFormSubmit(event){
+                        // 폼 제출시 페이지가 새로고침되는 기본 동작을 막습니다.
+                            // 비동기 처리를 위해서.
+                        event.preventDefault();
+
+                        // 폼 데이터를 가져옵니다.
+                        const formData = new FormData(event.target);
+                        const ddayTitle = formData.get('title');
+                        const ddayDate = formData.get('date');
+
+                        // 날짜 값이 비어있다면 전송을 막음.
+                        if (!ddayDate) {
+                            alert('목표 날짜를 반드시 입력해야 합니다.');
+                            return; // 함수 실행을 중단
+                        }
+                        // 제목 값이 비어있다면 전송을 막음.
+                        if(!ddayTitle) {
+                            alert('제목을 반드시 입력해야 합니다.');
+                            return;
+                        }
+
+                        // FormData를 서버로 보낼 JavaScript 객체 (JSON으로 변환할 객체)로 만듭니다.
+                        const ddayData = {
+                            title: ddayTitle,
+                            dday: ddayDate + 'T00:00:00',
+                        };
+
+                        // '수정'모드인지 '생성' 모드인지 결정합니다.
+                            // 기본 '생성' 모드로 설정해놓음.
+                        let url = '/scitHub/api/ddays';
+                        let method = 'POST';
+
+                        // currentDday 변수에 값이 있다면 '수정' 모드입니다.
+                        if (currentDday) {
+                            url += `/${currentDday.ddayId}`;  // URL에 ID 추가
+                            method = 'PUT';
+                        }
+                        // fetch 를 사용해 서버에 비동기 POST 요청을 보냅니다.
+                        try {
+                            const response = await fetch(url, {
+                                method: method,
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify(ddayData), // JavaScript객체를 JSON 문자열로 변환하여 전송
+                            });
+
+                            if (!response.ok) {
+                                // 서버에서 에러 응답(4xx, 5xx)이 오면 예외를 발생
+                                throw new Error(`디데이 ${method === 'POST' ? '추가' : '수정'}에 실패했습니다.`);
+                            }
+
+                            const result = await response.json();   // 성공 응답을 JSON으로 변환
+                            console.log(`서버 응답 (${method}):`, result);
+                            alert(`디데이가 성공적으로 ${method === 'POST' ? '추가' : '수정'} 되었습니다.`);
+
+                            closeModal();               // 모달 닫기
+                            fetchAndRenderDdays();      // 목록 새로고침
+
+                        } catch (error) {
+                                // 네트워크 오류나 위에서 발생시킨 예외를 여기서 처리한다.
+                                console.error('Submit Error:', error);
+                                alert(error.message);
+                        }
+                    }
+
+                    /**
+                     * 삭제함수
+                     * @param {Integer} ddayId 삭제할 이벤트의 Id
+                    */
+                    async function deleteDday(ddayId) {
+                        // 정말 삭제할 것인지 한번 더 확인
+                        if (!confirm('이 디데이를 정말 삭제하시겠습니까?')) return;
+
+                        try {
+                            // fetch를 사용해 서버에 DELETE 요청을 보냄.
+                            const response = await fetch(`/scitHub/api/ddays/${ddayId}`, {
+                                method: 'DELETE'
+                            });
+
+                            // 서버 응답이 실패하면 에러를 발생
+                            if (!response.ok) {
+                                // 서버가 보낸 에러 메시지가 있다면 사용, 없다면 빈객체라도 줘라
+                                const errorData = await response.json().catch(() => ({}));
+                                throw new Error(errorData.message || '디데이 삭제에 실패했습니다.');
+                            }
+
+                            alert('디데이가 성공적으로 삭제되었습니다.');
+
+                            // 목록을 새로고침하여 화면에서 삭제된 카드를 제거
+                            fetchAndRenderDdays();
+
+                        } catch(error) {
+                            console.error('Delete Error: ', error);
+                            alert(error.message);
+                        }
+                    }
+
+                    /**
+                     * 모달 닫기
+                    */
+                    function closeModal() {
+                        ddayModal.classList.remove('show');
+
+                        // 모달이 닫힐때 currentDday 깨끗하게 초기화
+                        currentDday = null;
+                        // 모달이 닫힐때 나머지 변경사항들도 다 초기화
+                        ddayForm.reset();
+                        deleteBtn.style.display = 'none';
+                        modalTitle.textContent = 'D-Day 追加';
+                    }
+
+                    // -- 이벤트 리스너 ----
+                    
+                    // 취소버튼 클릭시 모달 숨김
+                    cancelBtn.addEventListener('click', function(){
+                        closeModal();
+                    })
+
+                    // 삭제버튼 이벤트 등록
+                    deleteBtn.addEventListener('click', function(event){
+                        // 모달이 열릴때 currentDday에 data를 담아놓으니까 그걸 사용
+                        if (currentDday && currentDday.ddayId) {
+                            console.log('Deleting dday with id:', currentDday.ddayId);
+                            deleteDday(currentDday.ddayId);
+                            closeModal();
+                        }
+
+                    });
+
+                    // 등록버튼 클릭시 디데이 추가
+                    ddayForm.addEventListener('submit', handleFormSubmit);
+
+                    // 디데이 카드 영역에 이벤트 등록 (목록에서 각 카드의 아이콘 누르는 상황)
+                    ddayGrid.addEventListener('click', function(event) {
+                        
+                        // 수정
+                        // 클릭된 요소(target)에서 가장 가까운 .btn-edit를 찾음
+                        const editButton = event.target.closest('.btn-edit');
+                        console.log('Edit button clicked:', editButton);
+
+                        if (editButton) {
+                            // 수정 아이콘이 눌렸다면, 해당 버튼을 포함하는 가장 가까운 dday-card를 찾습니다.
+                                // (여기에 dday 정보들이 담겨있음)
+                            const card = editButton.closest('.dday-card');
+                            console.log('Card found:', card);  // 카드를 찾았는지
+                            console.log('Card dataset:', card?.dataset);  // dataset 값들 확인
+
+                            // card를 찾았다면
+                            if (card) {
+                                // 카드의 data-* 속성에서 수정에 필요한 모든 정보를 추출하여 객체로 만듦.
+                                const ddayData = {
+                                    ddayId: card.dataset.ddayId,
+                                    title: card.dataset.title,
+                                    date: card.dataset.date,
+                                }
+                                console.log('Opening modal with:', ddayData);  // 데이터 확인
+                                // 추출한 데이터를 가지고 'edit' 모드로 모달을 엽니다.
+                                openModal('edit', ddayData);
+                            }
+                            return; // 삭제 버튼 로직이 중복 실행되지 않도록 함수 종료
+                        }
+
+                        // 삭제아이콘 지정
+                        const deleteButton = event.target.closest('.btn-delete');
+
+                        // 삭제버튼을 찾으면
+                        if (deleteButton) {
+                            // 부모 태그로의 접근
+                            const card = deleteButton.closest('.dday-card');
+
+                            if (card) {
+                                // 그 카드의 고유 Id를 가져옵니다.
+                                const ddayId = card.dataset.ddayId;
+                                // 삭제하기 함수
+                                deleteDday(ddayId);
+                            }
+                        }
+                    })
+
+                    // openModal 함수를 전역에서 사용할 수 있도록 해줌
+                    window.openModal = openModal;
+
+                    // 초기 렌더링
+                    fetchAndRenderDdays();
+                })
+            </script>
+        </th:block>
+    </body>
+</html>

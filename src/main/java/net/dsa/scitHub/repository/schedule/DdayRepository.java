@@ -6,6 +6,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import net.dsa.scitHub.entity.schedule.Dday;
+import net.dsa.scitHub.entity.user.User;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -49,4 +50,13 @@ public interface DdayRepository extends JpaRepository<Dday, Integer> {
     /** 이번 달의 디데이들 조회 */
     @Query("SELECT d FROM Dday d WHERE YEAR(d.dday) = :year AND MONTH(d.dday) = :month")
     List<Dday> findByMonth(@Param("year") Integer year, @Param("month") Integer month);
+
+    /**
+     * User 객체를 받아, 해당 사용자의 모든 Dday를 dday 필드(날짜) 기준으로 오름차순 정렬하여 조회합니다.
+     * ((네이밍 의미))
+     * findByUser : Dday Entity 안에 있는 user 필드를 조건으로 사용하겠다는 의미
+     * OrderByDday : dday 필드 기준으로 정렬하겠다.
+     * Asc : 오름차순 정렬하겠다.
+    */
+    List<Dday> findByUserOrderByDdayAsc(User user);
 }

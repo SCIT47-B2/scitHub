@@ -6,8 +6,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import net.dsa.scitHub.entity.schedule.Event;
+import net.dsa.scitHub.enums.Visibility;
 
-import java.beans.Visibility;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -56,4 +56,16 @@ public interface EventRepository extends JpaRepository<Event, Integer> {
     /** 공개 이벤트만 조회 */
     @Query("SELECT e FROM Event e WHERE e.visibility = 'PUBLIC' ORDER BY e.startAt")
     List<Event> findPublicEvents();
+
+    // 전체일정과 개인일정의 토글에 따라서 보이게 하거나 숨기는 쿼리
+    @Query("SELECT e FROM Event e WHERE " +
+            "(:showPublic = true AND e.visibility = :publicVisibility) OR " + 
+            "(:showPrivate = true AND e.visibility = :privateVisibility AND:username Is NOT NULL AND e.user.username = :username)")
+            List<Event> findFilteredEvents(
+                            @Param("username") String username,
+                            @Param("showPublic") boolean showPublic,
+                            @Param("showPrivate") boolean showPrivate,
+                            @Param("publicVisibility") Visibility publicVisibility,
+                            @Param("privateVisibility") Visibility privateVisibility // 파라미터 추가
+    );
 }

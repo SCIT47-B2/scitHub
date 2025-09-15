@@ -38,8 +38,8 @@ public class AuthenticatedUserDetailsService implements UserDetailsService {
                 .id(userEntity.getUsername())
                 .password(userEntity.getPasswordHash())
                 .name(userEntity.getNameKor())
-                .enabled(userEntity.getIsActive())
                 .roleName(userEntity.getRole().getDisplayName())
+                .enabled(userEntity.getIsActive())
                 .build();
 
 		log.debug("인증정보 : {}", user);

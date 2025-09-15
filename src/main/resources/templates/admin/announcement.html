@@ -3,7 +3,7 @@
     xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
     layout:decorate="~{layouts/defaultLayout}">
     <head>
-        <title>공지사항</title>
+        <title>Announcement</title>
         <th:block layout:fragment="css">
             <!-- 이 페이지에만 적용될 CSS 파일을 여기에 추가합니다 -->
             <link rel="stylesheet" th:href="@{/css/announcement.css}">
@@ -11,7 +11,7 @@
     </head>
     <body>
         <!--// layout:fragment="content" : 이 부분이 메인 콘텐츠 영역이 됩니다. //-->
-        <section class="mainGrid" aria-label="메인 영역" layout:fragment="content">
+        <section class="mainGrid" layout:fragment="content">
 
             <!-- 전체 콘텐츠를 감싸는 컨테이너 -->
             <div class="content-container">
@@ -24,33 +24,33 @@
                             <input type="hidden" name="page" id="page">
                             <input type="hidden" name="boardName" id="boardName" th:value="${boardName}">
                             <select id="type" name="searchType">
-                                <option value="all"     th:selected="${searchType == 'all'}">전체</option>
-                                <option value="title"   th:selected="${searchType == 'title'}">제목</option>
-                                <option value="tag"     th:selected="${searchType == 'tag'}">태그</option>
-                                <option value="content" th:selected="${searchType == 'content'}">내용</option>
-                                <option value="user"    th:selected="${searchType == 'user'}">작성자</option>
+                                <option value="all"     th:selected="${searchType == 'all'}">全て</option>
+                                <option value="title"   th:selected="${searchType == 'title'}">タイトル</option>
+                                <option value="tag"     th:selected="${searchType == 'tag'}">タグ</option>
+                                <option value="content" th:selected="${searchType == 'content'}">内容</option>
+                                <option value="user"    th:selected="${searchType == 'user'}">投稿者</option>
                             </select>
-                            <input type="text" name="searchWord" th:value="${searchWord}" placeholder="검색어를 입력하세요"/>
-                            <button type="button" onclick="pagingFormSubmit(1)" aria-label="검색"><i class="fa-solid fa-magnifying-glass"></i></button>
+                            <input type="text" name="searchWord" th:value="${searchWord}" placeholder="検索キーワードを入力してください"/>
+                            <button type="button" onclick="pagingFormSubmit(1)"><i class="fa-solid fa-magnifying-glass"></i></button>
                         </form>
                     </div>
 
                     <!-- 2. 중심 공지 테이블 영역 -->
                     <div class="announcement-section">
-                        <h2 th:text="${boardName == 'announcement' ? '일반 공지' : boardName == 'announcementIt' ? 'IT 공지' : '일본어 공지'}"></h2>
+                        <h2 th:text="${boardName == 'announcement' ? 'お知らせ' : boardName == 'announcementIt' ? 'お知らせ - IT' : 'お知らせ - 日本語'}"></h2>
                         <table class="announcement-table">
                             <thead>
                                 <tr>
-                                    <th>글번호</th>
-                                    <th>제목</th>
-                                    <th>작성자</th>
-                                    <th>작성일</th>
-                                    <th>조회수</th>
+                                    <th>番号</th>
+                                    <th>タイトル</th>
+                                    <th>投稿者</th>
+                                    <th>投稿日</th>
+                                    <th>閲覧数</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td colspan="5" th:if="${postPage.isEmpty()}" class="no-data">공지가 없습니다.</td>
+                                    <td colspan="5" th:if="${postPage.isEmpty()}" class="no-data">お知らせがありません。</td>
                                 </tr>
                                 <tr th:each="post, status : ${postPage}" th:unless="${postPage.isEmpty()}">
                                     <td th:text="${post.postId}"></td>
@@ -66,7 +66,7 @@
                     </div>
 
                     <!-- 3. 페이지네이션 영역 -->
-                    <nav class="pagination-container" aria-label="페이지 네비게이션" th:if="${postPage.totalPages > 0}"
+                    <nav class="pagination-container" th:if="${postPage.totalPages > 0}"
                         th:with="blockSize = ${2 * linkSize + 1},
                                 startPage = ${((page - 1) / blockSize) * blockSize + 1},
                                 endPage = ${T(java.lang.Math).min(startPage + blockSize - 1, postPage.totalPages)}"
@@ -101,7 +101,7 @@
                     <!-- 4. 위쪽 공지 패널 -->
                     <div class="notice-panel" th:with="UpperBoardName=${boardName == 'announcement' ? 'announcementIt' : 'announcement'}">
                         <a th:href="|javascript:changeBoard('${UpperBoardName}')|" class="panel-header">
-                            <h3 th:text="${boardName == 'announcement' ? 'IT 공지' : '일반 공지'}"></h3>
+                            <h3 th:text="${boardName == 'announcement' ? 'お知らせ - IT' : 'お知らせ'}"></h3>
                             <span>&gt;</span>
                         </a>
                         <ul class="notice-list">
@@ -118,7 +118,7 @@
                     <!-- 5. 아래쪽 공지 패널 -->
                     <div class="notice-panel" th:with="lowerBoardName=${boardName == 'announcementJp' ? 'announcementIt' : 'announcementJp'}">
                         <a th:href="|javascript:changeBoard('${lowerBoardName}')|" class="panel-header">
-                            <h3 th:text="${boardName == 'announcementJp' ? 'IT 공지' : '일본어 공지'}"></h3>
+                            <h3 th:text="${boardName == 'announcementJp' ? 'お知らせ - IT' : 'お知らせ - 日本語'}"></h3>
                             <span>&gt;</span>
                         </a>
                         <ul class="notice-list">
