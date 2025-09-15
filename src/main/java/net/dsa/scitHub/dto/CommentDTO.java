@@ -16,7 +16,7 @@ import net.dsa.scitHub.entity.user.User;
 public class CommentDTO {
     private Integer commentId;
     private Integer userId;
-    private String userName;       // 로그인 시에 입력하는 ID
+    private String username;       // 로그인 시에 입력하는 ID
     private String userNameKor;
     private String content;
     private LocalDateTime createdAt;
