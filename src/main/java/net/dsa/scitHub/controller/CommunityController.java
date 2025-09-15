@@ -3,6 +3,8 @@ package net.dsa.scitHub.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,16 +16,16 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import net.dsa.scitHub.dto.BoardDTO;
 import net.dsa.scitHub.dto.CommentDTO;
 import net.dsa.scitHub.dto.MenuItem;
 import net.dsa.scitHub.dto.PostDTO;
-import net.dsa.scitHub.security.AuthenticatedUser;
 import net.dsa.scitHub.service.CommunityService;
+import net.dsa.scitHub.service.PostService;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -34,10 +36,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @Slf4j
 @Controller
+@RequestMapping("community")
 @RequiredArgsConstructor
 public class CommunityController {
 
     private final CommunityService cs;
+    private final PostService ps;
+
+    @Value("${board.pageSize}")
+	int pageSize;				// 페이지당 글 수
+
+	@Value("${board.linkSize}")
+	int linkSize;				// 페이지 이동 링크 수
 
     @ModelAttribute("menuItems")
     public List<MenuItem> menuItems() {
@@ -48,13 +58,16 @@ public class CommunityController {
         );
     }
 
+    // 게시판 관련 ---------------------------------------------------------------------------------------------
     /**
      * 커뮤니티 홈 페이지 요청
      * @param model
      * @return community/home.html
      */
-    @GetMapping({"/community", "/community/home"})
-    public String communityPage(Model model) {
+    @GetMapping({"", "/", "home"})
+    public String communityPage(
+        Model model,
+        @AuthenticationPrincipal UserDetails user) {
         return "community/home"; // templates/community/home.html
     }
 
@@ -64,7 +77,7 @@ public class CommunityController {
      * 글쓰기 페이지로 이동
      * @return community/writeForm.html
      */
-    @GetMapping("/community/writePost")
+    @GetMapping("writePost")
     public String writePostPage() {
         return "community/writeForm";
     }
@@ -73,7 +86,7 @@ public class CommunityController {
      * 작성한 글을 DB에 저장(비동기)
      * @param postDTO
      */
-    @PostMapping("/community/write")
+    @PostMapping("write")
     public ResponseEntity<?> writePost(
             PostDTO postDTO,
             @AuthenticationPrincipal UserDetails user) {
@@ -98,7 +111,7 @@ public class CommunityController {
      * @param model
      * @return read.html
      */
-	@GetMapping("community/readPost")
+	@GetMapping("readPost")
 	public String read(
 		    @RequestParam(name = "postId", defaultValue = "0") int postId,
             @AuthenticationPrincipal UserDetails user,
@@ -106,7 +119,7 @@ public class CommunityController {
 		try {
 			PostDTO postDTO = cs.getPost(postId, true, user.getUsername());
 			model.addAttribute("post", postDTO);
-            
+
             // 태그 리스트를 JSON 문자열 형식으로 변환
             ObjectMapper mapper = new ObjectMapper();
             String tagsJson = mapper.writeValueAsString(postDTO.getTagList());
@@ -128,7 +141,7 @@ public class CommunityController {
 	 * @param Model
 	 * @return updateForm.html
 	 */
-	@GetMapping("community/updatePost")
+	@GetMapping("updatePost")
 	public String update(
 			@RequestParam("postId") int postId,
             @AuthenticationPrincipal UserDetails user,
@@ -163,7 +176,7 @@ public class CommunityController {
 	 * @param upload 	업로드된 파일
 	 * @return 글읽기페이지
 	 */
-	@PatchMapping("community/updatePost")
+	@PatchMapping("updatePost")
 	public ResponseEntity<?> updatePost(
             @RequestParam("postId") Integer postId,
 			PostDTO postDTO,
@@ -184,7 +197,7 @@ public class CommunityController {
      * @param postId
      * @param user
      */
-    @GetMapping("community/deletePost")
+    @GetMapping("deletePost")
     public String deletePost(
         @RequestParam("postId") Integer postId,
         @AuthenticationPrincipal UserDetails user) {
@@ -201,7 +214,7 @@ public class CommunityController {
      * 게시글 좋아요 처리(비동기)
      * @param postId
      */
-    @PostMapping("community/likePost")
+    @PostMapping("likePost")
     public ResponseEntity<?> likePost(
             @RequestParam("postId") int postId,
             @AuthenticationPrincipal UserDetails user) {
@@ -221,7 +234,7 @@ public class CommunityController {
      * 댓글 목록 불러오기(비동기)
      * @return List<CommentDTO>
      */
-    @GetMapping("community/commentList")
+    @GetMapping("commentList")
     public ResponseEntity<List<CommentDTO>> commentList(
             @RequestParam("postId") int postId,
             @AuthenticationPrincipal UserDetails user) {
@@ -240,7 +253,7 @@ public class CommunityController {
      * 댓글 작성(비동기)
      * @param CommentDTO
      */
-    @PostMapping("community/writeComment")
+    @PostMapping("writeComment")
     public ResponseEntity<?> writeComment(
             CommentDTO commentDTO,
             @AuthenticationPrincipal UserDetails user) {
@@ -257,7 +270,7 @@ public class CommunityController {
      * 댓글 삭제(비동기)
      * @param commentId
      */
-    @DeleteMapping("community/deleteComment/{commentId}")
+    @DeleteMapping("deleteComment/{commentId}")
     public ResponseEntity<?> deleteComment(
             @PathVariable("commentId") Integer commentId,
             @AuthenticationPrincipal UserDetails user) {
@@ -276,7 +289,7 @@ public class CommunityController {
      * @param commentId
      * @param content
      */
-    @PatchMapping("community/updateComment")
+    @PatchMapping("updateComment")
     public ResponseEntity<?> updateComment(
             @RequestBody CommentDTO commentDTO,
             @AuthenticationPrincipal UserDetails user) {
@@ -289,5 +302,4 @@ public class CommunityController {
             return ResponseEntity.badRequest().body("댓글 삭제 실패");
         }
     }
-
 }

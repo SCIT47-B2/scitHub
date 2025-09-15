@@ -1,38 +1,33 @@
 package net.dsa.scitHub.service;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
+
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.dsa.scitHub.dto.BoardDTO;
 import net.dsa.scitHub.dto.CommentDTO;
 import net.dsa.scitHub.dto.PostDTO;
+import net.dsa.scitHub.entity.board.Board;
+import net.dsa.scitHub.entity.board.BoardBookmark;
 import net.dsa.scitHub.entity.board.Comment;
 import net.dsa.scitHub.entity.board.Post;
 import net.dsa.scitHub.entity.board.PostLike;
 import net.dsa.scitHub.entity.board.Tag;
 import net.dsa.scitHub.entity.user.User;
+import net.dsa.scitHub.repository.board.BoardBookmarkRepository;
 import net.dsa.scitHub.repository.board.BoardRepository;
 import net.dsa.scitHub.repository.board.CommentRepository;
 import net.dsa.scitHub.repository.board.PostLikeRepository;
 import net.dsa.scitHub.repository.board.PostRepository;
 import net.dsa.scitHub.repository.board.TagRepository;
 import net.dsa.scitHub.repository.user.UserRepository;
-import net.dsa.scitHub.security.AuthenticatedUser;
-import net.dsa.scitHub.util.FileManager;
 
 @Service
 @Slf4j
@@ -43,11 +38,45 @@ public class CommunityService {
     private final UserRepository ur;
     private final PostRepository pr;
     private final BoardRepository br;
+    private final BoardBookmarkRepository bbr;
     private final TagRepository tr;
     private final CommentRepository cr;
     private final PostLikeRepository plr;
-    private final FileManager fileManager;
 
+    // 게시판 관련 ----------------------------------------------------------------------------------
+    /**
+     * 유저가 즐겨찾기한 게시판 가져오기
+     */
+    /* 
+    public List<BoardDTO> getFavoriteBoards(String username) {
+
+        // 현재 로그인 계정의 User 엔티티 탐색
+        User userEntity = ur.findByUsername(username).orElseThrow(
+            () -> new EntityNotFoundException("해당 회원을 찾을 수 없습니다.")
+        );
+        // 로그인한 유저가 즐겨찾기한 게시판 목록 가져오기
+        List<Board> bookmarkedBoardList = br.findBookmarkedBoardsByUser(userEntity.getUserId());
+
+        // List<Entity> -> List<DTO>
+        List<BoardDTO> bookmarkedBoardDTOList = new ArrayList<>();
+        for (Board board : bookmarkedBoardList) {
+            BoardDTO boardDTO = BoardDTO.builder()
+                                        .boardId(board.getBoardId())
+                                        .name(board.getName())
+                                        .description(board.getDescription())
+                                        .build();
+            
+            for (Post post : board.getPosts()) {
+                
+            }
+        }
+
+        // List<DTO> 반환
+    }
+    */
+
+
+    // 게시글 관련 ----------------------------------------------------------------------------------
     /** 새 게시글 등록
      *  @param PostDTO
      */
@@ -231,6 +260,26 @@ public class CommunityService {
         return plr.countByPost_PostId(postId);
     }
 
+    // 게시글 태그 관련 -------------------------------------------------------------------------
+
+    /**
+     * 게시글 하나의 태그 모두 가져오기
+     */
+    public List<String> getTagList(Integer postId) {
+        // 게시글 실존 여부 체크
+        Post post = pr.findById(postId).orElseThrow(
+            () -> new EntityNotFoundException("해당 게시글이 존재하지 않습니다.")
+        );
+        List<Tag> tagList = post.getTags();
+        List<String> tagNames = new ArrayList<>();
+        // List<Tag> -> List<String> 변환
+        for (Tag tag : tagList) {
+            String tagName = tag.getName();
+            tagNames.add(tagName);
+        }
+        return tagNames;
+    }
+
     /**
      * 게시글의 태그 데이터 갱신
      * @param postId
@@ -369,23 +418,5 @@ public class CommunityService {
             throw new Exception("수정 권한이 없습니다.");
         }
         comment.setContent(commentDTO.getContent());
-    }
-
-    /**
-     * 게시글 하나의 태그 모두 가져오기
-     */
-    public List<String> getTagList(Integer postId) {
-        // 게시글 실존 여부 체크
-        Post post = pr.findById(postId).orElseThrow(
-            () -> new EntityNotFoundException("해당 게시글이 존재하지 않습니다.")
-        );
-        List<Tag> tagList = post.getTags();
-        List<String> tagNames = new ArrayList<>();
-        // List<Tag> -> List<String> 변환
-        for (Tag tag : tagList) {
-            String tagName = tag.getName();
-            tagNames.add(tagName);
-        }
-        return tagNames;
     }
 }

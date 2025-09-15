@@ -15,7 +15,6 @@ import org.springframework.web.multipart.MultipartFile;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dsa.scitHub.util.FileManager;
-import org.springframework.web.bind.annotation.GetMapping;
 
 
 
@@ -26,11 +25,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class CkEditor5Controller {
 
     // 업로드된 이미지의 저장 경로
-    @Value("${app.upload.image.path}")
+    @Value("${post.upload.image.path}")
     private String imagePath;
 
     // 업로드된 파일을 불러올 때 매핑되는 경로
-    @Value("${app.upload.image.url-pattern}")
+    @Value("${post.upload.image.url-pattern}")
     private String urlPattern;
 
     private final FileManager fileManager;
