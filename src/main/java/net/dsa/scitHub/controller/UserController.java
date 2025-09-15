@@ -1,5 +1,9 @@
 package net.dsa.scitHub.controller;
 
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.WebAttributes;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -7,6 +11,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dsa.scitHub.dto.UserDTO;
@@ -46,7 +52,21 @@ public class UserController {
 	 * @return loginForm.html
 	 */
 	@GetMapping("landingPage")
-	public String landingPage() {
+	public String landingPage(@RequestParam(value = "error", required = false) String error,
+							  HttpServletRequest request, Model model) {
+		if (error != null) {
+			HttpSession session = request.getSession(false);
+			String errorMessage = "로그인에 실패했습니다. 다시 시도해주세요."; // 기본 에러 메시지
+			if (session != null) {
+				AuthenticationException ex = (AuthenticationException) session.getAttribute(WebAttributes.AUTHENTICATION_EXCEPTION);
+				if (ex instanceof DisabledException) {
+					errorMessage = "차단된 사용자입니다. 관리자에게 문의하세요.";
+				} else if (ex instanceof BadCredentialsException) {
+					errorMessage = "아이디 또는 비밀번호가 일치하지 않습니다.";
+				}
+			}
+			model.addAttribute("errorMessage", errorMessage);
+		}
 		return "user/landingPage";
 	}
 
