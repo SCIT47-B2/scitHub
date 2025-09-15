@@ -64,11 +64,11 @@
              * @returns {Date} - 로컬 시간대 기준 Date
              */
             function parseDateLocal(ymd) {
-              /** 예외 처리: 값 없음 */
-              if (!ymd || typeof ymd !== 'string') return null;
-              const [y, m, d] = ymd.split('-').map(Number);
-              /** JS Date: month는 0부터 시작 */
-              return new Date(y, (m || 1) - 1, d || 1, 0, 0, 0, 0);
+                /** 예외 처리: 값 없음 */
+                if (!ymd || typeof ymd !== 'string') return null;
+                const [y, m, d] = ymd.split('-').map(Number);
+                /** JS Date: month는 0부터 시작 */
+                return new Date(y, (m || 1) - 1, d || 1, 0, 0, 0, 0);
             }
 
             /** 진행도 퍼센트 계산 (0~100 사이로 클램프)
@@ -78,19 +78,19 @@
              * @returns {number} - 퍼센트 (정수)
              */
             function calcProgressPercent(startDate, endDate, nowDate = new Date()) {
-              /** 잘못된 입력 방어 */
-              if (!(startDate instanceof Date) || isNaN(startDate)) return 0;
-              if (!(endDate instanceof Date) || isNaN(endDate)) return 0;
+                /** 잘못된 입력 방어 */
+                if (!(startDate instanceof Date) || isNaN(startDate)) return 0;
+                if (!(endDate instanceof Date) || isNaN(endDate)) return 0;
 
-              /** 구간 길이(ms) */
-              const total = endDate - startDate;
-              if (total <= 0) return 100; // 시작 ≥ 종료인 경우 완료로 간주
+                /** 구간 길이(ms) */
+                const total = endDate - startDate;
+                if (total <= 0) return 100; // 시작 ≥ 종료인 경우 완료로 간주
 
-              /** 진행 경과(ms) */
-              const elapsed = Math.min(Math.max(nowDate - startDate, 0), total);
-              const ratio = elapsed / total;
-              /** 소수점 반올림 */
-              return Math.round(ratio * 100);
+                /** 진행 경과(ms) */
+                const elapsed = Math.min(Math.max(nowDate - startDate, 0), total);
+                const ratio = elapsed / total;
+                /** 소수점 반올림 */
+                return Math.round(ratio * 100);
             }
 
             /** DOM의 study-card에서 data-start/end를 읽어 UI 갱신
@@ -98,31 +98,31 @@
              * @returns {void}
              */
             function updateStudyProgress(cardEl) {
-              if (!cardEl) return;
+                if (!cardEl) return;
 
-              const startStr = cardEl.getAttribute('data-start');
-              const endStr   = cardEl.getAttribute('data-end');
+                const startStr = cardEl.getAttribute('data-start');
+                const endStr   = cardEl.getAttribute('data-end');
 
-              const start = parseDateLocal(startStr);
-              const end   = parseDateLocal(endStr);
+                const start = parseDateLocal(startStr);
+                const end   = parseDateLocal(endStr);
 
-              let percent = calcProgressPercent(start, end);
-              /** 0~100 보정 */
-              percent = Math.min(100, Math.max(0, percent));
+                let percent = calcProgressPercent(start, end);
+                /** 0~100 보정 */
+                percent = Math.min(100, Math.max(0, percent));
 
-              /** 텍스트, 도넛 변수 반영 */
-              const percentTextEl = cardEl.querySelector('.big-percent');
-              const ringEl        = cardEl.querySelector('.ring');
+                /** 텍스트, 도넛 변수 반영 */
+                const percentTextEl = cardEl.querySelector('.big-percent');
+                const ringEl        = cardEl.querySelector('.ring');
 
-              if (percentTextEl) percentTextEl.textContent = `${percent}%`;
-              if (ringEl) ringEl.style.setProperty('--progress', String(percent));
+                if (percentTextEl) percentTextEl.textContent = `${percent}%`;
+                if (ringEl) ringEl.style.setProperty('--progress', String(percent));
             }
 
             /** 페이지 로드 시 1회 계산 */
             document.addEventListener('DOMContentLoaded', function onReady() {
-              /** 사이드바가 여러 개일 수 있으니 모두 처리 */
-              const cards = document.querySelectorAll('.sidebar .study-card[data-start][data-end]');
-              cards.forEach(updateStudyProgress);
+                /** 사이드바가 여러 개일 수 있으니 모두 처리 */
+                const cards = document.querySelectorAll('.sidebar .study-card[data-start][data-end]');
+                cards.forEach(updateStudyProgress);
             });
             /*]]>*/
             </script>

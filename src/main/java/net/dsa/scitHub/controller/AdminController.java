@@ -1,6 +1,7 @@
 package net.dsa.scitHub.controller;
 
 import java.util.List;
+import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -16,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.persistence.criteria.CriteriaBuilder.In;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dsa.scitHub.dto.CommentDTO;
@@ -24,6 +24,7 @@ import net.dsa.scitHub.dto.MenuItem;
 import net.dsa.scitHub.dto.MypageDTO;
 import net.dsa.scitHub.dto.PostDTO;
 import net.dsa.scitHub.dto.PostDetailDTO;
+import net.dsa.scitHub.dto.UserManageDTO;
 import net.dsa.scitHub.service.BoardService;
 import net.dsa.scitHub.service.PostService;
 import net.dsa.scitHub.service.UserService;
@@ -37,7 +38,6 @@ public class AdminController {
     private final PostService ps;
     private final BoardService bs;
     private final UserService us;
-    static private boolean readFlag = false; // 글 읽기 플래그
 
 	@Value("${board.uploadPath}")
 	String uploadPath;			// 첨부파일 저장 경로
@@ -57,13 +57,17 @@ public class AdminController {
      * @return 메뉴 아이템 리스트
      */
     @ModelAttribute("menuItems")
-    public List<MenuItem> menuItems() {
-        return List.of(
-            new MenuItem("お知らせ", "/admin/announcement"),
-            new MenuItem("お問い合わせ", "/admin/inquiry"),
-            // new MenuItem("신고", "/admin/report"),
-            new MenuItem("会員管理", "/admin/manageUser")
-        );
+    public List<MenuItem> menuItems(@AuthenticationPrincipal(expression = "roleName") String role) {
+        List<MenuItem> menuItems = new ArrayList<>();
+
+        menuItems.add(new MenuItem("お知らせ", "/admin/announcement"));
+        menuItems.add(new MenuItem("お問い合わせ", "/admin/inquiry"));
+
+        if ("ROLE_ADMIN".equals(role)) {
+            menuItems.add(new MenuItem("会員管理", "/admin/manageUser"));
+        }
+
+        return menuItems;
     }
 
     /**
@@ -379,9 +383,96 @@ public class AdminController {
         return "admin/report";
     }
 
+    /**
+     * 회원 관리 페이지
+     * @param model 모델
+     * @param page 페이지 번호
+     * @param searchType 검색 유형
+     * @param searchWord 검색어
+     * @param cohortNo 기수 필터
+     * @param role 역할 필터
+     * @return 뷰 이름
+     */
     @GetMapping("manageUser")
-    public String manageUserPage(Model model) {
+    public String manageUserPage(
+        Model model,
+        @RequestParam(name = "page", defaultValue = "1") int page,
+        @RequestParam(name = "searchType", defaultValue = "all") String searchType,
+        @RequestParam(name = "searchWord", defaultValue = "") String searchWord,
+        @RequestParam(name = "cohortNo", defaultValue = "0") int cohortNo,
+        @RequestParam(name = "role", defaultValue = "ALL") String role
+    ) {
+        log.debug("회원 관리 페이지 요청: page={}, searchType={}, searchWord={}, cohortNo={}, role={}", page, searchType, searchWord, cohortNo, role);
+        Page<UserManageDTO> userPage = us.findUsersByCriteria(page, pageSize, searchType, searchWord, cohortNo, role);
+        List<Integer> cohortList = us.findAllCohorts();
+
+        log.debug("페이징된 사용자 목록: {}", userPage.getContent());
+        log.debug("현재 페이지: {}", userPage.getNumber());
+        log.debug("전체 개수: {}", userPage.getTotalElements());
+        log.debug("전체 페이지 수: {}", userPage.getTotalPages());
+        log.debug("기수 목록: {}", cohortList);
+
+        model.addAttribute("userPage", userPage);   // 페이징된 사용자 목록
+        model.addAttribute("cohortList", cohortList); // 기수 목록
+
+        // 검색 및 필터링 파라미터 유지
+        model.addAttribute("page", page);
+        model.addAttribute("searchType", searchType);
+        model.addAttribute("searchWord", searchWord);
+        model.addAttribute("cohortNo", cohortNo);
+        model.addAttribute("role", role);
+        model.addAttribute("linkSize", linkSize);
+
         return "admin/manageUser";
     }
 
+    /**
+     * 사용자 활성/비활성 상태 토글 (AJAX)
+     * @param userId 대상 사용자의 ID
+     * @return ResponseEntity with updated user info or error message
+     */
+    @PostMapping("manageUser/toggleStatus")
+    @ResponseBody
+    public ResponseEntity<?> toggleUserStatus(@RequestParam("userId") Integer userId) {
+        log.debug("AJAX 사용자 상태 토글 요청: userId={}", userId);
+        try {
+            UserManageDTO updatedUser = us.toggleUserStatus(userId);
+            log.debug("사용자 상태 토글 성공: {}", updatedUser);
+
+            return ResponseEntity.ok(updatedUser);
+        } catch (EntityNotFoundException e) {
+            log.error("[예외 발생] 사용자 상태 토글 실패: {}", e.getMessage());
+
+            return ResponseEntity.status(404).body("사용자를 찾을 수 없습니다.");
+        } catch (Exception e) {
+            log.error("[예외 발생] 사용자 상태 토글 중 오류: {}", e.getMessage());
+
+            return ResponseEntity.status(500).body("사용자 상태 토글 중 오류가 발생했습니다.");
+        }
+    }
+
+    /**
+     * 사용자 권한 변경 (AJAX)
+     * @param userId 대상 사용자의 ID
+     * @return ResponseEntity with updated user info or error message
+     */
+    @PostMapping("manageUser/changeRole")
+    @ResponseBody
+    public ResponseEntity<?> changeUserRole(@RequestParam("userId") Integer userId) {
+        log.debug("AJAX 사용자 권한 변경 요청: userId={}", userId);
+        try {
+            UserManageDTO updatedUser = us.changeUserRole(userId);
+            log.debug("사용자 권한 변경 성공: {}", updatedUser);
+
+            return ResponseEntity.ok(updatedUser);
+        } catch (EntityNotFoundException e) {
+            log.error("[예외 발생] 사용자 권한 변경 실패: {}", e.getMessage());
+
+            return ResponseEntity.status(404).body("사용자를 찾을 수 없습니다.");
+        } catch (Exception e) {
+            log.error("[예외 발생] 사용자 권한 변경 중 오류: {}", e.getMessage());
+
+            return ResponseEntity.status(500).body("사용자 권한 변경 중 오류가 발생했습니다.");
+        }
+    }
 }
