@@ -35,28 +35,37 @@
                 </form>
             </div>
 
-            <div class="content-box">
+            <div class="content-box"
+                th:data-toggle-url="@{/admin/manageUser/toggleStatus}"
+                th:data-role-url="@{/admin/manageUser/changeRole}">
                 <table class="user-table">
                     <thead>
                     <tr>
                         <th>会員番号</th><th>ID</th><th>名前</th><th>期</th>
-                        <th>生年月日</th><th>性別</th><th>携帯電話番号</th><th>状態</th><th>権限</th>
+                        <th>生年月日</th><th>性別</th><th>携帯電話番号</th><th>状態</th><th>権限</th><th>操作</th>
                     </tr>
                     </thead>
                     <tbody>
                         <tr th:if="${userPage.isEmpty()}">
-                            <td colspan="9" class="no-data">該当する会員がいません。</td>
+                            <td colspan="10" class="no-data">該当する会員がいません。</td>
                         </tr>
-                        <tr th:each="user : ${userPage.content}">
-                            <td th:text="${user.userId}"></td>
-                            <td th:text="${user.username}"></td>
-                            <td th:text="${user.nameKor}"></td>
-                            <td th:text="${user.cohortNo}"></td>
-                            <td th:text="${user.birthDate}"></td>
-                            <td th:text="${user.gender == 'Man' ? '男性' : user.gender == 'Woman' ? '女性' : '指定なし'}"></td>
-                            <td th:text="${user.phone}"></td>
-                            <td th:text="${user.isActive ? 'アクティブ' : '非アクティブ'}"></td>
-                            <td th:text="${user.role}"></td>
+                        <tr th:each="user : ${userPage.content}" th:id="|user-row-${user.userId}|">
+                            <td class="user-id" th:text="${user.userId}"></td>
+                            <td class="username" th:text="${user.username}"></td>
+                            <td class="name-kor" th:text="${user.nameKor}"></td>
+                            <td class="cohort-no" th:text="${user.cohortNo}"></td>
+                            <td class="birth-date" th:text="${user.birthDate}"></td>
+                            <td class="gender" th:text="${user.gender == 'Man' ? '男性' : user.gender == 'Woman' ? '女性' : '指定なし'}"></td>
+                            <td class="phone" th:text="${user.phone}"></td>
+                            <td class="is-active" th:text="${user.isActive ? 'アクティブ' : '非アクティブ'}"></td>
+                            <td class="role" th:text="${user.role}"></td>
+                            <td class="actions">
+                                <button type="button" class="btn-action btn-role-change" th:data-userid="${user.userId}">権限変更</button>
+                                <button type="button" class="btn-action"
+                                    th:data-userid="${user.userId}"
+                                    th:text="${user.isActive ? '無効化' : '有効化'}"
+                                    th:classappend="${user.isActive ? 'btn-deactivate' : 'btn-activate'}"></button>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -94,12 +103,83 @@
             </nav>
         </section>
         <th:block layout:fragment="script">
+            <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
             <script>
+                // 페이지네이션 폼 제출 함수
                 function pagingFormSubmit(pageNum) {
                     // 1. 숨겨진 page 입력 필드에 클릭된 페이지 번호를 설정합니다.
                     document.getElementById('page').value = pageNum;
                     // 2. id가 'pagingForm'인 폼을 제출합니다.
                     document.getElementById('pagingForm').submit();
+                }
+
+                $(document).ready(function() {
+                    const container = $('.content-box');
+
+                    // 권한 변경 버튼 클릭 이벤트
+                    container.on('click', '.btn-role-change', function() {
+                        const userId = $(this).data('userid');
+                        if (confirm(`会員番号${userId}の権限を変更しますか？`)) {
+                            changeUserRole(userId);
+                        }
+                    });
+
+                    // 상태 변경 버튼 클릭 이벤트 (활성화/비활성화)
+                    container.on('click', '.btn-activate, .btn-deactivate', function() {
+                        const userId = $(this).data('userid');
+                        const actionText = $(this).text();
+                        if (confirm(`会員番号${userId}を${actionText}しますか？`)) {
+                            toggleUserStatus(userId);
+                        }
+                    });
+                });
+
+                // 사용자 상태 변경 AJAX 함수
+                function toggleUserStatus(userId) {
+                    const url = $('.content-box').data('toggle-url');
+
+                    $.ajax({
+                        url: url,
+                        type: 'POST',
+                        data: { userId: userId },
+                        success: function(updatedUser) {
+                            updateTableRow(updatedUser); // ✨ 성공 시 테이블 행 업데이트
+                        },
+                        error: (xhr) => alert('状態変更に失敗しました: ' + xhr.responseText)
+                    });
+                }
+
+                // 사용자 권한 변경 AJAX 함수
+                function changeUserRole(userId) {
+                    const url = $('.content-box').data('role-url');
+
+                    $.ajax({
+                        url: url,
+                        type: 'POST',
+                        data: { userId: userId },
+                        success: function(updatedUser) {
+                            updateTableRow(updatedUser); // ✨ 성공 시 테이블 행 업데이트
+                        },
+                        error: (xhr) => alert('権限変更に失敗しました: ' + xhr.responseText)
+                    });
+                }
+
+                // ✨ 테이블 행(Row)의 내용을 업데이트하는 공통 함수
+                function updateTableRow(user) {
+                    const row = $(`#user-row-${user.userId}`);
+                    if (row.length) {
+                        // 각 셀(td)의 내용 업데이트
+                        row.find('.is-active').text(user.isActive ? 'アクティブ' : '非アクティブ');
+                        row.find('.role').text(user.role);
+
+                        // 상태 변경 버튼 업데이트
+                        const statusButton = row.find('.btn-activate, .btn-deactivate');
+                        if (user.isActive) {
+                            statusButton.text('無効化').removeClass('btn-activate').addClass('btn-deactivate');
+                        } else {
+                            statusButton.text('有効化').removeClass('btn-deactivate').addClass('btn-activate');
+                        }
+                    }
                 }
             </script>
         </th:block>

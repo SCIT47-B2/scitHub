@@ -198,4 +198,41 @@ public class UserService {
     public List<Integer> findAllCohorts() {
         return ur.findDistinctCohortNos();
     }
+
+    /**
+     * 사용자 활성/비활성 상태 토글
+     * @param userId 대상 사용자의 ID
+     * @return UserManageDTO - 변경된 사용자 정보
+     * @throws EntityNotFoundException - 사용자가 존재하지 않을 경우
+     */
+    @Transactional
+    public UserManageDTO toggleUserStatus(Integer userId) {
+        User user = ur.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다: " + userId));
+
+        // 현재 상태를 반전시켜서 설정
+        user.setIsActive(!user.getIsActive());
+        User updatedUser = ur.save(user); // 변경된 엔티티를 받아옴
+
+        return UserManageDTO.convertToUserDTO(updatedUser); // DTO로 변환하여 반환
+    }
+
+    /**
+     * 사용자의 권한을 변경 (ADMIN <-> USER)
+     * @param userId 대상 사용자의 ID
+     * @return UserManageDTO - 변경된 사용자 정보
+     * @throws EntityNotFoundException - 사용자가 존재하지 않을 경우
+     */
+    @Transactional
+    public UserManageDTO changeUserRole(Integer userId) {
+        User user = ur.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다: " + userId));
+
+        // 현재 역할을 ADMIN과 USER 사이에서 토글
+        Role newRole = (user.getRole() == Role.ADMIN) ? Role.USER : Role.ADMIN;
+        user.setRole(newRole);
+        User updatedUser = ur.save(user); // 변경된 엔티티를 받아옴
+
+        return UserManageDTO.convertToUserDTO(updatedUser); // DTO로 변환하여 반환
+    }
 }

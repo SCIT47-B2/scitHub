@@ -383,6 +383,16 @@ public class AdminController {
         return "admin/report";
     }
 
+    /**
+     * 회원 관리 페이지
+     * @param model 모델
+     * @param page 페이지 번호
+     * @param searchType 검색 유형
+     * @param searchWord 검색어
+     * @param cohortNo 기수 필터
+     * @param role 역할 필터
+     * @return 뷰 이름
+     */
     @GetMapping("manageUser")
     public String manageUserPage(
         Model model,
@@ -416,4 +426,53 @@ public class AdminController {
         return "admin/manageUser";
     }
 
+    /**
+     * 사용자 활성/비활성 상태 토글 (AJAX)
+     * @param userId 대상 사용자의 ID
+     * @return ResponseEntity with updated user info or error message
+     */
+    @PostMapping("manageUser/toggleStatus")
+    @ResponseBody
+    public ResponseEntity<?> toggleUserStatus(@RequestParam("userId") Integer userId) {
+        log.debug("AJAX 사용자 상태 토글 요청: userId={}", userId);
+        try {
+            UserManageDTO updatedUser = us.toggleUserStatus(userId);
+            log.debug("사용자 상태 토글 성공: {}", updatedUser);
+
+            return ResponseEntity.ok(updatedUser);
+        } catch (EntityNotFoundException e) {
+            log.error("[예외 발생] 사용자 상태 토글 실패: {}", e.getMessage());
+
+            return ResponseEntity.status(404).body("사용자를 찾을 수 없습니다.");
+        } catch (Exception e) {
+            log.error("[예외 발생] 사용자 상태 토글 중 오류: {}", e.getMessage());
+
+            return ResponseEntity.status(500).body("사용자 상태 토글 중 오류가 발생했습니다.");
+        }
+    }
+
+    /**
+     * 사용자 권한 변경 (AJAX)
+     * @param userId 대상 사용자의 ID
+     * @return ResponseEntity with updated user info or error message
+     */
+    @PostMapping("manageUser/changeRole")
+    @ResponseBody
+    public ResponseEntity<?> changeUserRole(@RequestParam("userId") Integer userId) {
+        log.debug("AJAX 사용자 권한 변경 요청: userId={}", userId);
+        try {
+            UserManageDTO updatedUser = us.changeUserRole(userId);
+            log.debug("사용자 권한 변경 성공: {}", updatedUser);
+
+            return ResponseEntity.ok(updatedUser);
+        } catch (EntityNotFoundException e) {
+            log.error("[예외 발생] 사용자 권한 변경 실패: {}", e.getMessage());
+
+            return ResponseEntity.status(404).body("사용자를 찾을 수 없습니다.");
+        } catch (Exception e) {
+            log.error("[예외 발생] 사용자 권한 변경 중 오류: {}", e.getMessage());
+
+            return ResponseEntity.status(500).body("사용자 권한 변경 중 오류가 발생했습니다.");
+        }
+    }
 }
