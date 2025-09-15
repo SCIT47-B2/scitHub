@@ -20,6 +20,9 @@ public class CommentDTO {
     private String content;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private Integer postId;
+    // 수정 가능 여부 - DB엔 없음
+    private boolean canEdit
 
     public static CommentDTO convertToCommentDTO(Comment comment) {
         if (comment == null) {
@@ -33,6 +36,7 @@ public class CommentDTO {
                 .userId(user != null ? user.getUserId() : null)
                 .userNameKor(user != null ? user.getNameKor() : null)
                 .content(comment.getContent())
+                .postId(comment.getPostId())
                 .createdAt(comment.getCreatedAt())
                 .updatedAt(comment.getUpdatedAt())
                 .build();

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layouts/defaultLayout}">
+    <head>
+        <title>Home</title>
+        <th:block layout:fragment="css">
+            <link rel="stylesheet" th:href="@{/css/community/homeCss.css}">
+        </th:block>
+        <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+    </head>
+    <body>
+        <section class="mainField" aria-label="메인 영역" layout:fragment="content">
+            <div class="contentGrid">
+                <!-- 중앙 콘텐츠 영역 -->
+                <main class="mainContent">
+                    <div class="searchSection">
+                        <div class="categorySection">
+                            <select name="category" id="categoryDropdown">
+                                <option value="all" selected>전체</option>
+                                <option value="출강하는 게시판">즐겨찾는 게시판</option>
+                                <option value="자유게시판">자유게시판</option>
+                                <option value="IT">IT</option>
+                                <option value="일본어">일본어</option>
+                                <option value="일본 생활&문화">일본 생활&문화</option>
+                                <option value="취업&꿀팁">취업&꿀팁</option>
+                                <option value="취미&여행&맛집">취미&여행&맛집</option>
+                                <option value="자격증">자격증</option>
+                                <option value="졸업생">졸업생</option>
+                            </select>
+                        </div>
+                        
+                        <div class="searchBar">
+                            <input type="text" placeholder="검색">
+                        </div>
+                        
+                        <button class="writeBtn">글쓰기 ✏️</button>
+                    </div>
+
+                    <!-- 3단 포스트 그리드 -->
+                    <div class="postGrid">
+                        <!-- 이 부분 동적으로 생성해야 함 -->
+                        <!-- 첫 번째 컬럼 - 일본 생활&문화 -->
+                        <div class="postColumn">
+                            <div class="columnHeader">일본 생활&문화</div>
+                            
+                            <article class="postCard">
+                                <div class="postHeader">
+                                    <img src="/images/avatar.png" alt="아이디학하지" class="authorImg">
+                                    <div class="postMeta">
+                                        <span class="author">아이디학하지</span>
+                                        <span class="date">8월 15일 14:00</span>
+                                    </div>
+                                </div>
+                                <h3 class="postTitle">일본에서 집을 구하는 방법!</h3>
+                                <div class="postStats">
+                                    <span class="likes">💙 21</span>
+                                    <span class="comments">💬 8</span>
+                                    <span class="bookmark">🔖</span>
+                                </div>
+                            </article>
+
+                            <article class="postCard">
+                                <div class="postHeader">
+                                    <img src="/images/avatar.png" alt="아이디학하지" class="authorImg">
+                                    <div class="postMeta">
+                                        <span class="author">아이디학하지</span>
+                                        <span class="date">8월 2일 15:32</span>
+                                    </div>
+                                </div>
+                                <h3 class="postTitle">일본의 비즈니스 매너를 알아봅시다</h3>
+                                <div class="postStats">
+                                    <span class="likes">🤍 5</span>
+                                    <span class="comments">💬 8</span>
+                                    <span class="bookmark">🔖</span>
+                                </div>
+                            </article>
+
+                            <article class="postCard">
+                                <div class="postHeader">
+                                    <img src="/images/avatar.png" alt="아이디학하지" class="authorImg">
+                                    <div class="postMeta">
+                                        <span class="author">아이디학하지</span>
+                                        <span class="date">7월 18일 18:05</span>
+                                    </div>
+                                </div>
+                                <h3 class="postTitle">맛집/명소 안내해주는 인스타 오픈</h3>
+                                <div class="postStats">
+                                    <span class="likes">💙 14</span>
+                                    <span class="comments">💬 8</span>
+                                    <span class="bookmark">🔖</span>
+                                </div>
+                            </article>
+                        </div>
+
+                        <!-- 두 번째 컬럼 - 취업&꿀팁 -->
+                        <div class="postColumn">
+                            <div class="columnHeader">취업&꿀팁</div>
+                            
+                            <article class="postCard">
+                                <div class="postHeader">
+                                    <img src="/images/avatar.png" alt="아이디학하지" class="authorImg">
+                                    <div class="postMeta">
+                                        <span class="author">아이디학하지</span>
+                                        <span class="date">8월 15일 14:00</span>
+                                    </div>
+                                </div>
+                                <h3 class="postTitle">일본에서 집을 구하는 방법!</h3>
+                                <div class="postStats">
+                                    <span class="likes">💙 21</span>
+                                    <span class="comments">💬 8</span>
+                                    <span class="bookmark">🔖</span>
+                                </div>
+                            </article>
+
+                            <article class="postCard">
+                                <div class="postHeader">
+                                    <img src="/images/avatar.png" alt="아이디학하지" class="authorImg">
+                                    <div class="postMeta">
+                                        <span class="author">아이디학하지</span>
+                                        <span class="date">8월 2일 15:32</span>
+                                    </div>
+                                </div>
+                                <h3 class="postTitle">일본의 비즈니스 매너를 알아봅시다</h3>
+                                <div class="postStats">
+                                    <span class="likes">🤍 5</span>
+                                    <span class="comments">💬 8</span>
+                                    <span class="bookmark">🔖</span>
+                                </div>
+                            </article>
+
+                            <article class="postCard">
+                                <div class="postHeader">
+                                    <img src="/images/avatar.png" alt="아이디학하지" class="authorImg">
+                                    <div class="postMeta">
+                                        <span class="author">아이디학하지</span>
+                                        <span class="date">7월 18일 18:05</span>
+                                    </div>
+                                </div>
+                                <h3 class="postTitle">맛집/명소 안내해주는 인스타 오픈</h3>
+                                <div class="postStats">
+                                    <span class="likes">💙 14</span>
+                                    <span class="comments">💬 8</span>
+                                    <span class="bookmark">🔖</span>
+                                </div>
+                            </article>
+                        </div>
+
+                        <!-- 세 번째 컬럼 - 취업&꿀팁 -->
+                        <div class="postColumn">
+                            <div class="columnHeader">취업&꿀팁</div>
+                            
+                            <article class="postCard">
+                                <div class="postHeader">
+                                    <img src="/images/avatar.png" alt="아이디학하지" class="authorImg">
+                                    <div class="postMeta">
+                                        <span class="author">아이디학하지</span>
+                                        <span class="date">8월 15일 14:00</span>
+                                    </div>
+                                </div>
+                                <h3 class="postTitle">일본에서 집을 구하는 방법!</h3>
+                                <div class="postStats">
+                                    <span class="likes">💙 21</span>
+                                    <span class="comments">💬 8</span>
+                                    <span class="bookmark">🔖</span>
+                                </div>
+                            </article>
+
+                            <article class="postCard">
+                                <div class="postHeader">
+                                    <img src="/images/avatar.png" alt="아이디학하지" class="authorImg">
+                                    <div class="postMeta">
+                                        <span class="author">아이디학하지</span>
+                                        <span class="date">8월 2일 15:32</span>
+                                    </div>
+                                </div>
+                                <h3 class="postTitle">일본의 비즈니스 매너를 알아봅시다</h3>
+                                <div class="postStats">
+                                    <span class="likes">🤍 5</span>
+                                    <span class="comments">💬 8</span>
+                                    <span class="bookmark">🔖</span>
+                                </div>
+                            </article>
+
+                            <article class="postCard">
+                                <div class="postHeader">
+                                    <img src="/images/avatar.png" alt="아이디학하지" class="authorImg">
+                                    <div class="postMeta">
+                                        <span class="author">아이디학하지</span>
+                                        <span class="date">7월 18일 18:05</span>
+                                    </div>
+                                </div>
+                                <h3 class="postTitle">맛집/명소 안내해주는 인스타 오픈</h3>
+                                <div class="postStats">
+                                    <span class="likes">💙 14</span>
+                                    <span class="comments">💬 8</span>
+                                    <span class="bookmark">🔖</span>
+                                </div>
+                            </article>
+                        </div>
+                    </div>
+                </main>
+
+                <!-- 우측 사이드바 -->
+                <aside class="rightSidebar">
+                    <nav class="categoryMenuList">
+                        <a href="#" class="categoryMenuItem active">즐겨찾는 게시판</a>
+                        <a th:href="@{board?boardId=1}" class="categoryMenuItem">자유게시판</a>
+                        <a th:href="@{board?boardId=2}" class="categoryMenuItem">IT</a>
+                        <a th:href="@{board?boardId=3}" class="categoryMenuItem">일본어</a>
+                        <a th:href="@{board?boardId=4}" class="categoryMenuItem">일본 생활&문화</a>
+                        <a th:href="@{board?boardId=5}" class="categoryMenuItem">취업&꿀팁</a>
+                        <a th:href="@{board?boardId=6}" class="categoryMenuItem">취미&여행&맛집</a>
+                        <a th:href="@{board?boardId=7}" class="categoryMenuItem">자격증</a>
+                        <a th:href="@{board?boardId=8}" class="categoryMenuItem">졸업생</a>
+                    </nav>
+                </aside>
+            </div>
+        </section>
+        <th:block layout:fragment="script">
+            <script>
+                $(".writeBtn").click(function() {
+                    location.href = "writePost";
+                });
+            </script>
+        </th:block>
+    </body>
+</html>

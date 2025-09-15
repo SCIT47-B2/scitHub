@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layouts/defaultLayout}">
+    <head>
+        <title>게시글 작성</title>
+        <th:block layout:fragment="css">
+            <link rel="stylesheet" th:href="@{/css/home.css}">
+        </th:block>
+        <link rel="stylesheet" th:href="@{/css/searchBar.css}">
+        <link rel="stylesheet" th:href="@{/css/ckeditor5/editorStyle.css}">
+		<link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/46.0.3/ckeditor5.css" crossorigin>
+        <link rel="stylesheet" th:href="@{/css/community/writeForm.css}">
+    </head>
+    <body>
+        <section class="mainField" aria-label="메인 영역" layout:fragment="content">
+            <div class="searchSection">
+                <div class="categorySection">
+                    <select name="category" id="categoryDropdown">
+                        <option value="all" selected>전체</option>
+                        <option value="즐겨찾는 게시판">즐겨찾는 게시판</option>
+                        <option value="자유게시판">자유게시판</option>
+                        <option value="IT">IT</option>
+                        <option value="일본어">일본어</option>
+                        <option value="일본 생활&문화">일본 생활&문화</option>
+                        <option value="취업&꿀팁">취업&꿀팁</option>
+                        <option value="취미&여행&맛집">취미&여행&맛집</option>
+                        <option value="자격증">자격증</option>
+                        <option value="졸업생">졸업생</option>
+                    </select>
+                </div>
+
+                <div class="searchBar">
+                    <input type="text" placeholder="검색">
+                </div>
+
+                <button class="writeBtn" type="button" id="submitPostBtn">등록하기 ✏️</button>
+            </div>
+            <div class="decoration">
+                <div class="formField">
+                    <form th:action="@{write}" method="post" id="postForm">
+                        <div class="boardSelectSection">
+                            <select name="board" id="boardDropdown">
+                                <option value="">게시판을 선택해주세요</option>
+                                <option value="자유게시판">자유게시판</option>
+                                <option value="IT">IT</option>
+                                <option value="일본어">일본어</option>
+                                <option value="일본 생활&문화">일본 생활&문화</option>
+                                <option value="취업&꿀팁">취업&꿀팁</option>
+                                <option value="취미&여행&맛집">취미&여행&맛집</option>
+                                <option value="자격증">자격증</option>
+                                <option value="졸업생">졸업생</option>
+                            </select>
+                        </div>
+                        <input type="text" name="title" id="title">
+                        <div class="main-container">
+                            <div class="editor-container editor-container_classic-editor" id="editor-container">
+                                <div class="editor-container__editor"><div id="editor"></div></div>
+                            </div>
+                        </div>
+                        <input type="hidden" name="tagList" id="tagsData">
+                        <div class="tagArea">
+                            <input type="text" placeholder="#태그 입력" id="tagInput">
+                            <div id="tagContainer"></div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+        <th:block layout:fragment="script">
+            <script src="https://cdn.ckeditor.com/ckeditor5/46.0.3/ckeditor5.umd.js" crossorigin></script>
+		    <script src="https://cdn.ckeditor.com/ckeditor5/46.0.3/translations/ko.umd.js" crossorigin></script>
+            <script th:src="@{/js/ckeditor5/ckeditor5.js}"></script>
+            <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+            <script th:src="@{/js/community/makeTag.js}"></script>
+            <script th:src="@{/js/community/validate.js}"></script>
+            <script th:src="@{/js/community/writePost.js}"></script>
+        </th:block>
+    </body>
+</html>

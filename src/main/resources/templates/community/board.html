@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layouts/defaultLayout}">
+    <head>
+        <title>게시판</title>
+        <th:block layout:fragment="css">
+            <!-- 이 페이지에만 적용될 CSS 파일을 여기에 추가합니다 -->
+            <link rel="stylesheet" th:href="@{/css/announcement.css}">
+        </th:block>
+    </head>
+    <body>
+        <!--// layout:fragment="content" : 이 부분이 메인 콘텐츠 영역이 됩니다. //-->
+        <section class="mainGrid" aria-label="메인 영역" layout:fragment="content">
+
+            <!-- 전체 콘텐츠를 감싸는 컨테이너 -->
+            <div class="content-container">
+
+                <!-- 왼쪽 메인 콘텐츠 (검색 + 전체 공지 테이블) -->
+                <div class="main-content">
+                    <!-- 1. 검색 영역 -->
+                    <div class="search-bar">
+                        <form id="pagingForm" method="get" th:action="@{/admin/announcement}">
+                            <input type="hidden" name="page" id="page">
+                            <input type="hidden" name="boardName" id="boardName" th:value="${boardName}">
+                            <select id="type" name="searchType">
+                                <option value="all"     th:selected="${searchType == 'all'}">전체</option>
+                                <option value="title"   th:selected="${searchType == 'title'}">제목</option>
+                                <option value="tag"     th:selected="${searchType == 'tag'}">태그</option>
+                                <option value="content" th:selected="${searchType == 'content'}">내용</option>
+                                <option value="user"    th:selected="${searchType == 'user'}">작성자</option>
+                            </select>
+                            <input type="text" name="searchWord" th:value="${searchWord}" placeholder="검색어를 입력하세요"/>
+                            <button type="button" onclick="pagingFormSubmit(1)" aria-label="검색"><i class="fa-solid fa-magnifying-glass"></i></button>
+                        </form>
+                    </div>
+
+                    <!-- 2. 중심 공지 테이블 영역 -->
+                    <div class="announcement-section">
+                        <h2 th:text="${boardName}"></h2>
+                        <table class="announcement-table">
+                            <thead>
+                                <tr>
+                                    <th>글번호</th>
+                                    <th>제목</th>
+                                    <th>작성자</th>
+                                    <th>작성일</th>
+                                    <th>조회수</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="5" th:if="${postPage.isEmpty()}" class="no-data">공지가 없습니다.</td>
+                                </tr>
+                                <tr th:each="post, status : ${postPage}" th:unless="${postPage.isEmpty()}">
+                                    <td th:text="${post.postId}"></td>
+                                    <td>
+                                        <a th:text="${post.title}" th:href="@{/admin/announcementRead(postId=${post.postId})}"></a>
+                                    </td>
+                                    <td th:text="${post.userNameKor}" class="center"></td>
+                                    <td th:text="${#temporals.format(post.createdAt, 'yy-MM-dd HH:mm')}"></td>
+                                    <td th:text="${post.viewCount}" class="center"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- 3. 페이지네이션 영역 -->
+                    <nav class="pagination-container" aria-label="페이지 네비게이션" th:if="${postPage.totalPages > 0}"
+                        th:with="blockSize = ${2 * linkSize + 1},
+                                startPage = ${((page - 1) / blockSize) * blockSize + 1},
+                                endPage = ${T(java.lang.Math).min(startPage + blockSize - 1, postPage.totalPages)}"
+                        >
+                        <ul class="leftPagination">
+                            <li th:if="${postPage.hasPrevious()}">
+                                <a href="javascript:pagingFormSubmit(1)">|&lt;</a>
+                            </li>
+                            <li th:if="${startPage > 1}">
+                                <a th:href="|javascript:pagingFormSubmit(${startPage - 1})|">&lt;</a> <!-- 이전 블록 -->
+                            </li>
+                        </ul>
+                        <ul class="pagination">
+                            <li th:each="counter : ${#numbers.sequence(startPage, endPage)}">
+                                <b th:if="${counter == page}" th:text="${counter}" class="active"></b>
+                                <a th:if="${counter != page}" th:href="|javascript:pagingFormSubmit(${counter})|" th:text="${counter}"></a>
+                            </li>
+                        </ul>
+                        <ul class="rightPagination">
+                            <li th:if="${endPage < postPage.totalPages}">
+                                <a th:href="|javascript:pagingFormSubmit(${endPage + 1})|">&gt;</a> <!-- 다음 블록 -->
+                            </li>
+                            <li th:if="${postPage.hasNext()}">
+                                <a th:href="|javascript:pagingFormSubmit(${postPage.totalPages})|">&gt;|</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+
+                <!-- 우측 사이드바 -->
+                <aside class="rightSidebar">
+                    <nav class="categoryMenuList">
+                        <a th:href="@{home}" class="categoryMenuItem">즐겨찾는 게시판</a>
+                        <a th:href="@{board?boardId=1}" class="categoryMenuItem">자유게시판</a>
+                        <a th:href="@{board?boardId=2}" class="categoryMenuItem">IT</a>
+                        <a th:href="@{board?boardId=3}" class="categoryMenuItem">일본어</a>
+                        <a th:href="@{board?boardId=4}" class="categoryMenuItem">일본 생활&문화</a>
+                        <a th:href="@{board?boardId=5}" class="categoryMenuItem">취업&꿀팁</a>
+                        <a th:href="@{board?boardId=6}" class="categoryMenuItem">취미&여행&맛집</a>
+                        <a th:href="@{board?boardId=7}" class="categoryMenuItem">자격증</a>
+                        <a th:href="@{board?boardId=8}" class="categoryMenuItem">졸업생</a>
+                    </nav>
+                </aside>
+            </div>
+        </section>
+        <th:block layout:fragment="script">
+            <script>
+                function pagingFormSubmit(pageNum) {
+                    document.querySelector("#page").value = pageNum;
+                    document.querySelector("#pagingForm").submit();
+                }
+            </script>
+        </th:block>
+    </body>
+</html>
+
