@@ -35,7 +35,7 @@ public class CommentDTO {
         return CommentDTO.builder()
                 .commentId(comment.getCommentId())
                 .userId(user != null ? user.getUserId() : null)
-                .userName(user != null ? user.getUsername() : null)
+                .username(user != null ? user.getUsername() : null)
                 .userNameKor(user != null ? user.getNameKor() : null)
                 .content(comment.getContent())
                 .postId(comment.getPost().getPostId())
