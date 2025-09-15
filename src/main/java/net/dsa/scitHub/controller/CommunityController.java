@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,12 +15,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-import net.dsa.scitHub.dto.BoardDTO;
 import net.dsa.scitHub.dto.CommentDTO;
 import net.dsa.scitHub.dto.MenuItem;
 import net.dsa.scitHub.dto.PostDTO;
 import net.dsa.scitHub.service.CommunityService;
-import net.dsa.scitHub.service.PostService;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -41,7 +38,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class CommunityController {
 
     private final CommunityService cs;
-    private final PostService ps;
 
     @Value("${board.pageSize}")
 	int pageSize;				// 페이지당 글 수
