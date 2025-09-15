@@ -956,8 +956,16 @@
                             }
                         }
                         if (isAllDay) {
+                            const startDateStr = formData.get('startDate');
+                            let endDateStr = formData.get('endDate');
+
+                            // 만약 종료일이 입력되지 않았다면, 시작일과 동일하게 설정합니다.
+                            if (!endDateStr) {
+                                endDateStr = startDateStr;
+                            }
+
                             // 기존 endDate에 하루 더해서 00:00:00 붙이는 처리
-                            const endDate = new Date(formData.get('endDate')+'T00:00:00');
+                            const endDate = new Date(endDateStr+'T00:00:00');
                             endDate.setDate(endDate.getDate() + 1);
 
                             const year = endDate.getFullYear();
@@ -968,7 +976,7 @@
                             
                             eventData = {
                                 title : formData.get('eventTitle'),
-                                start : formData.get('startDate') + 'T00:00:00',
+                                start : startDateStr + 'T00:00:00',
                                 end : endDateDay + 'T00:00:00',
                                 content : formData.get('eventContent'),
                                 allDay: formData.get('isAllDay') === 'on'  // 'on'이면 true, 아니면 false
@@ -1057,8 +1065,9 @@
                                     },
                                     color : result.createdEvent.visibility === 'PUBLIC' ? '#ff9f89' : '#3788d8'
                                 }
-                                // FullCalendar에 이벤트 추가
-                                calendar.addEvent(newEvent);
+                                
+                                calendar.refetchEvents(); // 서버에서 전체 목록을 다시 불러와 화면을 완전히 새로 고침
+            
 
                                 // 모달 닫기
                                 closeModal();
