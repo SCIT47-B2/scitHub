@@ -333,7 +333,7 @@ public class CommunityService {
                 CommentDTO commentDTO = CommentDTO.builder()
                                                   .commentId(comment.getCommentId())
                                                   .userId(comment.getUser().getUserId())
-                                                  .userName(comment.getUser().getUsername())
+                                                  .username(comment.getUser().getUsername())
                                                   .content(comment.getContent())
                                                   .createdAt(comment.getCreatedAt())
                                                   .updatedAt(comment.getUpdatedAt())
