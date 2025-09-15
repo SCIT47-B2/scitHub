@@ -23,11 +23,13 @@ public class WebSecurityConfig {
 
 	// 로그인 없이 접근 가능한 URL 목록
     private static final String[] PUBLIC_URLS = {
-    		"/"                     // root
+    		"/"                     // 메인 페이지
             , "/images/**"          // 이미지 경로
             , "/css/**"             // CSS 파일들
             , "/js/**"              // JavaScript 파일들
             , "/**"                 // 테스트를 위해 모든 경로 허용 (실제 서비스 시에는 제거 필요)
+            , "/user/landingPage"   // 로그인 페이지
+            , "/user/login"         // 로그인 처리 URL
     };
 
     // @Component 와 같이 객체를 등록할때 사용, 보통 @Configuration 클래스 내에서 사용
@@ -49,6 +51,7 @@ public class WebSecurityConfig {
                     .passwordParameter("password")          // 폼의 비밀번호 파라미터 이름
                     .loginProcessingUrl("/user/login")    // 로그인폼 제출하여 처리할 경로
                     .defaultSuccessUrl("/", true)           // 로그인 성공 시 이동할 경로
+                    .failureUrl("/user/landingPage?error=true") // 로그인 실패 시 이동할 경로
                     .permitAll()                            // 로그인 페이지는 모두 접근 허용
             )
             // 로그아웃 설정

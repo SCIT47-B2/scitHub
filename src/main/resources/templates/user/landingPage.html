@@ -149,7 +149,7 @@
   <!-- /** 인터랙션 스크립트(필수)
        * @desc   버튼 토글, 유효성검증, ID 중복확인 팝업
        */ -->
-  <script>
+  <script th:inline="javascript">
     document.addEventListener('DOMContentLoaded', function(){
       /** 요소 캐시 */
       const loginBtn = document.getElementById('loginBtn');
@@ -300,6 +300,17 @@
         document.getElementById('idChecked').value = 'false';
         document.getElementById('checkedId').value = '';
       });
+
+      /* 로그인 실패 메시지 처리 */
+      const errorMessage = /*[[${errorMessage}]]*/ null;
+      if (errorMessage) {
+          alert(errorMessage);
+          // URL에서 에러 파라미터를 제거하여 새로고침 시 alert가 다시 뜨지 않도록 함
+          if (window.history.replaceState) {
+              const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+              window.history.replaceState({ path: cleanUrl }, '', cleanUrl);
+          }
+      }
     });
   </script>
 </body>
