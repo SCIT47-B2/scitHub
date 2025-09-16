@@ -29,7 +29,8 @@ public class PostDTO {
     private Integer viewCount;
     private int likeCount;
     private Boolean isLiked;          // 현재 로그인 유저가 좋아요를 눌렀는지 전달하는 용도
-    private Boolean isComment; // 문의글 답변 완료 여부
+    private Boolean isBookmarked;     // 현재 로그인 유저가 게시글을 북마크했는지 전달하는 용도
+    private Boolean isComment;         // 문의글 답변 완료 여부
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private List<String> tagList;

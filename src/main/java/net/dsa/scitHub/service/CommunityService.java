@@ -15,11 +15,13 @@ import net.dsa.scitHub.dto.CommentDTO;
 import net.dsa.scitHub.dto.PostDTO;
 import net.dsa.scitHub.entity.board.Comment;
 import net.dsa.scitHub.entity.board.Post;
+import net.dsa.scitHub.entity.board.PostBookmark;
 import net.dsa.scitHub.entity.board.PostLike;
 import net.dsa.scitHub.entity.board.Tag;
 import net.dsa.scitHub.entity.user.User;
 import net.dsa.scitHub.repository.board.BoardRepository;
 import net.dsa.scitHub.repository.board.CommentRepository;
+import net.dsa.scitHub.repository.board.PostBookmarkRepository;
 import net.dsa.scitHub.repository.board.PostLikeRepository;
 import net.dsa.scitHub.repository.board.PostRepository;
 import net.dsa.scitHub.repository.board.TagRepository;
@@ -37,6 +39,7 @@ public class CommunityService {
     private final TagRepository tr;
     private final CommentRepository cr;
     private final PostLikeRepository plr;
+    private final PostBookmarkRepository pbr;
 
     // 게시판 관련 ----------------------------------------------------------------------------------
     /**
@@ -147,6 +150,9 @@ public class CommunityService {
         // 현재 유저가 좋아요를 눌렀었는지 체크
         boolean isLiked = plr.existsByPost_PostIdAndUser_UserId(post.getPostId(), userEntity.getUserId());
         postDTO.setIsLiked(isLiked);
+        // 현재 유저가 이 게시글을 북마크했었는지 체크
+        boolean isBookmarked = pbr.existsByPost_PostIdAndUser_UserId(post.getPostId(), userEntity.getUserId());
+        postDTO.setIsBookmarked(isBookmarked);
 
         // 태그 리스트를 List<Tag> -> List<String> 변환
         List<Tag> tags = post.getTags();
@@ -253,6 +259,39 @@ public class CommunityService {
      */
     public int getLikeCount(int postId) {
         return plr.countByPost_PostId(postId);
+    }
+
+    /**
+     * 북마크 토글 처리
+     * @param postId
+     * @param username
+     */
+    public boolean toggleBookmarkPost(Integer postId, String username) {
+        // DB에서 해당 게시글 엔티티 탐색
+        Post post = pr.findById(postId).orElseThrow(
+            () -> new EntityNotFoundException("해당 게시글을 찾을 수 없습니다.")
+        );
+        // 현재 로그인 계정의 User 엔티티 탐색
+        User userEntity = ur.findByUsername(username).orElseThrow(
+            () -> new EntityNotFoundException("해당 회원을 찾을 수 없습니다.")
+        );
+
+        // 북마크 엔티티 작성
+        PostBookmark postBookmark = PostBookmark.builder().user(userEntity).post(post).build();
+        // 해당 좋아요 존재 여부 확인
+        Optional<PostBookmark> postBookmarkExisting = pbr.findByPost_PostIdAndUser_UserId(post.getPostId(), userEntity.getUserId());
+
+        if (postBookmarkExisting.isPresent()) {
+            // 이미 존재하는 좋아요면 삭제
+            pbr.delete(postBookmarkExisting.get());
+            // 북마크가 존재하지 않으므로 북마크 여부로 false 리턴
+            return false;
+        } else {
+            // 없으면 추가
+            pbr.save(postBookmark);
+            // 북마크가 존재하므로 북마크 여부로 true 리턴
+            return true;
+        }
     }
 
     // 게시글 태그 관련 -------------------------------------------------------------------------

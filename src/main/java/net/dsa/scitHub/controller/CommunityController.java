@@ -216,12 +216,31 @@ public class CommunityController {
             @AuthenticationPrincipal UserDetails user) {
         try {
             cs.toggleLikePost(postId, user.getUsername());
-            log.debug("좋아요 성공");
+            log.debug("좋아요 토글 처리 성공");
             int likeCount = cs.getLikeCount(postId);
             return ResponseEntity.ok(likeCount);
         } catch (Exception e) {
             log.debug("좋아요 처리 실패");
             return ResponseEntity.badRequest().body("좋아요 처리에 실패했습니다.");
+        }
+    }
+
+     /**
+     * 게시글 북마크 처리(비동기)
+     * @param postId
+     */
+    @PostMapping("bookmarkPost")
+    public ResponseEntity<?> bookmarkPost(
+            @RequestParam("postId") int postId,
+            @AuthenticationPrincipal UserDetails user) {
+        try {
+            // 북마크 토글 처리를 한 다음 결과값으로 북마크됐는지 여부를 가져옴
+            boolean isBookmarked = cs.toggleBookmarkPost(postId, user.getUsername());
+            log.debug("북마크 토글 처리 성공");
+            return ResponseEntity.ok(isBookmarked);
+        } catch (Exception e) {
+            log.debug("북마크 토글 처리 실패");
+            return ResponseEntity.badRequest().body("북마크 처리에 실패했습니다.");
         }
     }
 
@@ -234,9 +253,12 @@ public class CommunityController {
     public ResponseEntity<List<CommentDTO>> commentList(
             @RequestParam("postId") int postId,
             @AuthenticationPrincipal UserDetails user) {
-        log.debug("요청된 게시글 번호", postId);
+        log.debug("요청된 게시글 번호 : {}", postId);
         try {
             List<CommentDTO> commentList = cs.getCommentList(postId, user.getUsername());
+            for (CommentDTO commentDTO : commentList) {
+                log.debug("댓글 정보 : {}", commentDTO);
+            }
             return ResponseEntity.ok(commentList);
         } catch (Exception e) {
             log.debug("댓글 불러오기 중 에러 발생 : {}", e.getMessage());

@@ -46,7 +46,7 @@ function commentList() {
                 $(commentList).each(function(i, ob) {
                     str += `
                         <tr>
-                            <td>${ob.userName}</td>
+                            <td>${ob.username}</td>
                             <td class="commentContent" id="content${ob.commentId}">${ob.content}</td>
                             `;
                     if(ob.canEdit) {

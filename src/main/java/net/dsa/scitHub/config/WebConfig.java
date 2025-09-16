@@ -14,8 +14,8 @@ public class WebConfig implements WebMvcConfigurer {
 
     // 프로필 사진 업로드 시 실제 파일이 저장된 경로
     // 지연 상이 작성한 부분이지만 일단 풀리퀘 날린 재식이 기억을 바탕으로 임의로 설정함
-    @Value("${app.upload.image.path}")
-    private String ImagePath;
+    @Value("${board.path}")
+    private String profileImagePath;
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
@@ -27,6 +27,6 @@ public class WebConfig implements WebMvcConfigurer {
         // 프로필 사진 업로드 시 업로드된 이미지 파일들 매핑
         // URL "/images/abc.jpg" 요청을 "C:/uploads/images/abc.jpg" 파일로 매핑
         registry.addResourceHandler("/images/**")
-                .addResourceLocations("file:" + ImagePath + "/");
+                .addResourceLocations("file:" + profileImagePath + "/");
     }
 }

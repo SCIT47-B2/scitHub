@@ -78,7 +78,7 @@
                 <div class="content">
                     <div class="content-display" th:utext="${post.content}"></div>
                 </div>
-                <div class="likeAndCommentCount">
+                <div class="likeAndCommentCountAndBookMark">
                     <div class="likeDisplay">
                         <button type="button" id="likeBtn">좋아요</button>
                         <div class="likeDisplay">
@@ -89,6 +89,11 @@
                         </div>
                     </div>
                     <div class="commentCountDisplay"></div>
+                    <div class="bookmarkDisplay">
+                        <button type="button" id="bookmarkBtn">북마크</button>
+                        <span class="isBookmarkedDisplay"
+                                  th:text="${post.isBookmarked} ? '💙' : '🤍'"></span>
+                    </div>
                 </div>
                 <input type="hidden" name="tagList" id="tagsData" th:value="${post.tagList}">
                 <div class="writeComment">
@@ -102,12 +107,27 @@
                         </tbody>
                     </table>
                 </div>
+                <!-- 우측 사이드바 -->
+                <aside class="rightSidebar">
+                    <nav class="categoryMenuList">
+                        <a href="#" class="categoryMenuItem active">즐겨찾는 게시판</a>
+                        <a th:href="@{board?boardId=1}" class="categoryMenuItem">자유게시판</a>
+                        <a th:href="@{board?boardId=2}" class="categoryMenuItem">IT</a>
+                        <a th:href="@{board?boardId=3}" class="categoryMenuItem">일본어</a>
+                        <a th:href="@{board?boardId=4}" class="categoryMenuItem">일본 생활&문화</a>
+                        <a th:href="@{board?boardId=5}" class="categoryMenuItem">취업&꿀팁</a>
+                        <a th:href="@{board?boardId=6}" class="categoryMenuItem">취미&여행&맛집</a>
+                        <a th:href="@{board?boardId=7}" class="categoryMenuItem">자격증</a>
+                        <a th:href="@{board?boardId=8}" class="categoryMenuItem">졸업생</a>
+                    </nav>
+                </aside>
             </div>
         </section>
         <th:block layout:fragment="script">
             <script th:src="@{/js/community/controlPost.js}"></script>
             <script th:src="@{/js/community/controlComments.js}"></script>
             <script th:src="@{/js/community/toggleLikePost.js}"></script>
+            <script th:src="@{/js/community/toggleBookmark.js}"></script>
             <script th:src="@{/js/community/readPostInit.js}"></script>
         </th:block>
     </body>
