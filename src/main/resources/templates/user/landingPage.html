@@ -9,6 +9,11 @@
         * @desc   랜딩 페이지 전용 스타일
         */ -->
   <link rel="stylesheet" th:href="@{/css/landing.css}" href="/css/landing.css">
+  <!-- flatpickr (JavaScript Date Picker) 라이브러리 추가 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <!-- (선택) flatpickr 달력을 일본어로 표시하려면 아래 주석을 해제하세요. -->
+  <script src="https://npmcdn.com/flatpickr/dist/l10n/ja.js"></script>
 </head>
 <body>
   <!-- /** 메인 래퍼
@@ -129,7 +134,7 @@
               </div>
             </div>
             <div class="formGroup">
-              <input type="date" class="formInput" id="birth" name="birth" th:max="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}" required>
+              <input type="text" class="formInput" id="birth" name="birth" placeholder="生年月日" required>
             </div>
             <div class="formGroup">
               <input type="email" class="formInput" placeholder="メールアドレス" id="email" name="email" autocomplete="email" required>
@@ -173,6 +178,18 @@
           classSelect.appendChild(option);
         }
       }
+
+      /** flatpickr를 사용하여 생년월일 입력 필드를 초기화합니다.
+       * onReady 콜백을 사용하여 placeholder가 확실히 적용되도록 합니다. */
+      flatpickr("#birth", {
+        dateFormat: "Y-m-d", // 날짜 형식: 2025-09-16
+        maxDate: "today",    // 선택 가능한 최대 날짜를 오늘로 설정
+        locale: "ja",
+        onReady: function(selectedDates, dateStr, instance) {
+          // flatpickr가 초기화된 후 placeholder를 명시적으로 설정합니다.
+          instance.input.placeholder = "生年月日";
+        },
+      });
 
       /** 로그인 버튼 토글 */
       loginBtn.addEventListener('click', function() {
