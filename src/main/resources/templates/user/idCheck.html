@@ -2,7 +2,7 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <title>ID 중복확인</title>
+  <title>SCIT HUB - IDCheck</title>
   <link rel="stylesheet" th:href="@{/css/main.css}">
   <style>
     .btnRow{ display:flex; gap:8px; margin-top:12px; }
@@ -18,7 +18,7 @@
 </head>
 <body>
   <header>
-    <h1>[ ID 중복 확인 ]</h1>
+    <h1>IDチェック</h1>
   </header>
 
   <section>
@@ -27,34 +27,35 @@
       <!-- 사용 가능한 경우 -->
       <div th:if="${result}">
         <p>
-          <span th:text="|${searchId} : 사용할 수 있는 ID입니다.|"></span>
+          <span th:text="|[${searchId}] は使用可能なIDです。|"></span>
         </p>
+        <br>
         <div class="btnRow">
           <!-- 사용하기: 부모창에 값 세팅 후 닫기 -->
-          <button type="button" id="useButton" class="btnPrimary" th:data-id="${searchId}">이 ID 사용하기</button>
+          <button type="button" id="useButton" class="btnPrimary" th:data-id="${searchId}">このIDで加入する</button>
           <!-- 닫기 -->
-          <button type="button" class="btnSecondary closeBtn">닫기</button>
+          <button type="button" class="btnSecondary closeBtn">キャンセル</button>
         </div>
       </div>
 
       <!-- 사용 불가능한 경우 -->
       <div th:if="${not result}">
         <p>
-          <span th:text="|${searchId} : 이미 사용 중인 ID입니다.|"></span>
+          <span th:text="|${searchId} はすでに使用されています。|"></span>
         </p>
-        <p>다른 ID로 다시 시도해 주세요.</p>
+        <p>他のIDを試してください。</p>
         <div class="btnRow">
           <!-- 닫기(사용 불가여도 닫기 가능) -->
-          <button type="button" class="btnSecondary closeBtn">닫기</button>
+          <button type="button" class="btnSecondary closeBtn">キャンセル</button>
         </div>
       </div>
     </div>
 
     <!-- 방어: 직접 접근 등으로 result가 없는 경우 -->
     <div th:if="${result == null}">
-      <p>잘못된 접근입니다.</p>
+      <p>間違った接近です。</p>
       <div class="btnRow">
-        <button type="button" class="btnSecondary closeBtn">닫기</button>
+        <button type="button" class="btnSecondary closeBtn">キャンセル</button>
       </div>
     </div>
   </section>
