@@ -23,5 +23,5 @@ body{
 }
 
 /** 헤더/메인 패딩(가로 32px 정렬) */
-.homeHeader{ padding:24px 32px 0; }   /* 위 24, 아래 0 (간격은 home.css에서 제어) */
-main{ flex:1; padding:0 32px 32px; }  /* 위 0으로 두고, 헤더에서 하단 간격을 부여 */
+.homeHeader{ padding:24px 0 0; }   /* 위 24, 아래 0 (간격은 home.css에서 제어) */
+main{ flex:1; padding:0 0 32px; }  /* 위 0으로 두고, 헤더에서 하단 간격을 부여 */

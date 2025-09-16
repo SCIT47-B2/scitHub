@@ -3,15 +3,17 @@
     xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
     layout:decorate="~{layouts/defaultLayout}">
     <head>
-        <title>Home</title>
+        <title>Schedule</title>
         <th:block layout:fragment="css">
         </th:block>
         <style>
             /* 메인 그리드 스타일 */
             .mainGrid {
+                max-width: 1400px; /* 페이지 최대 너비 설정 */
+                margin: 0 auto;    /* 중앙 정렬 */
                 display: grid;
-                grid-template-columns: 8fr 1fr; /* 8:1 비율 */
-                height: 100vh;
+                grid-template-columns: 6fr 1fr; /* 6:1 비율로 수정 */
+                gap: 24px; /* 캘린더와 오른쪽 섹션 사이의 간격 */
             }
             /* 오른쪽 섹션 스타일 */
             .rightSection {
@@ -20,40 +22,6 @@
                 align-items: center;
                 justify-content: flex-start;
                 gap : 20px;
-            }
-
-
-            .personalToggleSection {
-                /* 오른쪽 섹션 위아래 높이를 정하기 위해서 */
-                margin-top : 20vh;
-            }
-
-            /* 모달 전체를 덮는 배경 */
-            .modal {
-                position: fixed; /* 화면에 고정 */
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                display: none; /* 처음엔 숨김 */
-                background-color: rgba(0, 0, 0, 0.5); /* 반투명 배경 */
-                z-index: 999; /* 위로 올리기 */
-            }
-
-            .modal.show {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-
-            /* 모달 내용 */
-            .modal-content {
-                background: white;
-                padding: 20px;
-                border-radius: 8px;
-                width: 400px;
-                max-width: 90vw;
-                box-shadow: 0 5px 15px rgba(0,0,0,0.3);
             }
 
             /* 기본 헤더 완전 숨김 */
@@ -129,7 +97,7 @@
             .view-buttons {
                 display: flex;
                 border: 1px solid #ddd;
-                border-radius: 4px;
+                border-radius: 10px;
                 overflow: hidden;
             }
 
@@ -152,13 +120,13 @@
             }
 
             .view-btn.active {
-                background: #007bff;
+                background: #4258BE;
                 color: white;
             }
 
             /* 요일 헤더 전체 영역 */
             .fc-col-header {
-                background-color: #7599cb;
+                background-color: #4258BE;
                 border-bottom: 2px solid #dee2e6;
                 color : white;
             }
@@ -167,13 +135,234 @@
             .invisible {
                 visibility : hidden;
             }
+
+            /* 오른쪽 섹션 스타일 */
+            .rightSection {
+                padding-top: 100px;
+            }
+
+            .toggle-group {
+                margin-bottom: 20px;
+                width: 80%;
+            }
+
+            .toggle-group div {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                margin-bottom: 10px;
+            }
+
+            /* 체크박스와 라벨 감싸는 div에 Flexbox 적용 (선택사항) */
+            .toggle-container {
+                display: flex;
+                align-items: center;
+                gap: 10px; /* 라벨과 체크박스 사이 간격 */
+            }
+
+            /* 실제 체크박스 숨기기 */
+            input[type="checkbox"] {
+                display: none;
+            }
+
+            /* 라벨을 커스텀 체크박스처럼 보이게 하기 */
+            input[type="checkbox"] + label {
+                position: relative;
+                padding-left: 25px; /* 라벨 왼쪽 여백 */
+                cursor: pointer;
+                font-size: 14px;
+                color: #333; /* 기본 글자색 */
+            }
+
+            /* 커스텀 체크박스 모양 */
+            input[type="checkbox"] + label::before {
+                content: '';
+                position: absolute;
+                left: 0;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 14px;
+                height: 14px;
+                border: 2px solid #ccc;
+                border-radius: 4px;
+                background-color: #fff;
+                transition: background-color 0.2s, border-color 0.2s;
+            }
+
+            /* 체크됐을 때 커스텀 체크박스 색상 변경 */
+            input[type="checkbox"]:checked + label::before {
+                background-color: black;
+                border-color: black;
+            }
+
+            /* 기본 체크박스 표시 (V 모양) 만들기 */
+            input[type="checkbox"]:checked + label::after {
+                content: '';
+                position: absolute;
+                top: 10%; /* 세로 위치 조정 */
+                left: 5px; /* 가로 위치 조정 */
+                width: 6px;
+                height: 10px;
+                border: solid #fff;
+                border-width: 0 2px 2px 0;
+                transform: rotate(45deg);
+            }
+
+            
+
+            .eventAddBtn {
+                width: 80%;
+                padding: 12px 20px;
+                font-size: 15px;
+                font-weight: 600;
+                color: white;
+                background-color: #4258BE;
+                border: none;
+                border-radius: 10px;
+                cursor: pointer;
+                transition: all 0.2s ease;
+            }
+
+            .eventAddBtn:hover {
+                background-color: #4258BE;
+                transform: translateY(-1px);
+                box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+            }
+
+            /* ===== 모달 스타일 (dDay.html 참고) ===== */
+            .modal {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.6);
+                backdrop-filter: blur(4px);
+                display: none;
+                align-items: center;
+                justify-content: center;
+                z-index: 9999;
+            }
+
+            .modal.show {
+                display: flex;
+            }
+
+            .modal-content {
+                background: white;
+                border-radius: 20px;
+                padding: 32px;
+                width: 90%;
+                max-width: 400px;
+                max-height: 90vh;
+                overflow-y: auto;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            }
+
+            .modal-content h3 {
+                font-size: 22px;
+                font-weight: 700;
+                color: #1e293b;
+                margin-bottom: 24px;
+            }
+
+            /* 폼 스타일 */
+            .form-group {
+                margin-bottom: 16px;
+                max-width: 100%;
+                display: flex;
+                align-items: center;
+            }
+
+            .form-group label {
+                display: block;
+                margin-bottom: 8px;
+                margin-right: auto;
+                color: #475569;
+                font-weight: 600;
+                font-size: 14px;
+            }
+
+            .form-group input[type="text"],
+            .form-group input[type="datetime-local"],
+            .form-group input[type="date"],
+            .form-group textarea {
+                width: 80%;
+                padding: 10px 14px;
+                border: 2px solid #e2e8f0;
+                border-radius: 10px;
+                font-size: 14px;
+                transition: all 0.2s ease;
+                font-family: inherit;
+            }
+
+            .form-group textarea {
+                min-height: 80px;
+                resize: vertical;
+            }
+
+            .form-group input:focus,
+            .form-group textarea:focus {
+                outline: none;
+                border-color: #3b82f6;
+                box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            }
+
+            .form-group.checkbox-group {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .date-inputs-grid {
+                display: grid;
+                grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+                gap: 12px;
+            }
+
+            /* 버튼 스타일 */
+            .modal-buttons {
+                display: flex;
+                gap: 12px;
+                justify-content: flex-end; 
+                margin-top: 28px;
+                padding-top: 20px;
+                border-top: 1px solid #f1f5f9;
+            }
+
+            .btn {
+                padding: 12px 24px;
+                border: none; 
+                border-radius: 10px;
+                font-weight: 600;
+                font-size: 14px;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                min-width: 80px;
+            }
+
+            .btn-primary { background: #4258BE; color: white; }
+            .btn-primary:hover { background: #2563eb; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
+            .btn-secondary { background: #f1f5f9; color: #64748b; }
+            .btn-secondary:hover { background: #e2e8f0; color: #475569; }
+            .btn-danger { background: #ef4444; color: white; }
+            .btn-danger:hover { background: #dc2626; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3); }
+
+            /* 왼쪽 캘린더 섹션 스타일 */
+            .leftSection {
+                background-color: white;
+                padding: 20px;
+                border-radius: 16px;
+                box-shadow: var(--shadow); /* 사이드바와 동일한 그림자 효과 적용 */
+                height: fit-content; /* 내용물 높이에 맞춤 */
+            }
         </style>
     </head>
     <body>
         <section class="mainGrid" aria-label="메인 영역" layout:fragment="content">
         <!-- 메인 캘린더 영역 -->
             <!-- 왼쪽 캘린더 영역 -->
-            <div class="leftSecton">
+            <div class="leftSection">
                 <!-- 커스텀 헤더 추가 -->
                  <div class="custom-calendar-header">
                     <div class="header-left">
@@ -194,68 +383,64 @@
             </div>
             <!-- 오른쪽 체크박스와 일정등록 버튼 영역 -->
             <div class="rightSection">
-                <!-- 관리자면 개인일정 토글 안보이게 -->
-                <div class="personalToggleSection"
-                th:classappend="${#authentication.principal.roleName == 'ROLE_ADMIN'} ? 'invisible' : ''">
-                    <input type="checkbox" id="personalToggle" checked>
-                    <span>個人の予定</span>
+                <div class="toggle-group">
+                    <div class="toggle-item" th:classappend="${#authentication.principal.roleName == 'ROLE_ADMIN'} ? 'invisible' : ''">
+                        <input type="checkbox" id="personalToggle" checked>
+                        <label for="personalToggle">個人の予定</label>
+                    </div>
+                    <div class="toggle-item">
+                        <input type="checkbox" id="adminToggle" checked>
+                        <label for="adminToggle">全体の予定</label>
+                    </div>
                 </div>
-                <div class="adminToggle">
-                    <input type="checkbox" id="adminToggle" checked>
-                    <span>全体の予定</span>
-                </div>
-                <div class="buttonSection">
-                    <button class="eventAddBtn" id="eventAddBtn">
-                        スケジュール登録
-                    </button>
-                </div>
+                <button class="eventAddBtn" id="eventAddBtn">
+                    日程登録
+                </button>
             </div>
 
             
             <!-- 일정등록 Modal -->
             <div id="eventModal" class="modal">
                 <div class="modal-content">
-                    <h3 id="modalTitle">일정 등록</h3>
+                    <h3 id="modalTitle">スケジュール登録</h3>
                     <form id="eventForm" class="eventForm">
                         <input type="hidden" id="eventId" name="eventId">
-                        <div>
-                            <label for="eventTitle">제목:</label>
+                        <div class="form-group">
+                            <label for="eventTitle">題目:</label>
                             <input type="text" id="eventTitle" name="eventTitle">
                         </div>
-                        <div>
-                            <label for="eventContent">내용:</label>
+                        <div class="form-group">
+                            <label for="eventContent">内容:</label>
                             <textarea id="eventContent" class="eventContent" name="eventContent"></textarea>
                         </div>
-                        <!-- 시간 포함 입력 (기본 표시) -->
-                        <div id="dateTimeInputs">
-                            <div>
-                                <label for="eventStartDate">시작일시:</label>
+                        <div class="date-inputs-grid">
+                            <!-- 시간 포함 입력 (기본 표시) -->
+                            <div id="dateTimeInputs" class="form-group">
+                                <label for="eventStartDate">開始日時:</label>
                                 <input type="datetime-local" id="eventStartDate" name="eventStartDate">
                             </div>
-                            <div>
-                                <label for="eventEndDate">종료일시:</label>
-                                <input type="datetime-local" id="eventEndDate" name="eventEndDate">
-                            </div>
-                        </div>
-                        <!-- 날짜만 입력 (숨김) -->
-                         <div id="dateOnlyInputs" style="display: none;">
-                            <div>
-                                <label>시작일시:</label>
+                            <!-- 날짜만 입력 (숨김) -->
+                            <div id="dateOnlyInputs" class="form-group" style="display: none;">
+                                <label>開始日時:</label>
                                 <input type="date" id="startDate" name="startDate">
                             </div>
-                            <div>
-                                <label>종료일시:</label>
+                            <div id="dateTimeEndInputs" class="form-group">
+                                <label for="eventEndDate">終了日時:</label>
+                                <input type="datetime-local" id="eventEndDate" name="eventEndDate">
+                            </div>
+                            <div id="dateOnlyEndInputs" class="form-group" style="display: none;">
+                                <label>終了日時:</label>
                                 <input type="date" id="endDate" name="endDate">
                             </div>
                         </div>
 
                         <!-- 종일 일정 체크박스 -->
-                        <div>
-                            <input type="checkbox" id="isAllDay" name="isAllDay" onchange="toggleDateInputs()">
-                            <label for="isAllDay">종일 일정</label>
+                        <div class="form-group">
+                            <input type="checkbox" id="isAllDay" name="isAllDay">
+                            <label for="isAllDay">終日の日程</label>
                         </div>
 
-                        <div id="modalButtons">
+                        <div id="modalButtons" class="modal-buttons">
                         </div>
                     </form>
                 </div>
@@ -398,7 +583,7 @@
 
                     switch(mode) {
                         case 'create' :
-                            modalTitle.textContent = '일정 등록';
+                            modalTitle.textContent = '日程登録';
                             
                             // 새로운 일정을 등록하는 것이므로, 숨겨진 eventId 값을 비움.
                             document.querySelector('#eventId').value='';
@@ -444,15 +629,15 @@
 
                             // 버튼 설정 (등록/취소)
                             modalButtons.innerHTML = `
-                                <button type="button" onclick="closeModal()">취소</button>
-                                <button type="submit" id="submitBtn">등록</button>
+                                <button type="button" class="btn btn-secondary" onclick="closeModal()">キャンセル</button>
+                                <button type="submit" class="btn btn-primary" id="submitBtn">登録</button>
                             `;
                             break;
 
                         case 'view':
                             currentEventInfo = info;  // 나중에 수정/삭제를 위해 정보 저장
 
-                            modalTitle.textContent = '일정 상세';
+                            modalTitle.textContent = '日程詳細';
                             populateForm(info.event); // 폼에 이벤트 데이터 채우기 
                             setFormEditable(false);   // 읽기 전용으로 만들기
 
@@ -465,17 +650,18 @@
                             const isOwner = currentUser.username === eventOwnerId;
 
                             // 기본적으로 닫기 버튼만 보여줌.
-                            let buttonsHTML = '<button type="button" onclick="closeModal()">닫기</button>';
+                            let buttonsHTML = '<button type="button" class="btn btn-secondary" onclick="closeModal()">閉じる</button>';
 
                             // 규칙에 따라 수정/삭제 버튼을 추가할지 결정
                                 // 규칙 1 : 관리자(isAdmin)이고 전체일정(PUBLIC)인가?
                                 // 규칙 2 : 일반사용자(!isAdmin)이고, 자신의(isOwner) 개인일정(PRIVATE)인가?
                             if((isAdmin && eventVisibility === 'PUBLIC')||
                                      (!isAdmin && isOwner && eventVisibility === 'PRIVATE')) {
-                                buttonsHTML += `
-                                        <button type="button" id="deleteBtn">삭제</button>
-                                        <button type="button" id="editBtn">수정</button>
-                                `
+                                buttonsHTML = `
+                                        <button type="button" class="btn btn-secondary" onclick="closeModal()">閉じる</button>
+                                        <button type="button" class="btn btn-danger" id="deleteBtn">削除</button>
+                                        <button type="button" class="btn btn-primary" id="editBtn">修整</button>
+                                `;
                             }
 
                             // 완성된 버튼 HTML을 모달에 삽입
@@ -489,15 +675,15 @@
                 */
                 function enableEditMode() {
                     // 1. 모달 제목 변경
-                    modalTitle.textContent = '일정 수정';
+                    modalTitle.textContent = '日程修正';
 
                     // 2. 폼을 편집 가능하게
                     setFormEditable(true);
 
                     // 3. 버튼을 '저장'과 '취소'로 변경
                     modalButtons.innerHTML = `
-                        <button type="button" onclick="disableEditMode()">취소</button>
-                        <button type="submit" id="submitBtn">저장</button>
+                        <button type="button" class="btn btn-secondary" onclick="disableEditMode()">キャンセル</button>
+                        <button type="submit" class="btn btn-primary" id="submitBtn">貯蔵</button>
                     `;
                 }
 
@@ -506,16 +692,16 @@
                 */ 
                 function disableEditMode() {
                     // 1. 모달 제목 변경
-                    modalTitle.textContent = '일정 상세';
+                    modalTitle.textContent = '日程詳細';
                     
                     // 다시 읽기 전용으로
                     setFormEditable(false);
 
                     // 버튼 원래대로 복원
                     modalButtons.innerHTML = `
-                        <button type="button" onclick="closeModal()">닫기</button>
-                        <button type="button" id="deleteBtn">삭제</button>
-                        <button type="button" onclick="enableEditMode()">수정</button>
+                        <button type="button" class="btn btn-secondary" onclick="closeModal()">閉じる</button>
+                        <button type="button" class="btn btn-danger" id="deleteBtn">削除</button>
+                        <button type="button" class="btn btn-primary" onclick="enableEditMode()">修整</button>
                     `;
 
                     // 수정한 내용이 있을 수 있으니, 원래 데이터로 폼을 다시 채움
@@ -576,8 +762,10 @@
 
                     // 종일 일정 체크시 토글(미체크 -> 체크)
                     if(isAllDay) {
-                        document.querySelector('#dateTimeInputs').style.display = 'none';
-                        document.querySelector('#dateOnlyInputs').style.display = 'block';
+                        document.querySelector('#dateTimeInputs').style.display = 'none'; // 시간+날짜 시작 숨김
+                        document.querySelector('#dateTimeEndInputs').style.display = 'none'; // 시간+날짜 종료 숨김
+                        document.querySelector('#dateOnlyInputs').style.display = 'block'; // 날짜만 시작 보임
+                        document.querySelector('#dateOnlyEndInputs').style.display = 'block'; // 날짜만 종료 보임
 
                         // 기존 DateTime 값이 있으면 Date 값으로 변환
                         const startDateTime = document.querySelector('#eventStartDate').value;
@@ -594,7 +782,9 @@
                     // 종일 일정 체크시 토글(체크 -> 미체크)
                     if(!isAllDay) {
                         document.querySelector('#dateTimeInputs').style.display = 'block';
+                        document.querySelector('#dateTimeEndInputs').style.display = 'block';
                         document.querySelector('#dateOnlyInputs').style.display = 'none';
+                        document.querySelector('#dateOnlyEndInputs').style.display = 'none';
 
                         const startDate = document.querySelector('#startDate').value;
                         const endDate = document.querySelector('#endDate').value;
@@ -751,7 +941,7 @@
                             .catch(error => {
                                 console.error('Fetch error:', error);
                                 failureCallback(error);
-                                alert('일정을 불러오는데 실패했습니다.');
+                                alert('スケジュールの読み込みに失敗しました.');
                             })
                         },
 
@@ -773,7 +963,7 @@
 
                         // 드롭 완료 시 DB 업데이트 //
                         eventDrop : function(info) {
-                            if(!confirm("이 변경사항을 저장하시겠습니까?")) {
+                            if(!confirm("この変更を保存しますか?")) {
                                 info.revert();  // 취소했다면 원래 위치로 되돌리기.
                                 return;
                             }
@@ -803,17 +993,17 @@
                             .then(response => {
                                 if(!response.ok) {
                                     // 서버에서 에러 응답이 오면 예외를 발생시켜 .catch()로 보냄
-                                    throw new Error('일정 업데이트에 실패했습니다.');
+                                    throw new Error('スケジュールの更新に失敗しました.');
                                 }
                                 return response.json();
                             })
                             .then(data => {
                                 console.log('서버로부터 업데이트 확인:', data);
-                                alert('일정이 성공적으로 변경되었습니다.');
+                                alert('日程が正常に変更されました.');
                             })
                             .catch(error => {
                                 console.error('업데이트 실패:', error);
-                                alert('일정 변경에 실패하여 원래 위치로 되돌립니다.');
+                                alert('スケジュールの変更に失敗し、元の場所に戻します.');
 
                                 // DB업데이트에 실패했으므로, 화면에 보이는 이벤트를 원래 위치로 되돌립니다.
                                 info.revert();
@@ -893,7 +1083,7 @@
                             console.log('삭제 버튼 클릭됨');
                             
                             // 사용자에게 정말 삭제할 것인지 확인.
-                            const isConfirmed = confirm('정말로 이 일정을 삭제하시겠습니까?');
+                            const isConfirmed = confirm('本当にこのスケジュールを削除しますか?');
 
                             if(isConfirmed){
                                 // 미리 저장해둔 info 에서 eventId 값을 가져옴
@@ -904,20 +1094,20 @@
                                 })
                                 .then(response => {
                                     if(!response.ok) {
-                                        throw new Error('서버 응답에 실패하였습니다.');
+                                        throw new Error('サーバーの応答に失敗しました.');
                                     }
                                     // 삭제 성공 시에는 본문 내용이 없으므로 이렇게 return
                                     return true;
                                 })
                                 .then(()=> {
-                                    alert('성공적으로 삭제되었습니다.');
+                                    alert('正常に削除されました.');
 
                                     calendar.refetchEvents();   // 캘린더 화면 갱신
                                     closeModal();
                                 })
                                 .catch(error=> {
                                     console.error("삭제 실패:",error);
-                                    alert('삭제에 실패했습니다.');
+                                    alert('削除に失敗しました.');
                                 })
 
                             }
@@ -991,14 +1181,14 @@
                             .then(response => {
                                 // response.ok가 아니면(응답이 성공) 에러를 발생시켜 .catch()로 보냄
                                 if(!response.ok) {
-                                    throw new Error('서버 응답에 실패했습니다.');
+                                    throw new Error('サーバーの応答に失敗しました.');
                                 }
                                 // 성공했다면, 응답 본문의 JSON을 javaScript 객체로 변환
                                 return response.json();
                             })
                             .then(updatedEventDTO => { // 최종적으로 변환된 JavaScript 객체(수정된 이벤트 정보)를 받음
                                 console.log('성공적으로 수정된 이벤트:', updatedEventDTO);
-                                alert('일정이 성공적으로 수정되었습니다.');
+                                alert('スケジュールは正常に修正されました.');
 
                                 // FullCalendar의 모든 이벤트를 서버에서 다시 불러와 화면을 갱신
                                 calendar.refetchEvents();
@@ -1069,7 +1259,7 @@
                             })
                             .catch(error => {
                                 console.error('에러 발생:', error);
-                                alert('오류 발생: ' + error.message);
+                                alert('エラー発生: ' + error.message);
                             });
                         }
                     });

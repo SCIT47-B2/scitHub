@@ -1,10 +1,20 @@
 /* ============ 헤더 ============ */
 /**
- * 헤더 그리드: 본문 3열(.homeGrid)과 동일한 컬럼 구성으로 정렬
+ * .header-container: 페이지 전체 너비와 좌우 여백 제어
+ * .headerGrid: 본문 3열(.mainGrid)과 동일한 컬럼 구성으로 정렬
  * - col1: 320px  (좌측 사이드 카드 폭과 시각적 정렬)
  * - col2: 1fr    (중앙 컬럼)
  * - col3: 300px  (우측 일정 카드 폭과 시각적 정렬)
  */
+
+/* 페이지 전체 너비와 좌우 여백을 제어하는 컨테이너 */
+.header-container {
+    width: 100%;
+    max-width: 1400px; /* 페이지 최대 너비 설정 */
+    margin: 0 auto;    /* 중앙 정렬 */
+    padding: 0 32px;   /* 좌우 여백 */
+    box-sizing: border-box;
+}
 .headerGrid{
     display:grid;
     grid-template-columns: 320px minmax(0,1fr) 300px;
