@@ -25,6 +25,7 @@ import net.dsa.scitHub.dto.MypageDTO;
 import net.dsa.scitHub.dto.PostDTO;
 import net.dsa.scitHub.dto.PostDetailDTO;
 import net.dsa.scitHub.dto.UserManageDTO;
+import net.dsa.scitHub.entity.board.Post;
 import net.dsa.scitHub.service.BoardService;
 import net.dsa.scitHub.service.PostService;
 import net.dsa.scitHub.service.UserService;
@@ -139,7 +140,35 @@ public class AdminController {
 
         model.addAttribute("postDTO", postDTO);
 
-        return "admin/announcementWrite";
+        return "admin/announcementWriteForm";
+    }
+
+    /**
+     * 공지사항 글 작성 처리 (AJAX)
+     * @param postDTO 글 정보
+     * @param userId 사용자 ID
+     * @return ResponseEntity with saved post ID or error message
+     */
+    @PostMapping("announcement/write")
+    @ResponseBody
+    public ResponseEntity<?> announcementWriteSubmit(
+        PostDTO postDTO,
+        @AuthenticationPrincipal(expression = "userId") Integer userId
+    ) {
+        try {
+            // DTO에 사용자 ID 설정
+            postDTO.setUserId(userId);
+
+            Post savedPost = ps.savePostAndReturnEntity(postDTO);
+            log.debug("글 저장 성공: {}", savedPost);
+
+            return ResponseEntity.ok(savedPost.getPostId());
+
+        } catch (Exception e) {
+            log.error("[예외 발생] 글 저장 실패: {}", e.getMessage());
+
+            return ResponseEntity.badRequest().body(String.format("글 저장 중 오류가 발생했습니다: %s", e.getMessage()));
+        }
     }
 
     /**
