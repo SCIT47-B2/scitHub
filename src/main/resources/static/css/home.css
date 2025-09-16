@@ -6,6 +6,12 @@
   - 좌석배치도 비율/밀도/톤 보정
 ========================= */
 
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&display=swap');
+
+html, body{
+  font-family: 'Noto Sans JP', sans-serif;
+}
+
 /** 카드 공통 */
 .card{
   background:#fff; border:1px solid #eee; border-radius:16px;

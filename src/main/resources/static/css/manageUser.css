@@ -2,6 +2,12 @@
 /* 회원 관리 페이지 스타일              */
 /* ================================== */
 
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&display=swap');
+
+html, body{
+  font-family: 'Noto Sans JP', sans-serif;
+}
+
 /* --- 1. 검색 및 필터 영역 --- */
 .search-filter-bar {
     display: flex;
