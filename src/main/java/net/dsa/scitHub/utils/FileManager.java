@@ -16,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
-public class AvatarFileManager {
+public class FileManager {
 
     /**
      * 파일을 저장하고 저장된 파일명을 리턴한다.

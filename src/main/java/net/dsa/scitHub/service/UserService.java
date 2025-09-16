@@ -23,7 +23,7 @@ import net.dsa.scitHub.entity.user.User;
 import net.dsa.scitHub.enums.Gender;
 import net.dsa.scitHub.enums.Role;
 import net.dsa.scitHub.repository.user.UserRepository;
-import net.dsa.scitHub.utils.AvatarFileManager;
+import net.dsa.scitHub.utils.FileManager;
 
 @Service
 @Slf4j
@@ -33,7 +33,7 @@ public class UserService {
 
     private final UserRepository ur;
     private final BCryptPasswordEncoder passwordEncoder;
-    private final AvatarFileManager fileManager;
+    private final FileManager fileManager;
 
     /**
      * 아이디 중복 확인
@@ -127,8 +127,8 @@ public class UserService {
         // 2) 이미지가 올라온 경우에만 저장 처리
         if (upload != null && !upload.isEmpty()) {
 
-            // 2-1) 실제 저장 디렉터리: {board.uploadPath}/uploads/avatar
-            String avatarDir = Paths.get(uploadPath, "uploads", "avatar").toString();
+            // 2-1) 실제 저장 디렉터리: {board.uploadPath}/images/avatar
+            String avatarDir = Paths.get(uploadPath, "images", "avatar").toString();
 
             // 2-2) 파일 저장(유틸은 디렉터리 생성/파일명 생성/저장 담당, 리턴: "yyyyMMdd_uuid.ext")
             String savedFileName = fileManager.saveFile(avatarDir, upload);

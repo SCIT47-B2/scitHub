@@ -39,7 +39,7 @@ public class AdminController {
     private final BoardService bs;
     private final UserService us;
 
-	@Value("${board.uploadPath}")
+	@Value("${file.uploadPath}")
 	String uploadPath;			// 첨부파일 저장 경로
 
 	@Value("${board.pageSize}")
