@@ -105,8 +105,8 @@ public class ArchiveController {
             Model model
         ) {
         List<MenuItem> menuItems = List.of(
-            new MenuItem("회사 리뷰", "/archive/companyList"),
-            new MenuItem("사진 앨범", "/archive/photoAlbum")
+            new MenuItem("会社レビュー", "/archive/companyList")
+            // new MenuItem("사진 앨범", "/archive/photoAlbum")
         );
         model.addAttribute("menuItems", menuItems);
 

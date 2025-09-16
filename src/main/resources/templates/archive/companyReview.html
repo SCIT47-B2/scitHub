@@ -3,7 +3,7 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/defaultLayout}">
 <head>
-    <title>회사 리뷰</title>
+    <title>Company Review</title>
     <th:block layout:fragment="css">
         <link rel="stylesheet" th:href="@{/css/home.css}">
         <link rel="stylesheet" th:href="@{/css/archive.css}">
@@ -44,7 +44,7 @@
 
             <div class="review-list-container">
                 <div th:if="${#lists.isEmpty(reviews)}">
-                    <p>리뷰가 없습니다.</p>
+                    <p>レビューがありません.</p>
                 </div>
                 <div th:unless="${#lists.isEmpty(reviews)}" class="review-cards-grid">
                     <div class="review-card" th:each="review : ${reviews}">
