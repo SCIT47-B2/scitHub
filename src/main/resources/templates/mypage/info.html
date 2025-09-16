@@ -36,7 +36,7 @@
             <!-- 이미지만 감싸는 내부 래퍼: 프레임 안에 정확히 클리핑 -->
             <div class="avatarClip">
               <img id="avatarImg"
-                   th:src="${#strings.isEmpty(user.avatarUrl)} ? @{/images/chiikawaPuzzle.png} : @{/uploads/avatar/{f}(f=${user.avatarUrl})}"
+                   th:src="${#strings.isEmpty(user.avatarUrl)} ? @{/images/chiikawaPuzzle.png} : @{/images/avatar/{f}(f=${user.avatarUrl})}"
                    alt="프로필 이미지">
             </div>
 

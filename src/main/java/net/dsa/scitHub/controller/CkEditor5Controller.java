@@ -1,5 +1,6 @@
 package net.dsa.scitHub.controller;
 
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,7 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.dsa.scitHub.util.FileManager;
+import net.dsa.scitHub.utils.FileManager;
 
 
 
@@ -24,16 +25,12 @@ import net.dsa.scitHub.util.FileManager;
 @RequestMapping("ckEditor5")
 public class CkEditor5Controller {
 
-    // 업로드된 이미지의 저장 경로
-    @Value("${post.upload.image.path}")
+    // 업로드된 이미지의 실제 저장 경로
+    // C:/uploads/...
+    @Value("${file.uploadPath}")
     private String imagePath;
 
-    // 업로드된 파일을 불러올 때 매핑되는 경로
-    @Value("${post.upload.image.url-pattern}")
-    private String urlPattern;
-
     private final FileManager fileManager;
-
 
     // 게시글 작성/수정 폼에서 이미지 저장
     @ResponseBody
@@ -42,10 +39,14 @@ public class CkEditor5Controller {
         @RequestParam("upload") MultipartFile upload) {
         log.debug("이미지 업로드 요청 : ");
         try {
+            // 이미지 업로드 경로 지정
+            // C:/uploads/images/postImages
+            String uploadPath = Paths.get(imagePath, "images", "postImages").toString();
             // 이미지 파일 업로드
-            String savedFileName = fileManager.saveFile(imagePath, upload);
+            String savedFileName = fileManager.saveFile(uploadPath, upload);
             // ckEditor5에 돌려줄 업로드 성공 응답 작성
-            String imageUrl = urlPattern + savedFileName;
+            // 외부 소스에 저장된 이미지를 불러올 수 있게 매핑된 경로를 반환해야 함
+            String imageUrl = "/scitHub/images/postImages/" + savedFileName;
             Map<String, String> response = new HashMap<>();
             response.put("url", imageUrl);
             log.debug("이미지 업로드 완료");
