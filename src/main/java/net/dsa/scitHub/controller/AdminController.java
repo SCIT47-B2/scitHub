@@ -158,6 +158,7 @@ public class AdminController {
         try {
             // DTO에 사용자 ID 설정
             postDTO.setUserId(userId);
+            postDTO.setViewCount(0);
 
             Post savedPost = ps.savePostAndReturnEntity(postDTO);
             log.debug("글 저장 성공: {}", savedPost);
@@ -169,6 +170,19 @@ public class AdminController {
 
             return ResponseEntity.badRequest().body(String.format("글 저장 중 오류가 발생했습니다: %s", e.getMessage()));
         }
+    }
+
+    @GetMapping("announcementRead")
+    public String announcementRead(
+        @RequestParam("postId") int postId,
+        Model model
+    ) {
+        log.debug("운영실 공지사항 상세보기 요청: postId={}", postId);
+
+        PostDetailDTO postDetail = ps.findPostDetailById(postId);
+        model.addAttribute("postDetail", postDetail);
+
+        return "admin/announcementRead";
     }
 
     /**

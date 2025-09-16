@@ -116,6 +116,11 @@ public class PostService {
         pr.save(post);
     }
 
+    /**
+     * 게시글 저장 후 저장된 엔티티 반환
+     * @param postDTO 저장할 게시글 정보
+     * @return 저장된 Post 엔티티
+     */
     @Transactional
     public Post savePostAndReturnEntity(PostDTO postDTO) {
 
@@ -125,9 +130,8 @@ public class PostService {
             .orElseThrow(() -> new EntityNotFoundException("게시판을 찾을 수 없습니다. ID: " + postDTO.getBoardId()));
 
         Post post = PostDTO.convertToPostEntity(postDTO, user, board);
-        Post savedPost = pr.save(post);
 
-        return savedPost;
+        return pr.save(post);
     }
 
     /**
