@@ -93,7 +93,7 @@
 /* --- 2. 콘텐츠 박스 및 테이블 --- */
 .content-box {
     background-color: var(--bg);
-    padding: 24px;
+    padding: 20px 24px;
     border-radius: var(--radius);
     box-shadow: var(--shadow);
 }
@@ -110,7 +110,7 @@
 
 .user-table th,
 .user-table td {
-    padding: 14px 10px;
+    padding: 10px 10px;
     text-align: center;
     border-bottom: 1px solid #e5e7eb;
     vertical-align: middle;

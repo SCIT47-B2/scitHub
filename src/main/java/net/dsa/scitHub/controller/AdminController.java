@@ -39,7 +39,7 @@ public class AdminController {
     private final BoardService bs;
     private final UserService us;
 
-	@Value("${board.uploadPath}")
+	@Value("${file.uploadPath}")
 	String uploadPath;			// 첨부파일 저장 경로
 
 	@Value("${board.pageSize}")
@@ -121,6 +121,25 @@ public class AdminController {
         model.addAttribute("lowerPosts", lowerPosts);   // 아래쪽 공지 게시글
 
         return "admin/announcement";
+    }
+
+    /**
+     * 공지사항 글 작성 페이지
+     * @return 뷰 이름
+     */
+    @GetMapping("announcement/write")
+    public String announcementWriteForm(
+        @RequestParam(name = "boardName", defaultValue = "announcement") String boardName,
+        Model model
+    ) {
+        int boardId = bs.getBoardIdFromName(boardName);
+
+        PostDTO postDTO = new PostDTO();
+        postDTO.setBoardId(boardId);
+
+        model.addAttribute("postDTO", postDTO);
+
+        return "admin/announcementWrite";
     }
 
     /**

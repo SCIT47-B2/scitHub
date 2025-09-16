@@ -9,7 +9,7 @@
                 <section class="profile" aria-label="프로필">
                     <img
                     th:if="${currentUser != null and !#strings.isEmpty(currentUser.avatarUrl)}"
-                    th:src="@{/uploads/avatar/{f}(f=${currentUser.avatarUrl})}"
+                    th:src="@{/images/avatar/{f}(f=${currentUser.avatarUrl})}"
                     alt="프로필 이미지" />
 
                     <img

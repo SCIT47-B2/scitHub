@@ -27,8 +27,8 @@ public class MypageController {
 
     private final UserService us;
 
-	@Value("${board.uploadPath}")
-	String uploadPath;	// 프로필파일 저장 경로
+	@Value("${file.uploadPath}")
+	String uploadPath;	// 프로필 파일 저장 경로
 
     /**
      * 마이페이지 메뉴 아이템
