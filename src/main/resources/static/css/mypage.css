@@ -3,6 +3,12 @@
  * 핵심: minmax(0,1fr) + min-width:0 로 우측 오버플로우 방지
  ************************************************************/
 
+ @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&display=swap');
+
+html, body{
+  font-family: 'Noto Sans JP', sans-serif;
+}
+
 /** 본문 컨테이너: 사이드바 우측 영역을 차지 */
 .profilePage{
   flex: 1;                /* body가 flex이므로 우측 영역 확장 */

@@ -1,5 +1,11 @@
 /* archive.css */
 
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&display=swap');
+
+html, body{
+  font-family: 'Noto Sans JP', sans-serif;
+}
+
 .mainGrid {
     display: flex; /* 또는 grid로 변경 */
     justify-content: center; /* 수평 중앙 정렬 */

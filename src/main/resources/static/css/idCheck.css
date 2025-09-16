@@ -1,0 +1,25 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&display=swap');
+    body{
+      font-family: 'Noto Sans JP', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      min-height: 100vh;
+    }
+    header {
+      margin-bottom: 1rem; /* 헤더와 본문 내용 사이의 간격 조정 */
+    }
+    h1 {
+      margin: 0; /* h1의 기본 상하 여백을 제거하여 콘텐츠를 위로 올림 */
+    }
+    .btnRow{ display:flex; justify-content: center; gap:8px; margin-top:12px; }
+    .btnPrimary{
+      padding:8px 12px; border:2px solid #111; background:#111; color:#fff;
+      border-radius:9999px; font-weight:700; cursor:pointer;
+    }
+    .btnSecondary{
+      padding:8px 12px; border:2px solid #111; background:#fff; color:#111;
+      border-radius:9999px; font-weight:700; cursor:pointer;
+    }
