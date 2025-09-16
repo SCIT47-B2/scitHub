@@ -129,7 +129,7 @@
               </div>
             </div>
             <div class="formGroup">
-              <input type="date" class="formInput" id="birth" name="birth" required>
+              <input type="date" class="formInput" id="birth" name="birth" th:max="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}" required>
             </div>
             <div class="formGroup">
               <input type="email" class="formInput" placeholder="メールアドレス" id="email" name="email" autocomplete="email" required>
