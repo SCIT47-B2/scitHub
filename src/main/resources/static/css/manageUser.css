@@ -93,7 +93,7 @@
 /* --- 2. 콘텐츠 박스 및 테이블 --- */
 .content-box {
     background-color: var(--bg);
-    padding: 24px;
+    padding: 20px 24px;
     border-radius: var(--radius);
     box-shadow: var(--shadow);
 }
@@ -110,7 +110,7 @@
 
 .user-table th,
 .user-table td {
-    padding: 14px 10px;
+    padding: 10px 10px;
     text-align: center;
     border-bottom: 1px solid #e5e7eb;
     vertical-align: middle;
@@ -197,11 +197,13 @@
 
 /* 권한 변경 버튼 (기본 회색 스타일) */
 .btn-role-change {
-    color: #374151; /* 기본 텍스트 색상 */
+    color: var(--primary); /* 기본 파란색 */
+    border-color: var(--secondary); /* 연한 파란색 테두리 */
 }
 .btn-role-change:hover {
-    background-color: #f3f4f6;
-    border-color: #9ca3af;
+    color: #1e40af; /* 진한 파란색 */
+    background-color: #e0e7ff; /* 연한 파란색 배경 */
+    border-color: #a5b4fc; /* 중간 파란색 테두리 */
 }
 
 /* 활성화 버튼 (초록색 계열) */

@@ -58,11 +58,14 @@
                             <td class="gender" th:text="${user.gender == 'Man' ? '男性' : user.gender == 'Woman' ? '女性' : '指定なし'}"></td>
                             <td class="phone" th:text="${user.phone}"></td>
                             <td class="is-active" th:text="${user.isActive ? 'アクティブ' : '非アクティブ'}"></td>
-                            <td class="role" th:text="${user.role}"></td>
+                            <td class="role" th:text="${user.role == 'ROLE_ADMIN' ? '管理者' : user.role == 'ROLE_USER' ? 'ユーザー' : '指定なし'}"></td>
                             <td class="actions">
-                                <button type="button" class="btn-action btn-role-change" th:data-userid="${user.userId}">権限変更</button>
+                                <button type="button" class="btn-action btn-role-change"
+                                    th:data-userid="${user.userId}"
+                                    th:data-namekor="${user.nameKor}">権限変更</button>
                                 <button type="button" class="btn-action"
                                     th:data-userid="${user.userId}"
+                                    th:data-namekor="${user.nameKor}"
                                     th:text="${user.isActive ? '無効化' : '有効化'}"
                                     th:classappend="${user.isActive ? 'btn-deactivate' : 'btn-activate'}"></button>
                             </td>
@@ -119,7 +122,8 @@
                     // 권한 변경 버튼 클릭 이벤트
                     container.on('click', '.btn-role-change', function() {
                         const userId = $(this).data('userid');
-                        if (confirm(`会員番号${userId}の権限を変更しますか？`)) {
+                        const nameKor = $(this).data('namekor');
+                        if (confirm(`"${nameKor}"の権限を変更しますか？`)) {
                             changeUserRole(userId);
                         }
                     });
@@ -127,8 +131,9 @@
                     // 상태 변경 버튼 클릭 이벤트 (활성화/비활성화)
                     container.on('click', '.btn-activate, .btn-deactivate', function() {
                         const userId = $(this).data('userid');
+                        const nameKor = $(this).data('namekor');
                         const actionText = $(this).text();
-                        if (confirm(`会員番号${userId}を${actionText}しますか？`)) {
+                        if (confirm(`"${nameKor}"を${actionText}しますか？`)) {
                             toggleUserStatus(userId);
                         }
                     });
@@ -170,7 +175,7 @@
                     if (row.length) {
                         // 각 셀(td)의 내용 업데이트
                         row.find('.is-active').text(user.isActive ? 'アクティブ' : '非アクティブ');
-                        row.find('.role').text(user.role);
+                        row.find('.role').text(user.role == 'ROLE_ADMIN' ? '管理者' : user.role == 'ROLE_USER' ? 'ユーザー' : '指定なし');
 
                         // 상태 변경 버튼 업데이트
                         const statusButton = row.find('.btn-activate, .btn-deactivate');
