@@ -24,13 +24,13 @@
                         <div class="company-name-rating">
                             <h2 th:text="${company.name}">회사명</h2>
                             <div class="avg-rating-stars">
-                            <th:block th:with="avgRating=${company.averageRating != null ? T(java.lang.Math).round(company.averageRating) : 0}">
-                                <th:block th:each="i : ${#numbers.sequence(1, 5)}">
-                                    <i class="fa fa-star" th:classappend="${i <= avgRating} ? 'filled' : ''"></i>
+                                <th:block th:with="avgRating=${company.averageRating != null ? T(java.lang.Math).round(company.averageRating) : 0}">
+                                    <th:block th:each="i : ${#numbers.sequence(1, 5)}">
+                                        <i class="fa fa-star" th:classappend="${i <= avgRating} ? 'filled' : ''"></i>
+                                    </th:block>
                                 </th:block>
-                            </th:block>
-                            <span th:text="${company.averageRating != null ? #numbers.formatDecimal(company.averageRating, 1, 1) : '0.0'}">4.3</span>
-                        </div>
+                                <span th:text="${company.averageRating != null ? #numbers.formatDecimal(company.averageRating, 1, 1) : '0.0'}">4.3</span>
+                            </div>
                         </div>
                         <div class="company-meta-info">
                             <span th:text="${company.industry.displayName}">업종</span>

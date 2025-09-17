@@ -16,9 +16,14 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import net.dsa.scitHub.dto.CommentDTO;
+import net.dsa.scitHub.dto.CourseDTO;
 import net.dsa.scitHub.dto.MenuItem;
 import net.dsa.scitHub.dto.PostDTO;
+import net.dsa.scitHub.entity.course.Course;
+import net.dsa.scitHub.enums.CourseType;
 import net.dsa.scitHub.service.CommunityService;
+import net.dsa.scitHub.service.CourseReviewService;
+import net.dsa.scitHub.service.CourseService;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -48,9 +53,9 @@ public class CommunityController {
     @ModelAttribute("menuItems")
     public List<MenuItem> menuItems() {
         return List.of(
-            new MenuItem("게시판 홈", "/community/home"),
-            new MenuItem("Q&A", "/community/qna"),
-            new MenuItem("강의평", "/community/courseReview")
+            new MenuItem("掲示板ホーム", "/community/home"),
+            new MenuItem("講義評", "/community/courseList"),
+            new MenuItem("Q&A", "/community/qna")
         );
     }
 
@@ -298,4 +303,31 @@ public class CommunityController {
             return ResponseEntity.badRequest().body("댓글 삭제 실패");
         }
     }
+
+
+    /** 강의평 */
+
+    private final CourseService ccs;
+    private final CourseReviewService crs;
+
+    /**
+     * 강의평 페이지
+     * @param model
+     * @param name 검색어 (강의명)
+     * @return courseList.html
+     */
+    @GetMapping("courseList")
+    public String courseList(
+            Model model,
+            @RequestParam(name="name", required=false) String name
+    ) {
+
+        // 이름으로 검색하거나 전체 강의 정보 가져오기
+        List<CourseDTO> courseList = ccs.getCourseList(name);
+
+        model.addAttribute("courseList", courseList);
+
+        return "community/courseList";
+    }
+
 }

@@ -72,6 +72,10 @@ public class CourseReview {
     /** 리뷰 텍스트 내용 */
     @Column(name = "comment_text", columnDefinition = "MEDIUMTEXT")
     private String commentText;
+
+    /** 강의 평점 */
+    @Column(name = "rating", nullable = false)
+    private Byte rating;
     
     /** 리뷰 작성 시간 */
     @CreatedDate

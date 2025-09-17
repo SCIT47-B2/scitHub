@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layouts/defaultLayout}">
+    <head>
+        <title>Course List</title>
+        <th:block layout:fragment="css">
+            <link rel="stylesheet" th:href="@{/css/archive.css}">
+        </th:block>
+    </head>
+    <body>
+        <section class="mainGrid" aria-label="메인 영역" layout:fragment="content">
+            <div class="container">
+                <!-- 검색바 -->
+                 <div class="search-box">
+                    <form th:action="@{/community/courseList}" method="get">
+                        <i class="fa fa-search"></i>
+                        <input type="text" name="name" placeholder="コース名で探す">
+                        <button type="submit" style="display: none;"></button>
+                    </form>
+                 </div>
+
+                <!-- 일본어 수업 -->
+                <div class="section">
+                    <div class="section-title">日本語</div>
+                    <div class="card-container">
+                        <div class="card" th:each="course : ${courseList}" th:if="${course.courseType.name() == 'JP'}">
+                            <h4 th:text="${course.name}">Course</h4>
+                            <p th:text="${course.instructorName}">Professor</p>
+                            <div class="avg-rating-stars">
+                                <th:block th:with="avgRating=${course.averageRating != null ? T(java.lang.Math).round(course.averageRating) : 0}">
+                                    <th:block th:each="i : ${#numbers.sequence(1, 5)}">
+                                        <i class="fa fa-star" th:classappend="${i <= avgRating} ? 'filled' : ''"></i>
+                                    </th:block>
+                                </th:block>
+                            </div>
+                            <div class="rating" th:text="${course.averageRating != null ? #numbers.formatDecimal(course.averageRating, 1, 1) : '0.0'}">4.1</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- IT 수업 -->
+                <div class="section">
+                    <div class="section-title">IT</div>
+                    <div class="card-container">
+                        <div class="card" th:each="course : ${courseList}" th:if="${course.courseType.name() == 'IT'}">
+                            <h4 th:text="${course.name}">Course</h4>
+                            <p th:text="${course.instructorName}">Professor</p>
+                            <div class="avg-rating-stars">
+                                <th:block th:with="avgRating=${course.averageRating != null ? T(java.lang.Math).round(course.averageRating) : 0}">
+                                    <th:block th:each="i : ${#numbers.sequence(1, 5)}">
+                                        <i class="fa fa-star" th:classappend="${i <= avgRating} ? 'filled' : ''"></i>
+                                    </th:block>
+                                </th:block>
+                            </div>
+                            <div class="rating" th:text="${course.averageRating != null ? #numbers.formatDecimal(course.averageRating, 1, 1) : '0.0'}">4.5</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <th:block layout:fragment="script">
+        </th:block>
+    </body>
+</html>
