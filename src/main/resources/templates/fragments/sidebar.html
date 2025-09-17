@@ -3,7 +3,7 @@
                 xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
     <body>
         <aside class="sidebar" aria-label="사이드바" th:fragment="sidebarFragment(menuItems)">
-            <a th:href="@{/}" class="logo">SCIT Hub</a>
+            <a th:href="@{/}" class="logo brandFont">SCIT Hub</a>
 
             <a th:href="@{/mypage/info}" class="profile-link">
                 <section class="profile" aria-label="프로필">
@@ -52,7 +52,20 @@
                 </div>
                 <div class="study-bottom">
                 <span class="big-percent">0%</span>
-                <div class="ring" style="--progress:0" aria-hidden="true"></div>
+
+                <!-- ■■■ 도넛: SVG 벡터(클리핑 방지) ■■■ -->
+                <div class="ring" style="--progress:0" aria-hidden="true">
+                <svg class="ringSvg" viewBox="0 0 48 48">
+                    <!-- 트랙(비진행 구간) -->
+                    <circle class="ringTrack" cx="24" cy="24" r="21" pathLength="100"></circle>
+                    <!-- 진행(한 가지 색상) -->
+                    <circle class="ringValue" cx="24" cy="24" r="21" pathLength="100"></circle>
+                </svg>
+                <!-- <span class="ringLabel">0%</span> -->
+                </div>
+                <!-- ■■■ /도넛 ■■■ -->
+
+
                 </div>
             </div>
             </div>

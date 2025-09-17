@@ -8,42 +8,23 @@
   <!-- flatpickr (JavaScript Date Picker) 라이브러리 추가 -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-  <!-- (선택) flatpickr 달력을 일본어로 표시하려면 아래 주석을 해제하세요. -->
   <script src="https://npmcdn.com/flatpickr/dist/l10n/ja.js"></script>
+
 </head>
 <body>
-  <!-- /** 메인 래퍼
-       * @desc   좌측(브랜딩) / 우측(로그인/회원가입)
-       */ -->
   <div class="mainContainer">
-
-    <!-- /** 좌측 브랜딩
-         * @desc   로고와 소개 문구
-         */ -->
     <section class="leftSection" aria-label="브랜딩">
-      <h1 class="logo">SCIT Hub</h1>
+      <h1 class="logo brandFont">SCIT Hub</h1>
       <p class="description">
         SCIT 専用のスケジュール・情報・コミュニティプラットフォーム
-        <br/>
-        SCIT学習と交流のための統合ハブです。
+        <br/>SCIT学習と交流のための統合ハブです。
       </p>
     </section>
 
-    <!-- /** 우측 인증
-         * @desc   로그인/회원가입 버튼 + 폼
-         */ -->
     <section class="rightSection" aria-label="인증">
-
-      <!-- /** 인증 버튼 스택
-           * @desc   버튼 클릭 시 해당 폼 표시, 반대 폼/버튼 비표시
-           */ -->
       <div class="authButtons">
         <button class="authBtn loginBtn" id="loginBtn" type="button" aria-controls="loginForm" aria-expanded="false">
           Login
-          <!-- /** 아이콘: 외부 SVG 파일
-               * @path  /icons/arrow_left_alt.svg
-               * @note  회전/슬라이드 애니메이션은 CSS 변수 기반
-               */ -->
           <img th:src="@{/icons/arrow_left_alt.svg}" src="/icons/arrow_left_alt.svg" alt="" class="btnIcon" id="loginArrow" aria-hidden="true">
         </button>
 
@@ -53,11 +34,7 @@
         </button>
       </div>
 
-      <!-- /** 로그인 폼
-           * @method POST
-           * @action /user/login
-           * @return 서버 인증 처리
-           */ -->
+      <!-- 로그인 폼 -->
       <form class="loginForm" id="loginForm" method="post" th:action="@{/user/login}" action="/user/login" aria-hidden="true">
         <div class="formGroup">
           <input type="text" class="formInput" placeholder="ID" id="username" name="username" autocomplete="username" required>
@@ -70,16 +47,10 @@
         </div>
       </form>
 
-      <!-- /** 회원가입 폼(2단계)
-           * @method POST
-           * @action /user/signup
-           * @return 계정 생성 요청
-           */ -->
+      <!-- 회원가입 폼(2단계) -->
       <form class="signupForm" id="signupForm" method="post" th:action="@{/user/signup}" action="/user/signup" aria-hidden="true">
         <div class="signupSteps">
-          <!-- /** 1단계: 기수/ID/비밀번호 */
-               * @id   signupStep1
-               */ -->
+          <!-- 1단계 -->
           <div class="step step-1 show" id="signupStep1">
             <div class="formGroup">
               <select id="classSelect" name="cohortNo" aria-label="기수 선택" required></select>
@@ -87,19 +58,22 @@
 
             <div class="formGroup">
               <div class="inputWithBtn">
-                <input type="text" class="formInput" placeholder="ID" id="id" name="userName" autocomplete="username" required>
+                <!-- ■ ID: 공백/엔터 금지 + 영문/숫자 모두 포함(3~10자) -->
+                <input type="text" class="formInput" placeholder="ID" id="id" name="userName" autocomplete="username" required aria-describedby="idError">
                 <button type="button" class="checkBtn" id="idCheckBtn" th:data-url="@{/user/idCheck}" data-url="/user/idCheck">IDチェック</button>
               </div>
-              <!-- /** 중복확인 상태 저장용(hidden)
-                   * @field idChecked  : boolean 문자열('true'|'false')
-                   * @field checkedId  : 중복확인 시점의 아이디
-                   */ -->
+              <!-- 중복확인 상태 -->
               <input type="hidden" id="idChecked" name="idChecked" value="false">
               <input type="hidden" id="checkedId" name="checkedId" value="">
+              <!-- ■ ID 오류 메시지 표시 영역 -->
+              <p class="errorText" id="idError" role="alert" aria-live="polite"></p>
             </div>
 
             <div class="formGroup" id="signupPwGroup">
-              <input type="password" class="formInput" placeholder="パスワード" id="pw" name="signupPassword" autocomplete="new-password" required>
+              <!-- ■ PW: 공백/엔터 금지 + 8~20자, 영문/숫자/특수문자 각 1개 이상 -->
+              <input type="password" class="formInput" placeholder="パスワード" id="pw" name="signupPassword" autocomplete="new-password" required aria-describedby="pwError">
+              <!-- ■ PW 오류 메시지 표시 영역 -->
+              <p class="errorText" id="pwError" role="alert" aria-live="polite"></p>
             </div>
             <div class="formGroup" id="signupPwCheckGroup">
               <input type="password" class="formInput" placeholder="パスワードの再入力" id="pwcheck" name="passwordConfirm" autocomplete="new-password" required>
@@ -109,9 +83,7 @@
             </div>
           </div>
 
-          <!-- /** 2단계: 기본 정보 */
-               * @id   signupStep2
-               */ -->
+          <!-- 2단계 -->
           <div class="step step-2" id="signupStep2">
             <div class="formGroup">
               <input type="text" class="formInput" placeholder="名前" id="name" name="name" required>
@@ -147,9 +119,6 @@
     </section>
   </div>
 
-  <!-- /** 인터랙션 스크립트(필수)
-       * @desc   버튼 토글, 유효성검증, ID 중복확인 팝업
-       */ -->
   <script th:inline="javascript">
     document.addEventListener('DOMContentLoaded', function(){
       /** 요소 캐시 */
@@ -164,6 +133,13 @@
       const step2 = document.getElementById('signupStep2');
       const signupNextBtn = document.getElementById('signupNextBtn');
 
+      // ■ 에러 요소
+      const idInput = document.getElementById('id');
+      const pwInput = document.getElementById('pw');
+      const pwCheckInput = document.getElementById('pwcheck');
+      const idErrorEl = document.getElementById('idError');
+      const pwErrorEl = document.getElementById('pwError');
+
       /** 기수 옵션 1회 생성(1~47, 기본 47) */
       if (classSelect && classSelect.options.length === 0) {
         for (let i = 1; i <= 47; i++) {
@@ -175,16 +151,12 @@
         }
       }
 
-      /** flatpickr를 사용하여 생년월일 입력 필드를 초기화합니다.
-       * onReady 콜백을 사용하여 placeholder가 확실히 적용되도록 합니다. */
+      /** flatpickr 초기화 */
       flatpickr("#birth", {
-        dateFormat: "Y-m-d", // 날짜 형식: 2025-09-16
-        maxDate: "today",    // 선택 가능한 최대 날짜를 오늘로 설정
+        dateFormat: "Y-m-d",
+        maxDate: "today",
         locale: "ja",
-        onReady: function(selectedDates, dateStr, instance) {
-          // flatpickr가 초기화된 후 placeholder를 명시적으로 설정합니다.
-          instance.input.placeholder = "生年月日";
-        },
+        onReady: function(_, __, instance) { instance.input.placeholder = "生年月日"; },
       });
 
       /** 로그인 버튼 토글 */
@@ -238,22 +210,70 @@
         return null;
       }
 
-      /** 회원가입 1단계 유효성 + 중복확인 체크 */
+      /** ■ 입력 중 공백/엔터 제거: ID/PW/재입력 */
+      function stripWhitespaceOnInput(e){ 
+        const prev = e.target.value;
+        e.target.value = prev.replace(/\s+/g,''); 
+      }
+      function preventEnterKey(e){
+        if (e.key === 'Enter'){ e.preventDefault(); return false; }
+      }
+      idInput.addEventListener('input', stripWhitespaceOnInput);
+      pwInput.addEventListener('input', stripWhitespaceOnInput);
+      pwCheckInput.addEventListener('input', stripWhitespaceOnInput);
+      idInput.addEventListener('keydown', preventEnterKey);
+      pwInput.addEventListener('keydown', preventEnterKey);
+      pwCheckInput.addEventListener('keydown', preventEnterKey);
+
+      /** ■ 에러 표시 유틸 */
+      function setErrorText(el, msg){ if(el) el.textContent = msg || ''; }
+
+      /** ■ 회원가입 1단계 유효성(에러는 붉은 글씨로 필드 하단 표시)
+       *  - ID: 3~10자, 영문+숫자 모두 포함, 공백/엔터 금지
+       *  - PW: 8~20자, 영문/숫자/특수문자 각 1개 이상, 공백/엔터 금지
+       *  - PW = PW확인 일치
+       *  - ID 중복확인 완료(checked)
+       *  @returns {boolean} 통과 여부
+       */
       function validateSignupStep1(){
-        const userId   = document.getElementById('id').value.trim();
-        const pw       = document.getElementById('pw').value;
-        const pwcheck  = document.getElementById('pwcheck').value;
+        const userId   = idInput.value.trim();
+        const pw       = pwInput.value;
+        const pwcheck  = pwCheckInput.value;
+
         const idChecked = document.getElementById('idChecked').value === 'true';
         const checkedId = document.getElementById('checkedId').value;
 
-        if (!userId || !pw || !pwcheck) return 'IDとパスワードの両方を入力してください。';
-        if (pw.length < 6) return 'パスワードは6文字以上で入力してください。';
-        if (pw !== pwcheck) return 'パスワードが一致しません。';
-        if (!idChecked || checkedId !== userId) return 'IDの重複チェックを完了してください。';
-        return null;
+        // 정규식 정의
+        const idRegex = /^(?=.*[A-Za-z])[A-Za-z\d]{3,10}$/;
+        const pwRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~])(?!.*\s).{8,20}$/;
+        // 초기화
+        setErrorText(idErrorEl, '');
+        setErrorText(pwErrorEl, '');
+
+        let isValid = true;
+
+        // ID 검증
+        if (!idRegex.test(userId)){
+          setErrorText(idErrorEl, 'IDは3〜10文字、英字のみ、または英字+数字で入力してください（数字のみ不可・空白不可）。');
+          isValid = false;
+        } else if (!idChecked || checkedId !== userId){
+          setErrorText(idErrorEl, 'IDの重複チェックを完了してください。');
+          isValid = false;
+        }
+
+        // PW 검증
+        if (!pwRegex.test(pw)){
+          setErrorText(pwErrorEl, 'パスワードは8〜20文字、英字・数字・記号を各1つ以上含め、空白を含めないでください。');
+          isValid = false;
+        } else if (pw !== pwcheck){
+          setErrorText(pwErrorEl, 'パスワードが一致しません。');
+          isValid = false;
+        }
+
+        return isValid;
       }
 
-      /** 회원가입 2단계 유효성 */
+      /** 회원가입 2단계 유효성 (기존 로직 유지) */
       function validateSignupFinal(){
         const name   = document.getElementById('name').value.trim();
         const gender = (document.querySelector('input[name="gender"]:checked') || {}).value || '';
@@ -269,8 +289,8 @@
 
       /** 1단계 → 2단계 전환 */
       signupNextBtn?.addEventListener('click', function(){
-        const err = validateSignupStep1();
-        if (err) { alert(err); return; }
+        const ok = validateSignupStep1();
+        if (!ok) return;                 // ■ 조건 미충족 시 진행 중단(경고창 대신 붉은 글씨 노출)
         step1.classList.remove('show');
         step2.classList.add('show');
       });
@@ -283,10 +303,10 @@
 
       /** 회원가입 제출 */
       signupForm.addEventListener('submit', function(e) {
-        const step1Err = validateSignupStep1();
-        if (step1Err) {
+        // 1단계 조건 재검증(직접 2단계로 와서 제출하는 경우 대비)
+        const ok = validateSignupStep1();
+        if (!ok) {
           e.preventDefault();
-          alert(step1Err);
           step2.classList.remove('show');
           step1.classList.add('show');
           return;
@@ -295,34 +315,44 @@
         if (finalErr) { e.preventDefault(); alert(finalErr); }
       });
 
-      /** ID 중복확인 팝업 */
+      /** ID 중복확인 버튼: 형식 먼저 통과해야 팝업 오픈 */
       document.querySelector('#idCheckBtn')?.addEventListener('click', function(){
         const baseUrl = this.dataset.url || '/user/idCheck';
-        const userId  = document.getElementById('id').value.trim();
-        if (userId.length < 3 || userId.length > 11) {
-          alert('IDは3〜10文字で入力してください。');
-          document.getElementById('id').focus();
+        const userId  = idInput.value.trim();
+
+        // 형식 사전 검증
+        const idRegex = /^(?=.*[A-Za-z])[A-Za-z\d]{3,10}$/;
+        setErrorText(idErrorEl, '');
+        if (!idRegex.test(userId)){
+          setErrorText(idErrorEl, 'IDは3〜10文字、英字のみ、または英字+数字で入力してください（数字のみ不ㅛ可・空白不可）。');
+          idInput.focus();
           return;
         }
+
         const url = `${baseUrl}?searchId=${encodeURIComponent(userId)}`;
         window.open(url, 'idwin', 'top=200,left=600,width=300,height=300');
       });
 
       /** ID 입력 변경 시 중복확인 상태 무효화 */
-      document.getElementById('id')?.addEventListener('input', function(){
+      idInput?.addEventListener('input', function(){
         document.getElementById('idChecked').value = 'false';
         document.getElementById('checkedId').value = '';
+        // 사용자가 다시 입력하는 동안, 기존 에러 숨김
+        setErrorText(idErrorEl, '');
       });
 
-      /* 로그인 실패 메시지 처리 */
+      /** PW/PW확인 입력 중 에러 숨김 */
+      pwInput?.addEventListener('input', function(){ setErrorText(pwErrorEl, ''); });
+      pwCheckInput?.addEventListener('input', function(){ setErrorText(pwErrorEl, ''); });
+
+      /* 로그인 실패 메시지 처리(기존 유지) */
       const errorMessage = /*[[${errorMessage}]]*/ null;
       if (errorMessage) {
-          alert(errorMessage);
-          // URL에서 에러 파라미터를 제거하여 새로고침 시 alert가 다시 뜨지 않도록 함
-          if (window.history.replaceState) {
-              const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
-              window.history.replaceState({ path: cleanUrl }, '', cleanUrl);
-          }
+        alert(errorMessage);
+        if (window.history.replaceState) {
+          const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+          window.history.replaceState({ path: cleanUrl }, '', cleanUrl);
+        }
       }
     });
   </script>
