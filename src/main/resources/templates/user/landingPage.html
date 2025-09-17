@@ -14,7 +14,7 @@
 <body>
   <div class="mainContainer">
     <section class="leftSection" aria-label="브랜딩">
-      <h1 class="logo">SCIT Hub</h1>
+      <h1 class="logo brandFont">SCIT Hub</h1>
       <p class="description">
         SCIT 専用のスケジュール・情報・コミュニティプラットフォーム
         <br/>SCIT学習と交流のための統合ハブです。
@@ -324,7 +324,7 @@
         const idRegex = /^(?=.*[A-Za-z])[A-Za-z\d]{3,10}$/;
         setErrorText(idErrorEl, '');
         if (!idRegex.test(userId)){
-          setErrorText(idErrorEl, 'IDは3〜10文字、英字のみ、または英字+数字で入力してください（数字のみ不可・空白不可）。');
+          setErrorText(idErrorEl, 'IDは3〜10文字、英字のみ、または英字+数字で入力してください（数字のみ不ㅛ可・空白不可）。');
           idInput.focus();
           return;
         }
