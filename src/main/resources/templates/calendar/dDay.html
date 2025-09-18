@@ -425,19 +425,19 @@
                 <h3 id="modalTitle">D-day登録</h3>
                 <form id="ddayForm">
                     <div class="form-group">
-                        <label for="ddayTitle">題目</label>
+                        <label for="ddayTitle">タイトル</label>
                         <input type="text" id="ddayTitle" name="title" placeholder="例:プロジェクト発表" required>
                     </div>
                     
                     <div class="form-group">
-                        <label for="ddayDate">目標日付</label>
+                        <label for="ddayDate">目標日</label>
                         <input type="date" id="ddayDate" name="date" required>
                     </div>
                     
                     <div class="modal-buttons">
                         <button type="button" class="btn btn-secondary" id="cancelBtn">キャンセル</button>
                         <button type="button" class="btn btn-danger" id="deleteBtn" style="display: none;">削除</button>
-                        <button type="submit" class="btn btn-primary">貯蔵</button>
+                        <button type="submit" class="btn btn-primary">登録</button>
                     </div>
                 </form>
                 </div>
@@ -585,7 +585,7 @@
                         try { 
                             const response = await fetch('/scitHub/api/ddays') // 명시하지 않으면 기본 GET 요청
                             if (!response.ok) {
-                                throw new Error('D-Day リストの読み込みに失敗しました.');
+                                throw new Error('D-Dayリストの読み込みに失敗しました.');
                             }
 
                             // JSON 문자열을 JavaScript가 사용할 수 있는 데이터 구조로 파싱
@@ -623,7 +623,7 @@
                         }
                         // 제목 값이 비어있다면 전송을 막음.
                         if(!ddayTitle) {
-                            alert('題目を必ず入力してください.');
+                            alert('タイトルを必ず入力してください.');
                             return;
                         }
 
@@ -655,12 +655,12 @@
 
                             if (!response.ok) {
                                 // 서버에서 에러 응답(4xx, 5xx)이 오면 예외를 발생
-                                throw new Error(`D-day ${method === 'POST' ? '登録' : '修整'}に失敗しました.`);
+                                throw new Error(`D-day${method === 'POST' ? '登録' : '修整'}に失敗しました.`);
                             }
 
                             const result = await response.json();   // 성공 응답을 JSON으로 변환
                             console.log(`서버 응답 (${method}):`, result);
-                            alert(`D-dayが成功的に ${method === 'POST' ? '登録' : '修整'} できました.`);
+                            alert(`D-dayが成功的に${method === 'POST'?'登録':'修整'}できました.`);
 
                             closeModal();               // 모달 닫기
                             fetchAndRenderDdays();      // 목록 새로고침
