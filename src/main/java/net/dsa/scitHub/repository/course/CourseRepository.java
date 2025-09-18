@@ -43,10 +43,8 @@ public interface CourseRepository extends JpaRepository<Course, Integer> {
     List<Course> findCoursesWithReviews();
     
     /** 평균 평점과 함께 강의 조회 */
-    @Query("SELECT c, AVG(cr.scorePreparedness + cr.scoreProfesion + cr.scoreCommunication + " +
-           "cr.scoreEngagement + cr.scoreFairness) / 5 FROM Course c LEFT JOIN c.reviews cr " +
-           "GROUP BY c ORDER BY AVG(cr.scorePreparedness + cr.scoreProfesion + cr.scoreCommunication + " +
-           "cr.scoreEngagement + cr.scoreFairness) / 5 DESC")
+    @Query("SELECT c, AVG(cr.rating) FROM Course c LEFT JOIN c.reviews cr " +
+           "GROUP BY c ORDER BY AVG(cr.rating) DESC")
     List<Object[]> findCoursesWithAverageScore();
     
     /** 특정 기수의 강의 유형별 개수 */
