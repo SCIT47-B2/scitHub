@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import net.dsa.scitHub.dto.CommentDTO;
 import net.dsa.scitHub.dto.CourseDTO;
+import net.dsa.scitHub.dto.CourseReviewDTO;
 import net.dsa.scitHub.dto.MenuItem;
 import net.dsa.scitHub.dto.PostDTO;
 import net.dsa.scitHub.entity.course.Course;
@@ -328,6 +330,48 @@ public class CommunityController {
         model.addAttribute("courseList", courseList);
 
         return "community/courseList";
+    }
+
+    /**
+     * 강의 리뷰 페이지
+     * @param courseId
+     * @param model
+     * @return courseReview.html
+     */
+    @GetMapping("courseReview")
+    public String courseReview(
+        @RequestParam(name="id", required=true) Integer courseId,
+        Model model
+    ) {
+        CourseDTO course = ccs.selectById(courseId);
+        List<CourseReviewDTO> reviews = crs.selectByCourseId(courseId);
+
+        model.addAttribute("course", course);
+        model.addAttribute("reviews", reviews);
+
+        return "community/courseReview";
+    }
+
+    /**
+     * 강의 리뷰 작성 처리(비동기)
+     * @param courseId
+     * @return
+     */
+    @PostMapping("/courseReview/{courseId}")
+    public ResponseEntity<String> createReview(@PathVariable("courseId") Integer courseId,
+                                               @ModelAttribute CourseReviewDTO reviewDTO,
+                                               @AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("ログインが必要です.");
+        }
+        try {
+            crs.createReview(courseId, userDetails.getUsername(), reviewDTO);
+            return ResponseEntity.ok("レビューが正常に登録されました.");
+        } catch (Exception e) {
+            log.error("강의 리뷰 등록 실패", e); 
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("レビューの登録中にエラーが発生しました.");
+        }
+
     }
 
 }

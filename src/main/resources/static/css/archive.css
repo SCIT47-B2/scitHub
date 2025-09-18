@@ -169,7 +169,7 @@ tbody tr:hover {
     margin-bottom: 20px; /* 회사 헤더와의 간격 */
 }
 
-.company-header {
+.header {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -181,7 +181,7 @@ tbody tr:hover {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.company-info-box {
+.info-box {
     display: flex;
     align-items: center;
 }
@@ -199,13 +199,13 @@ tbody tr:hover {
     flex-direction: column;
 }
 
-.company-name-rating {
+.name-rating {
     display: flex;
     align-items: center;
     margin-bottom: 5px;
 }
 
-.company-name-rating h2 {
+.name-rating h2 {
     margin: 0;
     font-size: 1.5rem;
     margin-right: 10px;
@@ -236,7 +236,7 @@ tbody tr:hover {
 }
 
 /* Company Meta Info (산업, 유형, 위치) */
-.company-meta-info span {
+.meta-info span {
     background-color: #B2C1E1;
     padding: 3px 8px;
     border-radius: 15px;

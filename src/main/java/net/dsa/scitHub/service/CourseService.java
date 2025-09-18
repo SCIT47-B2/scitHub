@@ -44,4 +44,18 @@ public class CourseService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * ID로 강의 조회
+     * @param courseId
+     * @return
+     */
+    public CourseDTO selectById(Integer courseId) {
+        Course course = cr.findById(courseId).orElse(null);
+        if (course != null) {
+            return CourseDTO.convertToCourseDTO(course);
+        } else {
+            return null;
+        }
+    }
+
 }

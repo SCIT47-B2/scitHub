@@ -37,37 +37,37 @@ public class CourseReview {
     @JoinColumn(name = "user_id")
     private User user;
     
-    /** 강사 준비성 점수 */
-    @Column(name = "score_preparedness", nullable = false)
-    private Integer scorePreparedness;
+    // /** 강사 준비성 점수 */
+    // @Column(name = "score_preparedness", nullable = false)
+    // private Integer scorePreparedness;
     
-    /** 강사 전문성 점수 */
-    @Column(name = "score_profesion", nullable = false)
-    private Integer scoreProfesion;
+    // /** 강사 전문성 점수 */
+    // @Column(name = "score_profesion", nullable = false)
+    // private Integer scoreProfesion;
     
-    /** 강사 소통 능력 점수 */
-    @Column(name = "score_communication", nullable = false)
-    private Integer scoreCommunication;
+    // /** 강사 소통 능력 점수 */
+    // @Column(name = "score_communication", nullable = false)
+    // private Integer scoreCommunication;
     
-    /** 강사 참여 유도 점수 */
-    @Column(name = "score_engagement", nullable = false)
-    private Integer scoreEngagement;
+    // /** 강사 참여 유도 점수 */
+    // @Column(name = "score_engagement", nullable = false)
+    // private Integer scoreEngagement;
     
-    /** 강사 공정성 점수 */
-    @Column(name = "score_fairness", nullable = false)
-    private Integer scoreFairness;
+    // /** 강사 공정성 점수 */
+    // @Column(name = "score_fairness", nullable = false)
+    // private Integer scoreFairness;
     
-    /** 강의 난이도 */
-    @Column(name = "course_difficulty", nullable = false)
-    private Integer courseDifficulty;
+    // /** 강의 난이도 */
+    // @Column(name = "course_difficulty", nullable = false)
+    // private Integer courseDifficulty;
     
-    /** 강의 과제량 */
-    @Column(name = "course_assignment", nullable = false)
-    private Integer courseAssignment;
+    // /** 강의 과제량 */
+    // @Column(name = "course_assignment", nullable = false)
+    // private Integer courseAssignment;
     
-    /** 강의 연결성 */
-    @Column(name = "course_connectivity", nullable = false)
-    private Integer courseConnectivity;
+    // /** 강의 연결성 */
+    // @Column(name = "course_connectivity", nullable = false)
+    // private Integer courseConnectivity;
     
     /** 리뷰 텍스트 내용 */
     @Column(name = "comment_text", columnDefinition = "MEDIUMTEXT")
