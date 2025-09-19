@@ -1,0 +1,258 @@
+/* ================================== */
+/*   게시판 페이지 최종 스타일 (board.html)   */
+/* ================================== */
+
+/* -- 기본 변수 (없을 경우를 대비한 기본값 포함) -- */
+:root {
+    --bg: #ffffff;
+    --primary: #4a67d5;
+    --shadow: 0 1px 3px rgba(0,0,0,0.1);
+    --radius: 12px;
+    --ink: #212529;
+    --muted: #6c757d;
+    --panel: #f8f9fa;
+}
+
+
+/* 1. 검색 영역 */
+.search-bar {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    background-color: var(--bg);
+    padding: 12px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+.search-bar select,
+.search-bar input {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 14px;
+    height: 40px;
+    box-sizing: border-box;
+}
+
+.search-bar select {
+    flex-shrink: 0;
+}
+
+.search-bar input#search-keyword {
+    flex-grow: 1;
+    width: 100%;
+}
+
+.search-bar button#search-btn {
+    border: none;
+    background-color: var(--primary);
+    color: white;
+    font-size: 16px;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    flex-shrink: 0;
+}
+
+.search-bar button#search-btn:hover {
+    background-color: #3b50b0;
+}
+
+
+/* 2. 게시판 테이블 섹션 */
+.board-section {
+    background-color: var(--bg);
+    padding: 24px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.section-header h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+/* '글쓰기' 버튼 스타일 */
+.writeBtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 40px;
+    padding: 0 16px;
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.writeBtn:hover {
+    background-color: #3b50b0;
+}
+
+/* 3. 게시글 테이블 */
+
+/* [추가] 테이블을 감싸는 컨테이너 스타일 */
+.table-responsive {
+    width: 100%;
+    overflow-x: auto; /* 내용이 넘칠 경우 가로 스크롤 생성 */
+    -webkit-overflow-scrolling: touch; /* 모바일에서 부드러운 스크롤 */
+}
+
+/* [수정] post-table에 min-width 설정 */
+.post-table {
+    width: 100%;
+    min-width: 800px; /* 테이블의 최소 너비 지정 (이 값 이하로 줄어들지 않음) */
+    border-collapse: collapse;
+    font-size: 14px;
+    table-layout: fixed;
+}
+
+/* 모든 th와 td의 기본 스타일 */
+.post-table th,
+.post-table td {
+    padding: 8px 6px;
+    border-bottom: 1px solid #e5e7eb;
+    vertical-align: middle;
+}
+
+/* thead의 th는 모두 가운데 정렬을 유지 */
+.post-table thead th {
+    text-align: center;
+    background-color: var(--panel);
+    color: #495057;
+    font-weight: 600;
+    border-bottom-width: 2px;
+}
+
+/* [수정] 제목에 해당하는 th와 td의 너비를 60%로 지정 */
+.post-table th.post-title,
+.post-table td.post-title {
+    width: 50%;
+    min-width: 200px;
+}
+
+.post-table th.post-writer,
+.post-table td.post-writer {
+    width: 15%;
+    min-width: 90px;
+}
+
+.post-table th.post-createdAt,
+.post-table td.post-createdAt {
+    width: 9%;
+    min-width: 85px;
+}
+
+.post-table .post-viewCount,
+.post-table .post-likeCount,
+.post-table .post-commentCount {
+    text-align: center;
+    min-width: 50px;
+}
+
+.postLink {
+    cursor: pointer;
+}
+
+/* [수정] 제목 셀(td)만 왼쪽 정렬 */
+.post-table tbody td.post-title {
+    text-align: left;
+    padding-left: 14px; /* 왼쪽 여백 */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.post-table td a {
+    color: var(--ink);
+    text-decoration: none;
+}
+
+.post-table td a:hover {
+    text-decoration: underline;
+}
+
+.post-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.post-table tbody tr:hover {
+    background-color: var(--panel);
+}
+
+/* "게시물이 없습니다" 메시지 스타일 */
+.post-table .no-posts-message td {
+    padding: 80px 0;
+    text-align: center;
+    color: var(--muted);
+    font-size: 16px;
+    font-weight: 500;
+}
+
+/* 메시지 행에는 호버 효과 제거 */
+.post-table tbody tr.no-posts-message:hover {
+    background-color: var(--bg);
+}
+
+
+/* 4. 페이지네이션 */
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 16px;
+    margin-top: 16px;
+    gap: 16px;
+}
+
+.leftPagination,
+.pagination,
+.rightPagination {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    gap: 8px;
+}
+
+.pagination-container a,
+.pagination-container b {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 36px;
+    height: 36px;
+    text-decoration: none;
+    color: var(--muted);
+    font-weight: 700;
+    border-radius: 8px;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.pagination-container a:hover {
+    background-color: #e9ecef;
+    color: var(--ink);
+}
+
+.pagination-container b.active {
+    background-color: var(--primary);
+    color: white;
+}

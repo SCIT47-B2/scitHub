@@ -1,193 +1,247 @@
-// 댓글 저장
-function inputButtonClick() {
-    // 작성자명 불러오기 : 현재 로그인 중인 유저의 이름을 불러와야 함
-    let postId   = $('#postId').val();
-    let userName = $('#currentUser').val();
-    let content  = $('#commentBox').val().trim();
-    
-    if (content == '') {
-        alert('댓글 내용을 입력하세요.');
-        return;
-    }
-    
-    $.ajax({
-        url: 'writeComment',
-        type: 'post',
-        data: {
-            postId: postId,
-            userName: userName,
-            content: content},
-        success: function() {
-            $('#comment').val('');
-            // 댓글 목록 재로딩
-            commentList();
-        },
-        error: function() {
-            alert('댓글을 저장하지 못했습니다.');
-        }
-    });
-}
+/**
+ *  댓글 목록 가져오기(ajax)
+ */
+function loadComments() {
+    let data = {
+        postId: $('#postId').val()
+    };
 
-// 댓글 목록 불러오기
-function commentList() {
-    let data = { postId: $('#postId').val() };
     $.ajax({
-        url: 'commentList',
+        url: 'commentList', // 기존에 사용하시던 URL
         type: 'get',
         data: data,
         dataType: 'json',
-        success: function(commentList) {
-            let str = ``;
-            let commentCount = 0;
-            
-            if (!commentList || commentList.length == 0) {
+        success: function(commentList) { // success 콜백의 파라미터 이름을 commentList로 사용
+            const commentListContainer = $('.comment-list');
+            commentListContainer.empty();
 
-            } else {
-                $(commentList).each(function(i, ob) {
-                    str += `
-                        <tr>
-                            <td>${ob.username}</td>
-                            <td class="commentContent" id="content${ob.commentId}">${ob.content}</td>
-                            `;
-                    if(ob.canEdit) {
-                        str += `
-                            <td>
-                                <button class="deleteButton"
-                                        data-commentid="${ob.commentId}">삭제</button>
-                            </td>
-                            <td>
-                                <button class="updateButton"
-                                        data-commentid="${ob.commentId}"
-                                        data-content="${ob.content}">수정</button>
-                            </td>
-                        </tr>
-                    `;
-                    }
-                    commentCount++;
-                });
+            if (!commentList || commentList.length === 0) {
+                commentListContainer.html('<div class="no-comments">아직 댓글이 없습니다.</div>');
+                return;
             }
-            
-            $('#commentTbody').html(str);
-            $('.commentCountDisplay').text(`💬 ${commentCount}`);
-            
-            //이벤트 등록
+
+            // $(commentList).each를 사용하여 기존 코드 형식 유지
+            $(commentList).each(function(index, comment) {
+                const commentHtml = createCommentHTML(comment);
+                commentListContainer.append(commentHtml);
+            });
         },
         error: function() {
-            alert('댓글 목록 조회 실패');
+            alert('댓글을 불러오는 데 실패했습니다.');
         }
     });
 }
 
-// 삭제
-function deleteFunc() {
-    let result = confirm("정말로 이 댓글을 삭제하시겠습니까?");
+/**
+ * 댓글 데이터 객체(CommentDTO)를 받아 HTML 문자열을 생성하는 헬퍼 함수
+ * @param {object} comment - 서버에서 받은 CommentDTO 객체
+ */
+function createCommentHTML(comment) {
+    // DTO의 createdAt 필드를 사용합니다.
+    const formattedDate = formatDate(comment.createdAt);
+
+    // DTO의 canEdit 필드를 사용하여 수정/삭제 버튼 표시를 결정합니다.
+    const actionButtons = comment.canEdit ? `
+        <div class="comment-actions">
+            <button class="comment-action-btn edit-btn" data-comment-id="${comment.commentId}"><i class="fa-solid fa-pen-to-square"></i></button>
+            <button class="comment-action-btn delete-btn" data-comment-id="${comment.commentId}"><i class="fa-solid fa-trash"></i></button>
+        </div>
+    ` : '';
+
+    const avatarUrl = comment.avatarUrl ? `/scitHub/images/avatar/${comment.avatarUrl}` : "/images/chiikawaPuzzle.png";
+    // DTO의 필드명을 사용하여 HTML을 구성합니다.
+    return `
+        <div class="comment" data-comment-id="${comment.commentId}">
+            <img src="${avatarUrl}" alt="프로필 사진" class="profile-pic-small">
+            <div class="comment-content">
+                <div class="comment-header">
+                    <span class="comment-author">${comment.username}</span>
+                    <span class="comment-date">${formattedDate}</span>
+                </div>
+                <p class="comment-text">${comment.content.replace(/\n/g, '<br>')}</p>
+            </div>
+            ${actionButtons}
+        </div>
+    `;
+}
+
+/**
+ * 날짜/시간 데이터를 'yyyy.MM.dd HH:mm' 형식의 문자열로 변환하는 헬퍼 함수
+ * @param {string | Date} dateString
+ */
+function formatDate(dateString) {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${year}年 ${month}月 ${day}日 ${hours}:${minutes}`;
+}
+
+
+// --- 이벤트 핸들러 (기존 형식 반영) ---
+
+/**
+ * 새 댓글 작성 버튼 클릭 시 호출되는 함수
+ */
+function inputButtonClick() {
+    const postId = $('#postId').val();
+    const content = $('#commentBox').val().trim(); // 새 댓글 입력창 ID를 'commentBox'으로 가정
+
+    if (content === '') {
+        alert('댓글 내용을 입력하세요.');
+        return;
+    }
+
+    $.ajax({
+        url: 'writeComment', // 기존에 사용하시던 URL
+        type: 'post',
+        data: {
+            postId: postId,
+            content: content
+        },
+        success: function() {
+            $('#commentBox').val(''); // 입력창 비우기
+            loadComments(); // 댓글 목록 새로고침
+        },
+        error: function() {
+            alert('댓글 작성에 실패했습니다.');
+        }
+    });
+}
+
+// 새 댓글 작성 버튼에 클릭 이벤트 연결
+// HTML에 <button onclick="inputButtonClick()">댓글 남기기</button> 와 같이 연결하거나 아래 코드를 사용
+$('#submit-comment-btn').on('click', inputButtonClick); // 버튼 ID를 'submit-comment-btn'으로 가정
+
+/**
+ * 동적으로 생성된 댓글의 삭제 버튼 클릭 처리 (이벤트 위임)
+ */
+$('.comment-list').on('click', '.delete-btn', function() {
+    const commentId = $(this).data('comment-id');
     
-    if (result) {
-        // 정말 이상하게도 id -> Id로 표기 시 에러 남
-        let commentId = $(this).data('commentid');
+    if (confirm('정말로 이 댓글을 삭제하시겠습니까?')) {
         $.ajax({
-            url: `deleteComment/${commentId}`,
-            type: 'delete',	 //HTTP 메서드 방식(삭제)
+            url: `deleteComment/${commentId}`, // 삭제 처리를 위한 URL
+            type: 'delete',
             success: function() {
-                commentList();
+                alert('댓글이 삭제되었습니다.');
+                // 특정 댓글 엘리먼트만 삭제하여 성능 향상
+                $(`.comment[data-comment-id=${commentId}]`).remove();
+                // 또는 전체 목록 새로고침
+                // loadComments();
             },
             error: function() {
-                alert('삭제 실패');
+                alert('댓글 삭제에 실패했습니다.');
             }
         });
     }
-}
+});
 
-// 수정
-function inputConfirmFunc(updateCommentButtonId, commentBoxId) {
-    return new Promise((resolve) => {
-        const updateButton = document.getElementById(updateCommentButtonId);
-        
-        // 취소 버튼 생성
-        const cancelButton = document.createElement('button');
-        cancelButton.textContent = '취소';
-        cancelButton.type = 'button';
-        updateButton.parentNode.appendChild(cancelButton);
-        
-        function handleUpdate() {
-            const updateText = document.getElementById(commentBoxId).value;
-            cleanup();
-            resolve({ action: 'update', text: updateText });
-        }
-        
-        function handleCancel() {
-            cleanup();
-            resolve({ action: 'cancel', text: null });
-        }
-        
-        function cleanup() {
-            updateButton.removeEventListener('click', handleUpdate);
-            cancelButton.removeEventListener('click', handleCancel);
-            cancelButton.remove();
-        }
-        
-        updateButton.addEventListener('click', handleUpdate);
-        cancelButton.addEventListener('click', handleCancel);
-    });
-}
+/**
+ * 동적으로 생성된 댓글의 수정 버튼 클릭 처리
+ */
+$('.comment-list').on('click', '.edit-btn', function() {
+    // 이미 다른 댓글이 수정 모드일 경우, 원래 상태로 되돌립니다.
+    if ($('.comment-edit-mode').length > 0) {
+        const editingCommentId = $('.comment-edit-mode').data('comment-id');
+        cancelEdit(editingCommentId);
+    }
 
-async function updateFunc() {
-    const commentId = $(this).data('commentid');
-    const commentData = $(this).data('content');
+    const commentId = $(this).data('comment-id');
+    const commentDiv = $(`.comment[data-comment-id=${commentId}]`);
+    const commentTextP = commentDiv.find('.comment-text');
     
-    const commentAreaId = '#content' + commentId;
-    const originalContent = $(commentAreaId).html(); // 원래 내용 저장
-    
-    const commentBoxId = 'commentBox' + commentId;
-    const updateCommentButtonId = 'updateComment' + commentId + 'Button';
-    
-    // input 폼으로 변경
-    const commentAreaStr = `
-        <input id="${commentBoxId}" value="${commentData}">
-        <button type="button" id="${updateCommentButtonId}">수정완료</button>
+    // <br> 태그를 다시 줄바꿈(\n) 문자로 변환합니다.
+    const originalContent = commentTextP.html().replace(/<br\s*\/?>/gi, '\n');
+
+    // 수정용 textarea와 버튼들을 포함하는 HTML 생성
+    const editFormHtml = `
+        <div class="comment-edit-form">
+            <textarea class="comment-edit-textarea">${originalContent}</textarea>
+            <div class="comment-edit-actions">
+                <button class="edit-action-btn cancel-edit-btn" data-comment-id="${commentId}" title="취소">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+                <button class="edit-action-btn save-edit-btn" data-comment-id="${commentId}" title="수정 완료">
+                    <i class="fa-solid fa-check"></i>
+                </button>
+            </div>
+        </div>
     `;
-    $(commentAreaId).html(commentAreaStr);
-    
-    try {
-        const result = await inputConfirmFunc(updateCommentButtonId, commentBoxId);
-        
-        if (result.action === 'cancel') {
-            // 취소 시 원래 내용으로 복원
-            $(commentAreaId).html(originalContent);
-            return;
-        }
-        
-        // 수정 진행
-        if (result.text && result.text.trim() !== '') {
-            const updateData = {
-                commentId: commentId,
-                content: result.text
-            };
-            console.log(updateData);
-            
-            // 성공 시 새로운 내용으로 표시
-            $(commentAreaId).html(result.text);
 
-            // Ajax 요청
-            $.ajax({
-                url: 'updateComment',
-                type: 'patch',
-                data: JSON.stringify(updateData),
-                contentType: 'application/json',
-                success: function() {
-                    commentList(); // 댓글 목록 새로고침
-                },
-                error: function() {
-                    alert('수정 실패');
-                    // 실패 시 원래 내용으로 복원
-                    $(commentAreaId).html(originalContent);
-                }
-            });
-        } else {
-            alert('수정할 내용을 입력해주세요!');
-            $(commentAreaId).html(originalContent);
+    // 기존 댓글 내용을 숨기고 수정 폼을 보여줍니다.
+    commentTextP.hide();
+    commentDiv.find('.comment-content').append(editFormHtml);
+
+    // 수정 모드임을 표시하기 위해 클래스 추가
+    commentDiv.addClass('comment-edit-mode');
+});
+
+/**
+ * '수정 완료' 버튼 클릭 처리 (이벤트 위임)
+ */
+$('.comment-list').on('click', '.save-edit-btn', function() {
+    const commentId = $(this).data('comment-id');
+    const commentDiv = $(`.comment[data-comment-id=${commentId}]`);
+    const newContent = commentDiv.find('.comment-edit-textarea').val().trim();
+
+    if (newContent === '') {
+        alert('수정할 내용을 입력하세요.');
+        return;
+    }
+
+    $.ajax({
+        url: 'updateComment', // 수정 처리를 위한 URL
+        type: 'patch',
+        contentType: 'application/json',
+        data: JSON.stringify({
+            commentId: commentId,
+            content: newContent
+        }),
+        success: function() {
+            // 수정된 내용을 p 태그에 반영하고 수정 폼을 제거합니다.
+            const commentTextP = commentDiv.find('.comment-text');
+            commentTextP.html(newContent.replace(/\n/g, '<br>')).show();
+            commentDiv.find('.comment-edit-form').remove();
+            commentDiv.removeClass('comment-edit-mode');
+            alert('댓글이 수정되었습니다.');
+        },
+        error: function() {
+            alert('댓글 수정에 실패했습니다.');
+            // 실패 시 원래 상태로 복구
+            cancelEdit(commentId);
         }
-    } catch (error) {
-        $(commentAreaId).html(originalContent);
+    });
+});
+
+/**
+ * '취소' 버튼 클릭 처리 (이벤트 위임) 및 취소 로직 함수화
+ */
+$('.comment-list').on('click', '.cancel-edit-btn', function() {
+    const commentId = $(this).data('comment-id');
+    cancelEdit(commentId);
+});
+
+/**
+ * 댓글 수정을 취소하고 원래 상태로 되돌리는 함수
+ * @param {number} commentId
+ */
+function cancelEdit(commentId) {
+    const commentDiv = $(`.comment[data-comment-id=${commentId}]`);
+    if (commentDiv.length > 0) {
+        commentDiv.find('.comment-text').show();
+        commentDiv.find('.comment-edit-form').remove();
+        commentDiv.removeClass('comment-edit-mode');
     }
 }
+
+/**
+ * 동적으로 생성된 textarea의 높이를 내용에 맞게 자동 조절 (이벤트 위임)
+ */
+$('.comment-list').on('input', '.comment-edit-textarea', function() {
+    $(this).css('height', 'auto'); // 높이를 초기화
+    $(this).css('height', this.scrollHeight + 'px'); // 스크롤 높이에 맞춰 높이 설정
+});

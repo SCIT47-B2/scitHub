@@ -24,10 +24,12 @@ public class PostDTO {
     private Integer userId;
     private String username;    // 로그인 시 입력하는 아이디
     private String userNameKor;
+    private String avatarUrl;   // 프로필 사진 url
     private String title;
     private String content;
     private Integer viewCount;
     private int likeCount;
+    private int commentCount;
     private Boolean isLiked;          // 현재 로그인 유저가 좋아요를 눌렀는지 전달하는 용도
     private Boolean isBookmarked;     // 현재 로그인 유저가 게시글을 북마크했는지 전달하는 용도
     private Boolean isComment;         // 문의글 답변 완료 여부

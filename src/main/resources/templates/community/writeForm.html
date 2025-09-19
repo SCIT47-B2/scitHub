@@ -14,28 +14,6 @@
     </head>
     <body>
         <section class="mainField" aria-label="메인 영역" layout:fragment="content">
-            <div class="searchSection">
-                <div class="categorySection">
-                    <select name="category" id="categoryDropdown">
-                        <option value="all" selected>전체</option>
-                        <option value="즐겨찾는 게시판">즐겨찾는 게시판</option>
-                        <option value="자유게시판">자유게시판</option>
-                        <option value="IT">IT</option>
-                        <option value="일본어">일본어</option>
-                        <option value="일본 생활&문화">일본 생활&문화</option>
-                        <option value="취업&꿀팁">취업&꿀팁</option>
-                        <option value="취미&여행&맛집">취미&여행&맛집</option>
-                        <option value="자격증">자격증</option>
-                        <option value="졸업생">졸업생</option>
-                    </select>
-                </div>
-
-                <div class="searchBar">
-                    <input type="text" placeholder="검색">
-                </div>
-
-                <button class="writeBtn" type="button" id="submitPostBtn">등록하기 ✏️</button>
-            </div>
             <div class="decoration">
                 <div class="formField">
                     <form th:action="@{write}" method="post" id="postForm">

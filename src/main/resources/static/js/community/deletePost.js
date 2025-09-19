@@ -1,5 +1,5 @@
-// 게시글 비동기 제출
-function updatePost() {
+// 비동기 요청으로 게시글 삭제 요청
+function deletePost() {
 
     // 게시글 식별자 저장
     const postId = $('#postId').val();

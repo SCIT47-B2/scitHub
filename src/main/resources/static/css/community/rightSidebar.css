@@ -1,0 +1,64 @@
+/* 우측 사이드바 */
+.rightSidebar {
+    background: #1a1a1a;
+    color: white;
+    border-radius: 12px;
+    margin-top: 50px;
+    padding: 7px 10px;
+    height: fit-content;
+    min-width: 0;
+    width: 100%;
+    border: 1px solid #333;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.sidebarHeader {
+    color: white;
+    font-weight: 600;
+    font-size: 14px;
+    text-align: center;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #333;
+}
+
+.categoryMenuList {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.categoryMenuItem {
+    color: #ccc;
+    padding: 6px 10px; /* 패딩을 조금 줄여서 컴팩트하게 */
+    border-radius: 6px;
+    transition: all 0.2s;
+    cursor: pointer;
+    font-size: 13px; /* 폰트 크기를 약간 줄임 */
+    text-decoration: none;
+    display: block;
+    border: 1px solid transparent;
+}
+
+.categoryMenuItem:hover {
+    background-color: #333;
+    color: white;
+    text-decoration: none;
+    border-color: #444;
+}
+
+.categoryMenuItem:active,
+.categoryMenuItem.active {
+    background-color: white;
+    color: black;
+    border-color: white;
+}
+
+/* 반응형에서 사이드바 스타일 조정 */
+@media (max-width: 768px) {
+    
+    .categoryMenuItem {
+        padding: 10px 16px;
+        font-size: 14px;
+    }
+}

@@ -52,6 +52,9 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     /** 특정 게시판에서 사용자 한국어 이름으로 검색 (페이징) */
     Page<Post> findByBoard_BoardIdAndUser_NameKorContaining(Integer boardId, String nameKor, Pageable pageable);
 
+    /** 특정 게시판에서 사용자 ID로 검색 (페이징) */
+    Page<Post> findByBoard_BoardIdAndUser_UsernameContaining(Integer boardId, String username, Pageable pageable);
+
     /** 특정 게시판에서 전체 검색: 제목, 내용, 작성자, 태그를 모두 포함하여 검색 (페이징) */
     @Query("SELECT DISTINCT p FROM Post p " +
             "LEFT JOIN p.user u " +

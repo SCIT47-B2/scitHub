@@ -1,9 +1,15 @@
 package net.dsa.scitHub.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 
@@ -13,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dsa.scitHub.dto.CommentDTO;
 import net.dsa.scitHub.dto.PostDTO;
+import net.dsa.scitHub.entity.board.Board;
 import net.dsa.scitHub.entity.board.Comment;
 import net.dsa.scitHub.entity.board.Post;
 import net.dsa.scitHub.entity.board.PostBookmark;
@@ -72,6 +79,139 @@ public class CommunityService {
         // List<DTO> 반환
     }
     */
+
+    /**
+     * 게시판 이름 가져오기
+     * @param boardId
+     * @param pageable
+     * @return
+     */
+    public String getBoardName(Integer boardId) {
+        Board board = br.findById(boardId).orElseThrow(
+            () -> new EntityNotFoundException("해당 게시판을 찾을 수 없습니다.")
+        );
+
+        return board.getName();
+    }
+
+    /**
+     * 게시판 맵 가져오기
+     * @return Map<Integer, String>
+     */
+    public Map<Integer, String> getBoardMap() {
+        // 목록에 노출할 게시판 가져오기
+        List<Board> boardList = br.findAllVisibleBoards();
+        // 리스트 -> 맵 구조로 변경
+        Map<Integer, String> boardMap = new HashMap<>();
+        for (Board board : boardList) {
+            // Key : 게시판 식별자, value : 게시판 이름
+            boardMap.put(board.getBoardId(), board.getName());
+        }
+        return boardMap;
+    }
+
+    /**
+     * 게시판 내의 게시글 가져오기(페이징)
+     * @param boardId
+     * @param pageable
+     * @return
+     */
+    public Page<PostDTO> findPostsByBoard(Integer boardId, Pageable pageable) {
+        Board board = br.findById(boardId).orElseThrow(
+            () -> new EntityNotFoundException("해당 게시판을 찾을 수 없습니다.")
+        );
+
+        Page<Post> postPage = pr.findByBoard_BoardId(board.getBoardId(), pageable);
+
+        // 페이지의 Entity -> DTO
+        List<PostDTO> postDTOList = new ArrayList<>();
+        for (Post post : postPage) {
+            PostDTO postDTO = PostDTO.builder()
+                                     .postId(post.getPostId())
+                                     .title(post.getTitle())
+                                     .username(post.getUser().getUsername())
+                                     .createdAt(post.getCreatedAt())
+                                     .viewCount(post.getViewCount())
+                                     .likeCount(post.getLikes().size())
+                                     .commentCount(post.getComments().size())
+                                     .build();
+            postDTOList.add(postDTO);
+        }
+
+        // List<DTO> -> Page<DTO>
+        Page<PostDTO> postDTOPage = new PageImpl<>(
+            postDTOList,                    // 실제 데이터
+            postPage.getPageable(),         // 페이지 정보
+            postPage.getTotalElements()     // 전체 항목 수
+        );
+
+        return postDTOPage;
+    }
+
+    /**
+     * 게시판 내의 게시글 검색 결과 가져오기(페이징)
+     * @param boardId
+     * @param searchType
+     * @param keyword
+     * @param pageable
+     * @return
+     */
+    public Page<PostDTO> searchPosts(Integer boardId, String searchType, String keyword, Pageable pageable) {
+        Board board = br.findById(boardId).orElseThrow(
+            () -> new EntityNotFoundException("해당 게시판을 찾을 수 없습니다.")
+        );
+        boardId = board.getBoardId();
+
+        // 게시글 페이지 생성
+        Page<Post> postPage;
+
+        // 리포지토리에서 검색 조건에 맞게 탐색
+        switch (searchType) {
+            case "titleAndContent":
+                postPage = pr.findByBoardAndKeyword(boardId, keyword, pageable);
+                break;
+            case "title":
+                postPage = pr.findByBoard_BoardIdAndTitleContaining(boardId, keyword, pageable);
+                break;
+            case "content":
+                postPage = pr.findByBoard_BoardIdAndContentContaining(boardId, keyword, pageable);
+                break;
+            case "author":
+                postPage = pr.findByBoard_BoardIdAndUser_UsernameContaining(boardId, keyword, pageable);
+                break;
+            case "tag":
+                // 특정 게시판에서 특정 태그를 포함한 게시글의 페이지
+                postPage = pr.findByBoard_BoardIdAndTags_NameContaining(boardId, keyword, pageable);
+                break;
+            default:
+                postPage = pr.findByBoard_BoardId(boardId, pageable);
+                break;
+        }
+        
+        // 페이지의 Entity -> DTO
+        List<PostDTO> postDTOList = new ArrayList<>();
+        for (Post post : postPage) {
+            PostDTO postDTO = PostDTO.builder()
+                                     .postId(post.getPostId())
+                                     .title(post.getTitle())
+                                     .username(post.getUser().getUsername())
+                                     .createdAt(post.getCreatedAt())
+                                     .viewCount(post.getViewCount())
+                                     .likeCount(post.getLikes().size())
+                                     .commentCount(post.getComments().size())
+                                     .build();
+            postDTOList.add(postDTO);
+        }
+
+        // List<DTO> -> Page<DTO>
+        Page<PostDTO> postDTOPage = new PageImpl<>(
+            postDTOList,                    // 실제 데이터
+            postPage.getPageable(),         // 페이지 정보
+            postPage.getTotalElements()     // 전체 항목 수
+        );
+
+        return postDTOPage;
+    }
 
 
     // 게시글 관련 ----------------------------------------------------------------------------------
@@ -137,8 +277,10 @@ public class CommunityService {
         // Entity -> DTO 변환
         PostDTO postDTO = PostDTO.builder()
                           .postId(post.getPostId())
+                          .boardId(post.getBoard().getBoardId())
                           .board(post.getBoard().getName())
                           .username(post.getUser().getUsername())
+                          .avatarUrl(post.getUser().getAvatarUrl())
                           .title(post.getTitle())
                           .content(post.getContent())
                           .viewCount(post.getViewCount())
@@ -157,11 +299,13 @@ public class CommunityService {
         // 태그 리스트를 List<Tag> -> List<String> 변환
         List<Tag> tags = post.getTags();
         List<String> tagList = new ArrayList<>();
-        for (Tag tag : tags) {
-            String tagName = tag.getName();
-            tagList.add(tagName);
-        }
+        if (tags != null && !tags.isEmpty()) {
+            for (Tag tag : tags) {
+                String tagName = tag.getName();
+                tagList.add(tagName);
+            }
         postDTO.setTagList(tagList);
+        }
 
         // postDTO 반환
         return postDTO;
@@ -194,7 +338,7 @@ public class CommunityService {
         post.setTitle(postDTO.getTitle());
         post.setContent(postDTO.getContent());
         // 태그 데이터 반영
-        // updateTagList(postDTO.getPostId(), postDTO.getTagList());
+        updateTagList(postDTO.getPostId(), postDTO.getTagList());
     }
 
     /**
@@ -319,11 +463,23 @@ public class CommunityService {
      * @param postId
      * @param List<Tag> newTags
      */
-    /*
-    public void updateTagList(Integer postId, List<String> newTags) {
+    
+    public void updateTagList(Integer postId, List<String> newTagList) {
+        // 게시글 존재 여부 확인
+        Post post = pr.findById(postId).orElseThrow(
+            () -> new EntityNotFoundException("해당 게시글이 존재하지 않습니다.")
+        );
         // 기존 태그 리스트
         List<Tag> existingTags = tr.findByPost_PostId(postId);
         // 새 태그 매핑
+        List<Tag> newTags = new ArrayList<>();
+        for (String newTagStr : newTagList) {
+            Tag newTag = Tag.builder()
+                            .name(newTagStr)
+                            .post(post)
+                            .build();
+            newTags.add(newTag);
+        }
 
         // 기존 태그를 name으로 매핑
         Map<String, Tag> existingTagMap = existingTags.stream()
@@ -353,7 +509,7 @@ public class CommunityService {
             tr.saveAll(toAdd);
         }
     }
-    */
+
 
     // 댓글 관련 기능 관련 ----------------------------------------------------------------------------------
 
@@ -372,6 +528,7 @@ public class CommunityService {
                 CommentDTO commentDTO = CommentDTO.builder()
                                                   .commentId(comment.getCommentId())
                                                   .userId(comment.getUser().getUserId())
+                                                  .avatarUrl(comment.getUser().getAvatarUrl())
                                                   .username(comment.getUser().getUsername())
                                                   .content(comment.getContent())
                                                   .createdAt(comment.getCreatedAt())

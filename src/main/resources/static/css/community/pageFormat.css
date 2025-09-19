@@ -1,0 +1,33 @@
+/* 메인 콘텐츠 그리드 레이아웃 */
+.contentGrid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 190px; /* 280px -> 190px로 축소 */
+    gap: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+    align-items: start;
+}
+
+/* 반응형 설정 */
+@media (max-width: 1200px) {
+    .contentGrid {
+        grid-template-columns: 1fr 170px; /* 250px -> 170px로 축소 */
+        gap: 15px;
+    }
+}
+
+@media (max-width: 768px) {
+    .contentGrid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    
+    .rightSidebar {
+        order: 2;
+    }
+    
+    .mainContent {
+        order: 1;
+    }
+}

@@ -1,9 +1,16 @@
 package net.dsa.scitHub.controller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -48,10 +55,17 @@ public class CommunityController {
     @ModelAttribute("menuItems")
     public List<MenuItem> menuItems() {
         return List.of(
-            new MenuItem("게시판 홈", "/community/home"),
+            new MenuItem("コミュニティホーム", "/community/home"),
             new MenuItem("Q&A", "/community/qna"),
-            new MenuItem("강의평", "/community/courseReview")
+            new MenuItem("講義評価", "/community/courseReview")
         );
+    }
+
+    @ModelAttribute("boardMap")
+    public Map<Integer, String> boardMap() {
+        Map<Integer, String> boardMap = cs.getBoardMap();
+        log.debug("게시글 맵 정보 : {}", boardMap);
+        return boardMap;
     }
 
     // 게시판 관련 ---------------------------------------------------------------------------------------------
@@ -67,6 +81,72 @@ public class CommunityController {
         return "community/home"; // templates/community/home.html
     }
 
+    /**
+     * 각 게시판 페이지로 이동
+     * @param model
+     * @return community/board.html
+     */
+    @GetMapping("board")
+    public String gotoBoard(
+        @RequestParam("boardId") Integer boardId,
+        Model model) {
+        try {
+            String boardName = cs.getBoardName(boardId);
+            model.addAttribute("boardName", boardName);
+            model.addAttribute("boardId", boardId);
+            return "community/board";     // templates/community/board
+            // 페이징된 게시글 불러오기와 렌더링은 비동기 처리로 진행함
+        } catch (Exception e) {
+            // 게시판 조회 실패 시 홈 화면으로
+            log.debug("게시판 조회 실패 : {}", e.getMessage());
+            return "redirect:home";
+        }
+    }
+
+    /**
+     * 페이징된 게시글 조회, 또는 페이징된 검색 목록 조회
+     * @param searchFrom
+     * @param searchType
+     * @param keyWord
+     * @param pageable
+     * @return
+     */
+    @GetMapping("getBoard")
+    public ResponseEntity<Page<PostDTO>> getPostsByBoard(
+        @RequestParam("boardId") Integer boardId,
+        @RequestParam(required = false) String searchType,
+        @RequestParam(required = false) String keyword,
+        @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+
+        // 수신 데이터 로그
+        log.debug("출력할 게시판의 id : {}", boardId);
+        log.debug("검색 범위 : {}", searchType);
+        log.debug("검색 키워드 : {}", keyword);
+
+        // postDTO 페이지 생성
+        Page<PostDTO> postPage;
+
+        try {
+            // keyword가 존재하면 검색 로직 수행, 없으면 일반 목록 조회
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                postPage = cs.searchPosts(boardId, searchType, keyword, pageable);
+            } else {
+                postPage = cs.findPostsByBoard(boardId, pageable);
+            }
+            log.debug("페이지 정보 : {}", postPage);
+            for (PostDTO postDTO : postPage) {
+                log.debug("각 게시글 정보 : {}", postDTO);
+            }
+            return ResponseEntity.ok(postPage);
+        } catch (Exception e) {
+            log.debug("게시글 검색 중 오류 발생 : {}", e);
+            Page<PostDTO> errorPostPage = Page.empty(pageable);
+            return ResponseEntity.badRequest().body(errorPostPage);
+        }
+    }
+
+
+
     // 게시글 작성 관련 ----------------------------------------------------------------------------------------
 
     /**
@@ -74,7 +154,10 @@ public class CommunityController {
      * @return community/writeForm.html
      */
     @GetMapping("writePost")
-    public String writePostPage() {
+    public String writePostPage(
+        @RequestParam("boardId") Integer boardId,
+        Model model) {
+        model.addAttribute("boardId", boardId);
         return "community/writeForm";
     }
 
@@ -126,7 +209,7 @@ public class CommunityController {
 			return "community/readPost";
 		} catch (Exception e) {
 			log.debug("[예외 발생] 글 정보 조회 실패..");
-			return "redirect:list";
+			return "redirect:home";
 		}
 	}
 
@@ -161,7 +244,7 @@ public class CommunityController {
 			return "community/updateForm";
 		} catch (Exception e) {
 			log.debug("[예외 발생] {}", e.getMessage());
-			return "redirect:home";
+			return "redirect:";
 		}
 	}
 
@@ -225,7 +308,7 @@ public class CommunityController {
         }
     }
 
-     /**
+    /**
      * 게시글 북마크 처리(비동기)
      * @param postId
      */
@@ -244,7 +327,7 @@ public class CommunityController {
         }
     }
 
-     // 댓글 관련-------------------------------------------------------------------------------------------
+    // 댓글 관련-------------------------------------------------------------------------------------------
     /**
      * 댓글 목록 불러오기(비동기)
      * @return List<CommentDTO>
@@ -314,10 +397,9 @@ public class CommunityController {
         log.debug("수정할 댓글과 내용 : {}", commentDTO);
         try {
             cs.updateComment(commentDTO, user.getUsername());
-            //cs.updateComment(commentDTO, null);
             return ResponseEntity.ok("댓글 수정 성공!");
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("댓글 삭제 실패");
+            return ResponseEntity.badRequest().body("댓글 수정 실패");
         }
     }
 }
