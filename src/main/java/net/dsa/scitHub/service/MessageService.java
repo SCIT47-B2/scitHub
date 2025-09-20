@@ -33,6 +33,11 @@ public class MessageService {
         User sender = findUserByUsername(senderUsername);
         User receiver = findUserByUsername(requestDto.getReceiverUsername());
 
+        // 나에게 보내는 메시지였을 시에는 예외 발생
+        if (sender.getUserId() == receiver.getUserId()) {
+            throw new IllegalArgumentException("自分宛のメッセージは送信できません。");
+        }
+
         Message message = requestDto.toEntity(sender, receiver);
         Message savedMessage = messageRepository.save(message);
 
