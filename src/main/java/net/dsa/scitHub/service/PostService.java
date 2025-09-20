@@ -117,6 +117,24 @@ public class PostService {
     }
 
     /**
+     * 게시글 저장 후 저장된 엔티티 반환
+     * @param postDTO 저장할 게시글 정보
+     * @return 저장된 Post 엔티티
+     */
+    @Transactional
+    public Post savePostAndReturnEntity(PostDTO postDTO) {
+
+        User user = ur.findById(postDTO.getUserId())
+            .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다. ID: " + postDTO.getUserId()));
+        Board board = br.findById(postDTO.getBoardId())
+            .orElseThrow(() -> new EntityNotFoundException("게시판을 찾을 수 없습니다. ID: " + postDTO.getBoardId()));
+
+        Post post = PostDTO.convertToPostEntity(postDTO, user, board);
+
+        return pr.save(post);
+    }
+
+    /**
      * 게시글 상세 정보 조회 (작성자, 댓글, 댓글 작성자 포함)
      * @param postId 조회할 게시글 ID
      * @return PostDetailDTO

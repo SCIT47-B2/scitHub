@@ -1,17 +1,16 @@
 package net.dsa.scitHub.controller;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,9 +24,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import net.dsa.scitHub.dto.CommentDTO;
 import net.dsa.scitHub.dto.BoardDTO;
+import net.dsa.scitHub.dto.CourseDTO;
+import net.dsa.scitHub.dto.CourseReviewDTO;
 import net.dsa.scitHub.dto.MenuItem;
 import net.dsa.scitHub.dto.PostDTO;
 import net.dsa.scitHub.service.CommunityService;
+import net.dsa.scitHub.service.CourseReviewService;
+import net.dsa.scitHub.service.CourseService;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -57,9 +60,9 @@ public class CommunityController {
     @ModelAttribute("menuItems")
     public List<MenuItem> menuItems() {
         return List.of(
-            new MenuItem("コミュニティホーム", "/community/home"),
-            new MenuItem("Q&A", "/community/qna"),
-            new MenuItem("講義評価", "/community/courseReview")
+            new MenuItem("掲示板ホーム", "/community/home"),
+            new MenuItem("講義評", "/community/courseList"),
+            new MenuItem("Q&A", "/community/qna")
         );
     }
 
@@ -415,4 +418,73 @@ public class CommunityController {
             return ResponseEntity.badRequest().body("댓글 수정 실패");
         }
     }
+
+
+    /** 강의평 */
+
+    private final CourseService ccs;
+    private final CourseReviewService crs;
+
+    /**
+     * 강의평 페이지
+     * @param model
+     * @param name 검색어 (강의명)
+     * @return courseList.html
+     */
+    @GetMapping("courseList")
+    public String courseList(
+            Model model,
+            @RequestParam(name="name", required=false) String name
+    ) {
+
+        // 이름으로 검색하거나 전체 강의 정보 가져오기
+        List<CourseDTO> courseList = ccs.getCourseList(name);
+
+        model.addAttribute("courseList", courseList);
+
+        return "community/courseList";
+    }
+
+    /**
+     * 강의 리뷰 페이지
+     * @param courseId
+     * @param model
+     * @return courseReview.html
+     */
+    @GetMapping("courseReview")
+    public String courseReview(
+        @RequestParam(name="id", required=true) Integer courseId,
+        Model model
+    ) {
+        CourseDTO course = ccs.selectById(courseId);
+        List<CourseReviewDTO> reviews = crs.selectByCourseId(courseId);
+
+        model.addAttribute("course", course);
+        model.addAttribute("reviews", reviews);
+
+        return "community/courseReview";
+    }
+
+    /**
+     * 강의 리뷰 작성 처리(비동기)
+     * @param courseId
+     * @return
+     */
+    @PostMapping("/courseReview/{courseId}")
+    public ResponseEntity<String> createReview(@PathVariable("courseId") Integer courseId,
+                                               @ModelAttribute CourseReviewDTO reviewDTO,
+                                               @AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("ログインが必要です.");
+        }
+        try {
+            crs.createReview(courseId, userDetails.getUsername(), reviewDTO);
+            return ResponseEntity.ok("レビューが正常に登録されました.");
+        } catch (Exception e) {
+            log.error("강의 리뷰 등록 실패", e); 
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("レビューの登録中にエラーが発生しました.");
+        }
+
+    }
+
 }

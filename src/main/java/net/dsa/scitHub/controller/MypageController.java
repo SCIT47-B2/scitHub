@@ -37,8 +37,8 @@ public class MypageController {
     @ModelAttribute("menuItems")
     public List<MenuItem> menuItems() {
         return List.of(
-            new MenuItem("기본 정보", "/mypage/info"),
-            new MenuItem("쪽지함", "/mypage/messages")
+            new MenuItem("会員情報", "/mypage/info"),
+            new MenuItem("メッセージ", "/mypage/messages")
         );
     }
 

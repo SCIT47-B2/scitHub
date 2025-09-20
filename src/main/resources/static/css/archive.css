@@ -1,5 +1,11 @@
 /* archive.css */
 
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&display=swap');
+
+html, body{
+  font-family: 'Noto Sans JP', sans-serif;
+}
+
 .mainGrid {
     display: flex; /* 또는 grid로 변경 */
     justify-content: center; /* 수평 중앙 정렬 */
@@ -39,7 +45,8 @@
 .table-container {
     background-color: #fff;
     border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    /* box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); */
+    box-shadow: var(--shadow);
     overflow: hidden;
 }
 
@@ -168,7 +175,7 @@ tbody tr:hover {
     margin-bottom: 20px; /* 회사 헤더와의 간격 */
 }
 
-.company-header {
+.header {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -177,9 +184,10 @@ tbody tr:hover {
     border: 1px solid #e0e0e0;
     border-radius: 10px;
     margin-bottom: 30px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.company-info-box {
+.info-box {
     display: flex;
     align-items: center;
 }
@@ -197,13 +205,13 @@ tbody tr:hover {
     flex-direction: column;
 }
 
-.company-name-rating {
+.name-rating {
     display: flex;
     align-items: center;
     margin-bottom: 5px;
 }
 
-.company-name-rating h2 {
+.name-rating h2 {
     margin: 0;
     font-size: 1.5rem;
     margin-right: 10px;
@@ -234,7 +242,7 @@ tbody tr:hover {
 }
 
 /* Company Meta Info (산업, 유형, 위치) */
-.company-meta-info span {
+.meta-info span {
     background-color: #B2C1E1;
     padding: 3px 8px;
     border-radius: 15px;
@@ -279,7 +287,8 @@ tbody tr:hover {
     padding: 20px;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* 카드 그림자 */
+    /* box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); 카드 그림자 */
+    box-shadow: var(--shadow);
     background-color: white;
 }
 
@@ -411,4 +420,51 @@ tbody tr:hover {
 
 .submit-button:hover {
     background-color: #7384b0;
+}
+
+
+body {
+    font-family: sans-serif;
+    background-color: #f7f8fc;
+    padding: 20px;
+}
+.section {
+    margin-bottom: 40px;
+}
+.section-title {
+    background-color: #4258BE;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+.card-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+.card {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    padding: 15px;
+    width: 180px;
+}
+.card h4 {
+    margin: 0 0 5px;
+    font-size: 16px;
+}
+.card p {
+    margin: 0 0 10px;
+    color: #555;
+    font-size: 14px;
+}
+.stars {
+    color: #facc15;
+    margin-bottom: 5px;
+}
+.rating {
+    font-weight: bold;
+    color: #333;
 }

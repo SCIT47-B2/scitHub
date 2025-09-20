@@ -17,8 +17,8 @@ public class ClassroomController {
     public String classroomPage(Model model) {
 
         List<MenuItem> menuItems = List.of(
-            new MenuItem("ホーム", "/classroom/home"),
-            new MenuItem("講義室", "/classroom/room")
+            new MenuItem("ホーム", "/classroom/home")
+            // new MenuItem("講義室", "/classroom/room")
         );
 
         model.addAttribute("menuItems", menuItems);

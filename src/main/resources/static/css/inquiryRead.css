@@ -5,6 +5,12 @@
 /* --color-primary는 레이아웃의 defaultLayout.html 등에서 정의될 것으로 예상 */
 /* 예: :root { --primary: #4A67C5; --secondary: #6c757d; --bg: #f8f9fa; --shadow: 0 4px 8px rgba(0,0,0,0.05); } */
 
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&display=swap');
+
+html, body{
+  font-family: 'Noto Sans JP', sans-serif;
+}
+
 .detail-container {
     display: flex;
     flex-direction: column;

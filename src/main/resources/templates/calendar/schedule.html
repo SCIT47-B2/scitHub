@@ -1,1089 +1,127 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+<html lang="jp" xmlns:th="http://www.thymeleaf.org"
     xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
     layout:decorate="~{layouts/defaultLayout}">
-    <head>
-        <title>Home</title>
-        <th:block layout:fragment="css">
-        </th:block>
-        <style>
-            /* 메인 그리드 스타일 */
-            .mainGrid {
-                display: grid;
-                grid-template-columns: 8fr 1fr; /* 8:1 비율 */
-                height: 100vh;
-            }
-            /* 오른쪽 섹션 스타일 */
-            .rightSection {
-                display : flex;
-                flex-direction : column;
-                align-items: center;
-                justify-content: flex-start;
-                gap : 20px;
-            }
+  <head>
+    <title>Schedule</title>
 
+    <!-- 외부 CSS 불러오기 -->
+    <th:block layout:fragment="css">
+      <link rel="stylesheet" th:href="@{/css/schedule.css}">
+    </th:block>
+  </head>
+  <body>
+    <section class="mainGrid" aria-label="메인 영역" layout:fragment="content">
+      <!-- 왼쪽 캘린더 영역 -->
+      <div class="leftSection">
+        <!-- 커스텀 헤더 -->
+        <div class="custom-calendar-header">
+          <div class="header-left">
+            <button id="prevBtn" class="nav-btn">‹</button>
+            <h2 id="calendarTitle">2024年 12月</h2>
+            <button id="nextBtn" class="nav-btn">›</button>
+            <button id="todayBtn" class="today-btn">今日</button>
 
-            .personalToggleSection {
-                /* 오른쪽 섹션 위아래 높이를 정하기 위해서 */
-                margin-top : 20vh;
-            }
-
-            /* 모달 전체를 덮는 배경 */
-            .modal {
-                position: fixed; /* 화면에 고정 */
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                display: none; /* 처음엔 숨김 */
-                background-color: rgba(0, 0, 0, 0.5); /* 반투명 배경 */
-                z-index: 999; /* 위로 올리기 */
-            }
-
-            .modal.show {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-
-            /* 모달 내용 */
-            .modal-content {
-                background: white;
-                padding: 20px;
-                border-radius: 8px;
-                width: 400px;
-                max-width: 90vw;
-                box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            }
-
-            /* 기본 헤더 완전 숨김 */
-            .fc-header-toolbar {
-                display: none !important;
-            }
-
-            /* 커스텀 헤더 스타일 */
-            .custom-calendar-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding: 10px 0;
-                margin-bottom: 15px;
-            }
-
-            .header-left {
-                display : flex;
-                align-items : center;
-                gap : 5px;
-            }
-
-            .header-right {
-                display: flex;
-                align-items : center;
-                gap : 10px;
-            }
-
-            /* 네비게이션 버튼 스타일 */
-            .nav-btn {
-                width: 30px;
-                height: 30px;
-                border: 1px solid #ddd;
-                background: white;
-                border-radius: 4px;
-                cursor: pointer;
-                font-size: 16px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                transition: background 0.2s;
-            }
-
-            .nav-btn:hover {
-                background: #f0f0f0;
-            }
-
-            /* 캘린더 제목 스타일 */
-            #calendarTitle {
-                margin: 0 15px;
-                font-size: 18px;
-                font-weight: bold;
-                min-width: 120px;
-                text-align: center;
-            }
-
-            /* Today 버튼 스타일 */
-            .today-btn {
-                padding: 6px 12px;
-                border: 1px solid #ddd;
-                background: white;
-                border-radius: 4px;
-                cursor: pointer;
-                font-size: 14px;
-                transition: background 0.2s;
-            }
-
-            .today-btn:hover {
-                background: #f0f0f0;
-            }
-
-            /* 뷰 버튼 그룹 스타일 */
-            .view-buttons {
-                display: flex;
-                border: 1px solid #ddd;
-                border-radius: 4px;
-                overflow: hidden;
-            }
-
-            .view-btn {
-                padding: 6px 12px;
-                border: none;
-                background: white;
-                cursor: pointer;
-                font-size: 14px;
-                transition: background 0.2s;
-                border-right: 1px solid #ddd;
-            }
-
-            .view-btn:last-child {
-                border-right: none;
-            }
-
-            .view-btn:hover {
-                background: #f0f0f0;
-            }
-
-            .view-btn.active {
-                background: #007bff;
-                color: white;
-            }
-
-            /* 요일 헤더 전체 영역 */
-            .fc-col-header {
-                background-color: #7599cb;
-                border-bottom: 2px solid #dee2e6;
-                color : white;
-            }
-            
-            /* 사용자에게 숨기기 위한 CSS (자리는 차지하지만 보이지 않게) */
-            .invisible {
-                visibility : hidden;
-            }
-        </style>
-    </head>
-    <body>
-        <section class="mainGrid" aria-label="메인 영역" layout:fragment="content">
-        <!-- 메인 캘린더 영역 -->
-            <!-- 왼쪽 캘린더 영역 -->
-            <div class="leftSecton">
-                <!-- 커스텀 헤더 추가 -->
-                 <div class="custom-calendar-header">
-                    <div class="header-left">
-                        <button id="prevBtn" class="nav-btn">‹</button>
-                        <h2 id="calendarTitle">2024年 12月</h2>
-                        <button id="nextBtn" class="nav-btn">›</button>
-                        <button id="todayBtn" class="today-btn">今日</button>
-                    </div>
-                    <div class="header-right">
-                        <div class="view-buttons">
-                            <button class="view-btn active" data-view="dayGridMonth">M</button>
-                            <button class="view-btn" data-view="timeGridWeek">W</button>
-                            <button class="view-btn" data-view="timeGridDay">D</button>
-                        </div>
-                    </div>
-                 </div>
-                <div id='calendar'></div>
-            </div>
-            <!-- 오른쪽 체크박스와 일정등록 버튼 영역 -->
-            <div class="rightSection">
-                <!-- 관리자면 개인일정 토글 안보이게 -->
-                <div class="personalToggleSection"
-                th:classappend="${#authentication.principal.roleName == 'ROLE_ADMIN'} ? 'invisible' : ''">
-                    <input type="checkbox" id="personalToggle" checked>
-                    <span>個人の予定</span>
-                </div>
-                <div class="adminToggle">
-                    <input type="checkbox" id="adminToggle" checked>
-                    <span>全体の予定</span>
-                </div>
-                <div class="buttonSection">
-                    <button class="eventAddBtn" id="eventAddBtn">
-                        スケジュール登録
-                    </button>
-                </div>
+            <!-- 일정등록(아이콘) 버튼: 텍스트 제거, 펜 이미지 사용 -->
+            <button class="eventAddBtn" id="eventAddBtn" aria-label="日程登録">
+                <img th:src="@{/icons/pen-line.png}" src="/icons/pen-line.png" alt="日程登録">
+            </button>
             </div>
 
-            
-            <!-- 일정등록 Modal -->
-            <div id="eventModal" class="modal">
-                <div class="modal-content">
-                    <h3 id="modalTitle">일정 등록</h3>
-                    <form id="eventForm" class="eventForm">
-                        <input type="hidden" id="eventId" name="eventId">
-                        <div>
-                            <label for="eventTitle">제목:</label>
-                            <input type="text" id="eventTitle" name="eventTitle">
-                        </div>
-                        <div>
-                            <label for="eventContent">내용:</label>
-                            <textarea id="eventContent" class="eventContent" name="eventContent"></textarea>
-                        </div>
-                        <!-- 시간 포함 입력 (기본 표시) -->
-                        <div id="dateTimeInputs">
-                            <div>
-                                <label for="eventStartDate">시작일시:</label>
-                                <input type="datetime-local" id="eventStartDate" name="eventStartDate">
-                            </div>
-                            <div>
-                                <label for="eventEndDate">종료일시:</label>
-                                <input type="datetime-local" id="eventEndDate" name="eventEndDate">
-                            </div>
-                        </div>
-                        <!-- 날짜만 입력 (숨김) -->
-                         <div id="dateOnlyInputs" style="display: none;">
-                            <div>
-                                <label>시작일시:</label>
-                                <input type="date" id="startDate" name="startDate">
-                            </div>
-                            <div>
-                                <label>종료일시:</label>
-                                <input type="date" id="endDate" name="endDate">
-                            </div>
-                        </div>
-
-                        <!-- 종일 일정 체크박스 -->
-                        <div>
-                            <input type="checkbox" id="isAllDay" name="isAllDay" onchange="toggleDateInputs()">
-                            <label for="isAllDay">종일 일정</label>
-                        </div>
-
-                        <div id="modalButtons">
-                        </div>
-                    </form>
-                </div>
+          <!-- 체크박스 그룹을 header-right로 이동하여 뷰버튼 왼쪽에 한 줄 정렬 -->
+          <div class="header-right">
+            <div class="toggle-group">
+              <div class="toggle-item" th:classappend="${#authentication.principal.roleName == 'ROLE_ADMIN'} ? 'invisible' : ''">
+                <input type="checkbox" id="personalToggle" checked>
+                <label for="personalToggle">個人</label>
+              </div>
+              <div class="toggle-item">
+                <input type="checkbox" id="adminToggle" checked>
+                <label for="adminToggle">全体</label>
+              </div>
             </div>
 
-        </section>
-
-        <th:block layout:fragment="script">
-            <script th:inline="javascript">
-            // 유저 정보를 저장하기 위함.
-                // 여기 안에 있는 거는 태그로 인식하지말고 텍스트로 인식하라는 의미
-                    // 타임리프와 자바스크립트 두 환경에서 다르게 인식하게 하기 위한 특이한 형태
-                    // 타임리프에서는 안에를 읽고 주석을 읽지 않고,
-                    // 자바스크립트에서는 주석 처리되어 인식되지 않음
-                /*<![CDATA[*/
-
-                    // 안에 타임리프가 실행되면 뒤에 null이 사라지고
-                        // 서버 없이 실행되면 안에가 주석처리되고 null만 남음
-                    const currentUser = {
-                        userId: /*[[${currentUserId}]]*/ null,
-                        username: /*[[${currentUsername}]]*/ null,
-                        role: /*[[${currentUserRole}]]*/ null
-                    };
-                    
-                    console.log("Current User:", currentUser);
-
-                /*]]>*/
-            </script>
-
-            <!-- FUllCalendar JS -->
-            <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.19/index.global.min.js'></script>
-            <script>
-                // 전역에서 사용할 변수들
-                const eventModal = document.querySelector('#eventModal');
-                const modalTitle = document.querySelector('#modalTitle');
-                const eventForm = document.querySelector('#eventForm');
-                const modalButtons = document.querySelector('#modalButtons');
-                const personalToggleSection = document.querySelector('.personalToggleSection');
-
-                // 현재 클릭한 이벤트 정보를 저장할 변수
-                let currentEventInfo = null;
-                // calendar 변수를 전역에 설정
-                let calendar = null;
-
-                /**
-                 * 시작일과 종료일 input 요소에 'change' 이벤트 리스너를 추가합니다.
-                 * 날짜가 변경되거나 지워질 때마다 min/max 속성을 동적으로 설정/해제합니다.
-                 */
-                function addDateValidationListeners() {
-                    // 날짜/시간 입력 필드
-                    const startDateTimeInput = document.querySelector('#eventStartDate');
-                    const endDateTimeInput = document.querySelector('#eventEndDate');
-                    
-                    // 날짜만 입력 필드
-                    const startDateInput = document.querySelector('#startDate');
-                    const endDateInput = document.querySelector('#endDate');
-
-                    // 시작일시가 변경되면 -> 종료일시의 '최소' 날짜를 설정
-                    startDateTimeInput.addEventListener('change', () => {
-                        if (startDateTimeInput.value) {
-                            endDateTimeInput.min = startDateTimeInput.value;
-                        } else {
-                            // 시작일시가 지워지면, 종료일시의 min 제약조건 해제
-                            endDateTimeInput.min = '';
-                        }
-                    });
-
-                    // 종료일시가 변경되면 -> 시작일시의 '최대' 날짜를 설정
-                    endDateTimeInput.addEventListener('change', () => {
-                        if (endDateTimeInput.value) {
-                            startDateTimeInput.max = endDateTimeInput.value;
-                        } else {
-                            // 종료일시가 지워지면, 시작일시의 max 제약조건 해제
-                            startDateTimeInput.max = '';
-                        }
-                    });
-
-                    // 시작일이 변경되면 -> 종료일의 '최소' 날짜를 설정
-                    startDateInput.addEventListener('change', () => {
-                        if (startDateInput.value) {
-                            endDateInput.min = startDateInput.value;
-                        } else {
-                            // 시작일이 지워지면, 종료일의 min 제약조건 해제
-                            endDateInput.min = '';
-                        }
-                    });
-
-                    // 종료일이 변경되면 -> 시작일의 '최대' 날짜를 설정
-                    endDateInput.addEventListener('change', () => {
-                        if (endDateInput.value) {
-                            startDateInput.max = endDateInput.value;
-                        } else {
-                            // 종료일이 지워지면, 시작일의 max 제약조건 해제
-                            endDateInput.max = '';
-                        }
-                    });
-                }
-
-                /**
-                 * 현재 input에 설정된 값을 기준으로 min/max 제약 조건을 즉시 업데이트합니다.
-                 * JS로 날짜 값을 직접 설정한 후에 호출합니다.
-                 */
-                function updateDateConstraints() {
-                    const startDT = document.querySelector('#eventStartDate');
-                    const endDT = document.querySelector('#eventEndDate');
-                    const startD = document.querySelector('#startDate');
-                    const endD = document.querySelector('#endDate');
-
-                    // 제약조건 초기화
-                    startDT.max = '';
-                    endDT.min = '';
-                    startD.max = '';
-                    endD.min = '';
-
-                    // 현재 값에 따라 제약조건 설정
-                    if (startDT.value) {
-                        endDT.min = startDT.value;
-                    }
-                    if (endDT.value) {
-                        startDT.max = endDT.value;
-                    }
-                    if (startD.value) {
-                        endD.min = startD.value;
-                    }
-                    if (endD.value) {
-                        startD.max = endD.value;
-                    }
-                }
-
-                /**
-                 * 모달을 열고 상태를 설정하는 메인 함수
-                 * @param {string} mode - 'create', 'view'
-                 * @param {object} info - FullCalendar에서 받은 이벤트 또는 날짜 정보
-                */
-               function openModal(mode, info) {
-                    eventModal.classList.add('show');
-                    eventForm.reset();
-                    toggleDateInputs();
-                    setFormEditable(true);
-
-                    switch(mode) {
-                        case 'create' :
-                            modalTitle.textContent = '일정 등록';
-                            
-                            // 새로운 일정을 등록하는 것이므로, 숨겨진 eventId 값을 비움.
-                            document.querySelector('#eventId').value='';
-                            // 1. info 객체나 startStr이 없는 경우
-                            if(!info || !info.dateStr) {
-                                // 모든 날짜/ 시간 입력 필드를 깨끗하게 비웁니다.
-                                document.getElementById('eventStartDate').value = '';
-                                document.getElementById('eventEndDate').value = '';
-                                document.getElementById('startDate').value = '';
-                                document.getElementById('endDate').value = '';
-                            }
-                            // 2. info 객체가 있는 경우 (캘린더의 날짜 또는 시간을 클릭)
-                            else {
-
-                                // 날짜 칸을 클릭시 allDay가 true 값이고
-                                // 시간 칸을 클릭시 allDay가 false인 것을 이용해
-                                // 모달 칸의 input요소인 startDateTime에 현재 시각 집어 넣기
-                                let selectDateTime;
-
-                                // 2-1. 날짜 칸을 클릭시
-                                if(info.allDay) {
-
-                                    // 날짜 칸 클릭 시
-                                    // 클릭한 날짜에 현재 시간을 조합
-                                    const now = new Date();
-                                    // 현재시간을 가져오고 앞 숫자가 비어있으면 0으로 채워라. 2글자 까지.
-                                    const hours = String(now.getHours()).padStart(2, '0');
-                                    const minutes = String(now.getMinutes()).padStart(2, '0');
-
-                                    selectDateTime = `${info.dateStr}T${hours}:${minutes}`;
-                                }
-                                // 2-2. 시간 칸을 클릭 시
-                                else if(!info.allDay){
-                                    // 분까지 표시한 날짜 형식 (초 앞에서 자르기 위한 코드)
-                                    selectDateTime = info.dateStr.slice(0,16);
-                                }
-
-                                document.getElementById('eventStartDate').value = selectDateTime;
-                            }
-
-                            // 시작일 설정 후 제약조건 업데이트
-                            updateDateConstraints();
-
-                            // 버튼 설정 (등록/취소)
-                            modalButtons.innerHTML = `
-                                <button type="button" onclick="closeModal()">취소</button>
-                                <button type="submit" id="submitBtn">등록</button>
-                            `;
-                            break;
-
-                        case 'view':
-                            currentEventInfo = info;  // 나중에 수정/삭제를 위해 정보 저장
-
-                            modalTitle.textContent = '일정 상세';
-                            populateForm(info.event); // 폼에 이벤트 데이터 채우기 
-                            setFormEditable(false);   // 읽기 전용으로 만들기
-
-                            // 일정의 userId와 Visibility(PUBLIC, PRIVATE) 담아두기
-                            const eventOwnerId = info.event.extendedProps.userId;
-                            const eventVisibility = info.event.extendedProps.visibility;
-
-                            // currentUser에 담아두었던 정보를 바탕으로 관리자인지, event의소유자가 맞는지 확인해서 담아두기
-                            const isAdmin = currentUser.role === 'ROLE_ADMIN';
-                            const isOwner = currentUser.username === eventOwnerId;
-
-                            // 기본적으로 닫기 버튼만 보여줌.
-                            let buttonsHTML = '<button type="button" onclick="closeModal()">닫기</button>';
-
-                            // 규칙에 따라 수정/삭제 버튼을 추가할지 결정
-                                // 규칙 1 : 관리자(isAdmin)이고 전체일정(PUBLIC)인가?
-                                // 규칙 2 : 일반사용자(!isAdmin)이고, 자신의(isOwner) 개인일정(PRIVATE)인가?
-                            if((isAdmin && eventVisibility === 'PUBLIC')||
-                                     (!isAdmin && isOwner && eventVisibility === 'PRIVATE')) {
-                                buttonsHTML += `
-                                        <button type="button" id="deleteBtn">삭제</button>
-                                        <button type="button" id="editBtn">수정</button>
-                                `
-                            }
-
-                            // 완성된 버튼 HTML을 모달에 삽입
-                            modalButtons.innerHTML = buttonsHTML;
-                            break;
-                    }
-                }
-
-                /**
-                 * 상세보기에서 수정하는 모달로 변환하는 함수
-                */
-                function enableEditMode() {
-                    // 1. 모달 제목 변경
-                    modalTitle.textContent = '일정 수정';
-
-                    // 2. 폼을 편집 가능하게
-                    setFormEditable(true);
-
-                    // 3. 버튼을 '저장'과 '취소'로 변경
-                    modalButtons.innerHTML = `
-                        <button type="button" onclick="disableEditMode()">취소</button>
-                        <button type="submit" id="submitBtn">저장</button>
-                    `;
-                }
-
-                /**
-                 * '수정 상태'를 취소하고 다시 '상세보기'로 돌아가는 함수
-                */ 
-                function disableEditMode() {
-                    // 1. 모달 제목 변경
-                    modalTitle.textContent = '일정 상세';
-                    
-                    // 다시 읽기 전용으로
-                    setFormEditable(false);
-
-                    // 버튼 원래대로 복원
-                    modalButtons.innerHTML = `
-                        <button type="button" onclick="closeModal()">닫기</button>
-                        <button type="button" id="deleteBtn">삭제</button>
-                        <button type="button" onclick="enableEditMode()">수정</button>
-                    `;
-
-                    // 수정한 내용이 있을 수 있으니, 원래 데이터로 폼을 다시 채움
-                    populateForm(currentEventInfo.event)
-                }
-
-                /**
-                 * 폼에 데이터를 채우는 함수
-                */
-                function populateForm(event) {
-                    document.getElementById('eventId').value = event.id;
-                    document.getElementById('eventTitle').value = event.title;
-                    document.getElementById('eventContent').value = event.extendedProps.content;
-                    document.getElementById('isAllDay').checked = event.allDay;
-                    
-                    // 종일 여부에 따라 입력 필드 UI 변경
-                    toggleDateInputs();
-
-                    if (event.allDay) {
-                        document.getElementById('startDate').value = event.startStr;
-                        document.getElementById('endDate').value = event.endStr ? new Date(new Date(event.endStr).getTime() - 86400000).toISOString().split('T')[0] : event.startStr;
-                    } else {
-                        document.getElementById('eventStartDate').value = event.start ? event.start.toISOString().slice(0, 16) : '';
-                        document.getElementById('eventEndDate').value = event.end ? event.end.toISOString().slice(0, 16) : '';
-                    }
-
-                    // 폼 데이터 채운 후 제약조건 업데이트
-                    updateDateConstraints();
-                }
-
-                /**
-                 * 모달 닫기 함수
-                */
-                function closeModal() {
-                    eventModal.classList.remove('show');
-                    currentEventInfo = null; // 모달이 닫힐 때 데이터 초기화
-                }
-
-                /**
-                 *  폼 필드의 편집 가능 여부를 설정하는 함수
-                */
-                function setFormEditable(isEditable) {
-                    document.querySelector('#eventTitle').readOnly = !isEditable;
-                    document.querySelector('#eventContent').readOnly = !isEditable;
-                    document.querySelector('#eventStartDate').readOnly = !isEditable;
-                    document.querySelector('#eventEndDate').readOnly = !isEditable;
-                    document.querySelector('#startDate').readOnly = !isEditable;
-                    document.querySelector('#endDate').readOnly = !isEditable;
-                    document.querySelector('#isAllDay').disabled = !isEditable;
-                }
-                /**
-                 * 종일 일정 체크박스 상태에 따라 입력 필드 토글 함수
-                */
-                function toggleDateInputs() {
-
-                    // 체크 되었습니까?
-                    const isAllDay = document.getElementById('isAllDay').checked;
-
-                    // 종일 일정 체크시 토글(미체크 -> 체크)
-                    if(isAllDay) {
-                        document.querySelector('#dateTimeInputs').style.display = 'none';
-                        document.querySelector('#dateOnlyInputs').style.display = 'block';
-
-                        // 기존 DateTime 값이 있으면 Date 값으로 변환
-                        const startDateTime = document.querySelector('#eventStartDate').value;
-                        const endDateTime = document.querySelector('#eventEndDate').value;
-                        
-                        if (startDateTime) {
-                            // split('T')로 T 기준으로 나누고 앞부분(날짜)만 사용
-                            document.querySelector('#startDate').value = startDateTime.split('T')[0];
-                        }
-                        if (endDateTime) {
-                            document.querySelector('#endDate').value = endDateTime.split('T')[0];
-                        }
-                    }
-                    // 종일 일정 체크시 토글(체크 -> 미체크)
-                    if(!isAllDay) {
-                        document.querySelector('#dateTimeInputs').style.display = 'block';
-                        document.querySelector('#dateOnlyInputs').style.display = 'none';
-
-                        const startDate = document.querySelector('#startDate').value;
-                        const endDate = document.querySelector('#endDate').value;
-
-                        if (startDate) {
-                            document.querySelector('#eventStartDate').value = startDate + 'T09:00';
-                        }
-                        if (endDate) {
-                            document.querySelector('#eventEndDate').value = endDate + 'T18:00';
-                        }
-                    }
-                }
-
-                /**
-                 *  전체일정 토글이나 개인일정 토글이 변경될 경우 실행되는 함수
-                */
-                function handleFilterChange() {
-                    // calendar가 초기화된 후에만 refetchEvents를 호출하도록 함.
-                    if (calendar) {
-                        // events 다시 호출
-                        calendar.refetchEvents();
-                    }
-                }
-
-                /**
-                 * JavaScript Date 객체를 'YYYY-MM-DDTHH:mm' 형식의 로컬 시간 문자열로 변환
-                 * @param {Date} date  변환할 Date 객체
-                 * @return {string|null} 변환된 문자열 또는 null
-                */
-                function formatDateForServer(date) {
-                    if(!date) return null;
-
-                    const year = date.getFullYear(); // 2025
-                    const month = String(date.getMonth() + 1).padStart(2, '0'); // 3월이라면 2+1해서 03
-                    const day = String(date.getDate()).padStart(2, '0'); // 5일이라면 05
-                    const hours = String(date.getHours()).padStart(2, '0'); // 5시라면 05
-                    const minutes = String(date.getMinutes()).padStart(2, '0'); // 5분이라면 05
-                    const seconds = String(date.getSeconds()).padStart(2, '0'); // 5초라면 05
-
-                    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
-
-                }
-                // FullCalendar 초기화
-                document.addEventListener('DOMContentLoaded', function() {
-
-                    // 시작과 종료일 input 요소에 'cahnge' 이벤트 리스너를 추가하여 min/max 속성 동적 설정
-                    addDateValidationListeners();
-
-                    let calendarEl = document.getElementById('calendar');
-                    calendar = new FullCalendar.Calendar(calendarEl, {
-                        // 기본 뷰 월별 달력으로 보도록 함.
-                        initialView: 'dayGridMonth',
-                        locale: 'ja',
-
-                        // 드래그 활성화
-                        editable: true,
-
-                        // 기본 헤더 제거
-                        headerToolbar: {
-                            left: '',
-                            center: '',
-                            right: ''
-                        },
-
-                        // 각 뷰의 버튼 텍스트 커스터마이징
-                        buttonText: {
-                            today: 'Today',
-                            month: 'M',
-                            week: 'W',
-                            day: 'D'
-                        },
-
-                        // 요일 헤더 스타일 커스터마이징
-                        dayHeaderContent: function(arg){
-                            const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-                            
-                            // arg.date는 해당 칸의 날짜 객체. getDay()를 통해서 요일 인덱스를 가져옴
-                            const dayIndex = arg.date.getDay(); // 월요일일 경우 1을 반환
-
-                            return dayNames[dayIndex];
-                        },
-
-                        // 날짜 클릭 및 드래그 선택 활성화
-                        selectable: true,
-
-
-                        // 주의 시작 요일 (0: 일요일, 1: 월요일)
-                        firstDay: 0,
-
-                        // 주의 고정 여부
-                        fixedWeekCount: false,
-
-                        // 날짜 변경 시 제목 업데이트
-                        // fullCalendar의 datesSet이라는 콜백 함수를 정의하는 부분
-                        datesSet: function(info) {
-                            document.getElementById('calendarTitle').textContent = info.view.title;
-                        },
-
-                        // 이벤트 가져오기
-                        events : function(info, successCallback, failureCallback) {
-
-                            // 현재 체크박스 상태를 가져옵니다.
-                            const showPublic = document.querySelector('#adminToggle').checked;
-                            const showPrivate = document.querySelector('#personalToggle').checked;
-
-                            // 기본값이 GET이라 단순 조회때 fetch안에 내용을 명시하지 않아도 됨
-                            fetch(`/scitHub/api/calendar/events?showPublic=${showPublic}&showPrivate=${showPrivate}`)
-                            .then(response => {
-                                if(!response.ok) {
-                                    throw new Error('Network response was not ok');
-                                }
-                                return response.json();
-                            })
-                            .then(data => {
-                                console.log('받아온 데이터:', data);
-
-                                // DTO를 FullCalendar 형식으로 변환
-
-                                // 빈 배열 생성
-                                const events = [];
-                                
-                                for (let i = 0; i < data.length; i++) {
-                                    const event = data[i];
-
-                                    // 권한에 따라 이벤트 수정 가능 여부 결정
-                                    let isEventEditable = true; // 기본값은 true (수정 가능)
-                                    const isAdmin = currentUser.role === 'ROLE_ADMIN';
-                                    const isPublicEvent = event.visibility === 'PUBLIC';
-
-                                    // 관리자가 아니고, 전체일정이라면 수정 불가능하게 설정
-                                    if( !isAdmin && isPublicEvent) {
-                                        isEventEditable = false;
-                                    }
-
-                                    const transformedEvent = {
-                                        id : event.eventId,
-                                        title : event.title,
-                                        start : event.start,
-                                        end : event.end,
-                                        allDay : event.allDay,
-                                        extendedProps: {
-                                            content: event.content,
-                                            visibility: event.visibility,
-                                            userId: event.userId
-                                        },
-                                        editable: isEventEditable,
-                                        color : event.visibility === 'PUBLIC' ? '#ff9f89' :  '#3788d8'
-                                    }
-                                    events.push(transformedEvent);
-                                }
-
-                                successCallback(events);
-                            })
-                            .catch(error => {
-                                console.error('Fetch error:', error);
-                                failureCallback(error);
-                                alert('일정을 불러오는데 실패했습니다.');
-                            })
-                        },
-
-                        // 날짜 클릭 시(새 일정 추가) //
-                        dateClick: function(info) {
-                            console.log('날짜 클릭 ' + info.dateStr);
-
-                            // openModal 함수에 'create' 모드와 클릭한 날짜 정보 전달
-                            openModal('create', info);
-                        },
-
-                        // 이벤트 클릭시 상세보기로 이동
-                        eventClick : function(info) {
-                            console.log("이벤트 클릭: ", info.event);
-
-                            // openModal 함수에 'view' 모드와 클릭한 이벤트 정보 전달
-                            openModal('view', info);
-                        },
-
-                        // 드롭 완료 시 DB 업데이트 //
-                        eventDrop : function(info) {
-                            if(!confirm("이 변경사항을 저장하시겠습니까?")) {
-                                info.revert();  // 취소했다면 원래 위치로 되돌리기.
-                                return;
-                            }
-                            
-                            //  info에서 필요한 정보 추출
-                            const eventId = info.event.id;
-                            const newStart = formatDateForServer(info.event.start);
-                            const newEnd = info.event.end ? formatDateForServer(info.event.end) : null;
-                            const isAllDay = info.event.allDay;
-
-                            // 서버에 전송할 데이터 준비 (서버의 DTO와 필드명 맞추기)
-                            const eventUpdateData = {
-                                // id는 URL로 보내므로 body에는 포함하지 않아도 됨
-                                start : newStart,
-                                end : newEnd,
-                                allDay : isAllDay
-                            };
-
-                            // fetch를 이용해 서버에 PUT 또는 PATCH 요청 전송
-                            fetch(`/scitHub/api/calendar/events/${eventId}`, {
-                                method : 'PUT',
-                                headers : {
-                                    'Content-Type': 'application/json',
-                                },
-                                body : JSON.stringify(eventUpdateData),
-                            })
-                            .then(response => {
-                                if(!response.ok) {
-                                    // 서버에서 에러 응답이 오면 예외를 발생시켜 .catch()로 보냄
-                                    throw new Error('일정 업데이트에 실패했습니다.');
-                                }
-                                return response.json();
-                            })
-                            .then(data => {
-                                console.log('서버로부터 업데이트 확인:', data);
-                                alert('일정이 성공적으로 변경되었습니다.');
-                            })
-                            .catch(error => {
-                                console.error('업데이트 실패:', error);
-                                alert('일정 변경에 실패하여 원래 위치로 되돌립니다.');
-
-                                // DB업데이트에 실패했으므로, 화면에 보이는 이벤트를 원래 위치로 되돌립니다.
-                                info.revert();
-                            })
-                        }
-                    });
-
-                    calendar.render();
-
-
-                    // 필터링 체크박스 기능. PUBLIC 일정 토글, PRIVATE 일정 토글
-                    const adminToggle = document.querySelector('#adminToggle');
-                    const personalToggle = document.querySelector('#personalToggle');
-
-                    // 전체일정 체크박스와 개인일정 체크박스를 handleFilterChange에 연결
-                    adminToggle.addEventListener('change', handleFilterChange);
-                    personalToggle.addEventListener('change', handleFilterChange);
-
-                    // 모달 배경 클릭 시 모달 닫기
-                    eventModal.addEventListener('click', function(event) {
-                        // 모달의 구조가 eventModal(div)안에 modal-content(div)라고 되어 있어서 작동한다.
-                        if (event.target === eventModal) {
-                            closeModal();
-                        }
-                    });
-
-
-
-                    // 커스텀 헤더 버튼 이벤트 연결
-                    document.querySelector('#prevBtn').addEventListener('click', function() {
-                        calendar.prev();
-                    });
-                    document.querySelector('#nextBtn').addEventListener('click', function() {
-                        calendar.next();
-                    })
-                    document.getElementById('todayBtn').addEventListener('click', function() {
-                        calendar.today();
-                    })
-
-                    // 뷰 변경 버튼 이벤트
-                    document.querySelectorAll('.view-btn').forEach(function(btn) {
-                        btn.addEventListener('click', function() {
-                            // 활성 상태 변경할때 active 클래스 추가 제거
-                            document.querySelector('.view-btn.active').classList.remove('active');
-                            this.classList.add('active');
-
-                            // 캘린더 뷰 변경
-                            // dataset을 통해 data-view 속성값을 가져옴
-                            const view = this.dataset.view;
-                            calendar.changeView(view);
-                        });
-
-                    });
-
-
-                    // 일정 등록 버튼 요소 선택
-                    const eventAddBtn = document.querySelector('#eventAddBtn');
-                    // 일정 등록 버튼 클릭 시 모달 표시
-                    eventAddBtn.addEventListener('click', function() {
-                        openModal('create');
-                    });
-
-                    // 수정 버튼과 삭제 버튼 기능 구현
-                        // 부모 요소인 modalButtons에 이벤트 리스너 추가
-                    modalButtons.addEventListener('click', function(event) {
-                        // event.target은 실제로 클린된 자식 요소를 가리킴.
-                        const clickedElement = event.target;
-
-                        // 클릭된 요소의 id를 확인해서 수정 버튼인지 판단.
-                        if ( clickedElement.id === 'editBtn') {
-                            console.log('수정 버튼 클릭됨');
-                            enableEditMode();   // 수정 모달로 전환
-                        }
-
-                        // 클린된 요소의 id를 확인해서 삭제 버튼인지 판단.
-                        if ( clickedElement.id === 'deleteBtn') {
-                            console.log('삭제 버튼 클릭됨');
-                            
-                            // 사용자에게 정말 삭제할 것인지 확인.
-                            const isConfirmed = confirm('정말로 이 일정을 삭제하시겠습니까?');
-
-                            if(isConfirmed){
-                                // 미리 저장해둔 info 에서 eventId 값을 가져옴
-                                const eventId = currentEventInfo.event.id;
-
-                                fetch(`/scitHub/api/calendar/events/${eventId}`, { // eventId를 포함한 url
-                                    method : 'DELETE' // DELETE 메서드로 요청
-                                })
-                                .then(response => {
-                                    if(!response.ok) {
-                                        throw new Error('서버 응답에 실패하였습니다.');
-                                    }
-                                    // 삭제 성공 시에는 본문 내용이 없으므로 이렇게 return
-                                    return true;
-                                })
-                                .then(()=> {
-                                    alert('성공적으로 삭제되었습니다.');
-
-                                    calendar.refetchEvents();   // 캘린더 화면 갱신
-                                    closeModal();
-                                })
-                                .catch(error=> {
-                                    console.error("삭제 실패:",error);
-                                    alert('삭제에 실패했습니다.');
-                                })
-
-                            }
-                        }
-                    })
-
-                    // eventForm 제출 이벤트 ( 실제로 '이벤트 등록' '이벤트 수정' 을 담당하게 된다.)
-                    eventForm.addEventListener('submit', function(event) {
-                        event.preventDefault(); // 폼의 기본 제출 동작(페이지 새로고침)을 막음
-                        
-                        // 폼 데이터를 객체로 만들기
-                        const formData = new FormData(eventForm);
-
-                        // 데이터베이스 스키마에 맞게 데이터 가공
-                        // isAllDay가 체크되었는지 여부에 따른 가공
-
-                        // 하루종일 체크박스 지정
-                        const isAllDay = document.getElementById('isAllDay').checked;
-
-                        // JSON 담을 그릇 준비
-                        let eventData;
-
-
-                        if (!isAllDay) {
-                            // datetime-local에서 받은 값에 초(:00)를 추가하여 DTO에서 요구하는 포맷(yyyy-MM-dd'T'HH:mm:ss)에 맞춰줌
-                            const startDate = formData.get('eventStartDate') ? formData.get('eventStartDate') + ':00' : null;
-                            const endDate = formData.get('eventEndDate') ? formData.get('eventEndDate') + ':00' : null;
-
-                            eventData = {
-                                title : formData.get('eventTitle'),
-                                // DTO에서 초까지 요구하므로 초를 추가한 값으로 변경
-                                start : startDate,
-                                end : endDate,
-                                content : formData.get('eventContent'),
-                                allDay: formData.get('isAllDay') === 'on'  // 'on'이면 true, 아니면 false
-                            }
-                        }
-                        if (isAllDay) {
-                            const startDateStr = formData.get('startDate');
-                            let endDateStr = formData.get('endDate');
-
-                            // 만약 종료일이 입력되지 않았다면, 시작일과 동일하게 설정합니다.
-                            if (!endDateStr) {
-                                endDateStr = startDateStr;
-                            }
-
-                            // 기존 endDate에 하루 더해서 00:00:00 붙이는 처리
-                            const endDate = new Date(endDateStr+'T00:00:00');
-                            endDate.setDate(endDate.getDate() + 1);
-
-                            const year = endDate.getFullYear();
-                            const month = String(endDate.getMonth() +1).padStart(2, '0');
-                            const day = String(endDate.getDate()).padStart(2,'0');
-
-                            const endDateDay = `${year}-${month}-${day}`;
-                            
-                            eventData = {
-                                title : formData.get('eventTitle'),
-                                start : startDateStr + 'T00:00:00',
-                                end : endDateDay + 'T00:00:00',
-                                content : formData.get('eventContent'),
-                                allDay: formData.get('isAllDay') === 'on'  // 'on'이면 true, 아니면 false
-                            }
-                        }
-
-                        // 처음 등록은 eventId가 없고, 수정하려는 event는 eventId가 있는 것을 사용하여 분기처리
-                        const eventId = formData.get('eventId');
-                        console.log('event 분기 처리, 제대로 eventId 가져왔는지 확인', eventId);
-
-                        // 수정
-                        // eventId가 있으면 -> 수정
-                        if(eventId) {
-                            console.log("eventId 있는 분기에 진입!")
-                            fetch(`/scitHub/api/calendar/events/${eventId}`, { // URL에 eventId 포함
-                                method : 'PUT', // HTTP 요청 메소드 ( PUT -> 전체 교체)
-                                headers : { 'Content-Type' : 'application/json'},
-                                body : JSON.stringify(eventData), // 수정할 데이터를 JSON 문자열로 변환하여 전송
-                            })
-                            .then(response => {
-                                // response.ok가 아니면(응답이 성공) 에러를 발생시켜 .catch()로 보냄
-                                if(!response.ok) {
-                                    throw new Error('서버 응답에 실패했습니다.');
-                                }
-                                // 성공했다면, 응답 본문의 JSON을 javaScript 객체로 변환
-                                return response.json();
-                            })
-                            .then(updatedEventDTO => { // 최종적으로 변환된 JavaScript 객체(수정된 이벤트 정보)를 받음
-                                console.log('성공적으로 수정된 이벤트:', updatedEventDTO);
-                                alert('일정이 성공적으로 수정되었습니다.');
-
-                                // FullCalendar의 모든 이벤트를 서버에서 다시 불러와 화면을 갱신
-                                calendar.refetchEvents();
-
-                                closeModal();
-                            })
-                        }
-
-                        // 생성
-                        // eventId가 없으면 -> 생성
-                        if(!eventId) {
-                            
-                            fetch('/scitHub/api/calendar/events', {
-                                method: 'POST', // HTTP 요청 메소드 (POST -> 생성)
-
-                                headers: {
-                                    'Content-Type': 'application/json' // 보내는 데이터의 타입
-                                },
-                                body: JSON.stringify(eventData), // JavaScript 객체를 JSON 문자열로 변환
-                            })
-                            .then(response => {
-                                // HTTP 상태 코드가 200~299인지 확인.
-                                if (response.ok) {
-                                    // 응답 헤더에서 'Location' 값을 꺼냅니다.
-                                    const location = response.headers.get('Location');
-                                    
-                                    // 응답 본문(body)에서 생성된 이벤트 객체(createdEvent)를 JSON으로 파싱합니다.
-                                    return response.json().then(function(createdEvent) {
-                                        const resultObject = {
-                                            location : location,
-                                            createdEvent : createdEvent
-                                        };
-
-                                        return resultObject;
-                                    });
-                                } else{
-                                    return response.json().then(errorData => Promise.reject(errorData));
-                                }
-                            })
-                            .then(result => {
-                                // 위에서 반환한 {location, createdEvent} 객체를 받는 부분
-                                console.log('성공적으로 생성된 이벤트: ', result.createdEvent);
-                                console.log('생성된 이벤트의 위치: ', result.location);
-
-                                // 서버의 응답을 FullCalendar 형식으로 변환
-                                const newEvent = {
-                                    id : result.createdEvent.eventId,
-                                    title : result.createdEvent.title,
-                                    start : result.createdEvent.start,
-                                    end : result.createdEvent.end,
-                                    allDay : result.createdEvent.allDay,
-                                    extendedProps: {
-                                        visibility : result.createdEvent.visibility,
-                                        userId : result.createdEvent.userId,
-                                        content : result.createdEvent.content
-                                    },
-                                    color : result.createdEvent.visibility === 'PUBLIC' ? '#ff9f89' : '#3788d8'
-                                }
-                                
-                                calendar.refetchEvents(); // 서버에서 전체 목록을 다시 불러와 화면을 완전히 새로 고침
-            
-
-                                // 모달 닫기
-                                closeModal();
-
-                                // 모달 폼 초기화
-                                eventForm.reset();
-                                toggleDateInputs();
-                            })
-                            .catch(error => {
-                                console.error('에러 발생:', error);
-                                alert('오류 발생: ' + error.message);
-                            });
-                        }
-                    });
-                });
-            </script>
-        </th:block>
-    </body>
+            <div class="view-buttons">
+              <button class="view-btn active" data-view="dayGridMonth">M</button>
+              <button class="view-btn" data-view="timeGridWeek">W</button>
+              <button class="view-btn" data-view="timeGridDay">D</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="calendar"></div>
+      </div>
+
+      <!-- 일정등록 Modal -->
+      <div id="eventModal" class="modal">
+        <div class="modal-content">
+          <h3 id="modalTitle">スケジュール登録</h3>
+          <form id="eventForm" class="eventForm">
+            <input type="hidden" id="eventId" name="eventId">
+
+            <div class="form-group">
+              <label for="eventTitle">題目:</label>
+              <input type="text" id="eventTitle" name="eventTitle">
+            </div>
+
+            <div class="form-group">
+              <label for="eventContent">内容:</label>
+              <textarea id="eventContent" class="eventContent" name="eventContent"></textarea>
+            </div>
+
+            <div class="date-inputs-grid">
+              <!-- 시간 포함 입력 (기본 표시) -->
+              <div id="dateTimeInputs" class="form-group">
+                <label for="eventStartDate">開始日時:</label>
+                <input type="datetime-local" id="eventStartDate" name="eventStartDate">
+              </div>
+
+              <!-- 날짜만 입력 (숨김) -->
+              <div id="dateOnlyInputs" class="form-group" style="display: none;">
+                <label>開始日時:</label>
+                <input type="date" id="startDate" name="startDate">
+              </div>
+
+              <div id="dateTimeEndInputs" class="form-group">
+                <label for="eventEndDate">終了日時:</label>
+                <input type="datetime-local" id="eventEndDate" name="eventEndDate">
+              </div>
+
+              <div id="dateOnlyEndInputs" class="form-group" style="display: none;">
+                <label>終了日時:</label>
+                <input type="date" id="endDate" name="endDate">
+              </div>
+            </div>
+
+            <!-- 종일 일정 체크박스 -->
+            <div class="form-group">
+              <input type="checkbox" id="isAllDay" name="isAllDay">
+              <label for="isAllDay">終日の日程</label>
+            </div>
+
+            <div id="modalButtons" class="modal-buttons"></div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <th:block layout:fragment="script">
+      <!-- 서버 모델 값을 JS로 전달(전역) -->
+      <script th:inline="javascript">
+        /*<![CDATA[*/
+        window.currentUser = {
+          userId: /*[[${currentUserId}]]*/ null,
+          username: /*[[${currentUsername}]]*/ null,
+          role: /*[[${currentUserRole}]]*/ null
+        };
+        /*]]>*/
+      </script>
+
+      <!-- FullCalendar CDN -->
+      <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.19/index.global.min.js"></script>
+
+      <!-- 외부 JS 불러오기 -->
+      <script th:src="@{/js/schedule.js}"></script>
+    </th:block>
+  </body>
 </html>

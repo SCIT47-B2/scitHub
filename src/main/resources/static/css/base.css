@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&display=swap');
+
 /* 가벼운 reset + 공통 레이아웃 */
 html,body{height:100%}
 
@@ -11,7 +13,7 @@ body{
   display:flex;              /* 좌: 사이드바, 우: 콘텐츠 */
   background:var(--bg);
   color:var(--ink);
-  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+  font-family:'Noto Sans JP', sans-serif;
 }
 
 /** 우측 콘텐츠 래퍼 */
@@ -23,5 +25,36 @@ body{
 }
 
 /** 헤더/메인 패딩(가로 32px 정렬) */
-.homeHeader{ padding:24px 32px 0; }   /* 위 24, 아래 0 (간격은 home.css에서 제어) */
-main{ flex:1; padding:0 32px 32px; }  /* 위 0으로 두고, 헤더에서 하단 간격을 부여 */
+.homeHeader{ padding:24px 0 0; }   /* 위 24, 아래 0 (간격은 home.css에서 제어) */
+main{ flex:1; padding:0 0 32px; }  /* 위 0으로 두고, 헤더에서 하단 간격을 부여 */
+
+/** 브랜드 폰트 등록: AllRoundGothic Bold */
+@font-face{
+  font-family: 'ScitBrand';
+  src:
+    url('/fonts/AllRoundGothic-Bold.woff2') format('woff2'),         /* 있으면 권장 */
+    url('/fonts/Fontspring-DEMO-allroundgothic-bold.otf') format('opentype'); /* 현재 파일 */
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/** 브랜드 전용 폰트 스택(전역 토큰) */
+:root{
+  --font-brand: 'ScitBrand', 'Noto Sans JP', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+}
+
+/** 브랜드 전용 폰트 유틸리티 — 필요한 텍스트에만 부여 */
+.brandFont{
+  font-family: var(--font-brand);
+  font-weight: 700;              /* 데모 파일이 Bold라 700 */
+  letter-spacing: .2px;          /* 필요 시 조정 */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* (선택) .logo가 다른 CSS에서 font를 강하게 지정한다면 우선순위 보강 */
+.logo.brandFont{
+  font-family: var(--font-brand) !important;
+  font-weight: 700;
+}
