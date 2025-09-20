@@ -103,47 +103,6 @@ public class CommunityService {
     }
 
     /**
-     * 게시판 이름 일본어로 바꾸기
-     * @param String
-     * @return String
-     */
-    public String translateToJp(String name) {
-        String result = "";
-        switch (name) {
-            case "free":
-                result = "自由掲示板";
-                break;
-            case "it":
-                result = "IT";
-                break;
-            case "japanese":
-                result = "日本語";
-                break;
-            case "jpCulture":
-                result = "日本文化&生活情報";
-                break;
-            case "job":
-                result = "就活情報&コツ";
-                break;
-            case "hobby":
-                result = "趣味&旅行&グルメ情報";
-                break;
-            case "certificate":
-                result = "資格情報";
-                break;
-            case "graduated":
-                result = "卒業生掲示板";
-                break;
-            default:
-                result = "掲示板の名前が間違っています";
-                break;
-        }
-
-        return result;
-    }
-
-
-    /**
      * 게시판 맵 가져오기
      * @return Map<Integer, String>
      */
@@ -436,6 +395,10 @@ public class CommunityService {
             () -> new EntityNotFoundException("해당 회원을 찾을 수 없습니다.")
         );
 
+        // 자기 게시물에 좋아요 시도 시 예외 반환
+        if (post.getUser().getUserId() == userEntity.getUserId()) {
+            throw new RuntimeException("自分が作成したポストには「いいね！」できません。");
+        }
         // 좋아요 엔티티 작성
         PostLike postLike = PostLike.builder().user(userEntity).post(post).build();
         // 해당 좋아요 존재 여부 확인

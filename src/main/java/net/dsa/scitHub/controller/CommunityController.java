@@ -74,7 +74,7 @@ public class CommunityController {
         boardMap.put("it", "IT情報");
         boardMap.put("japanese", "日本語情報");
         boardMap.put("jpCulture", "日本文化&生活情報");
-        boardMap.put("job", "就業情報&コツ");
+        boardMap.put("job", "就活情報&コツ");
         boardMap.put("hobby", "趣味&旅行&グルメ情報");
         boardMap.put("certificate", "資格情報");
         boardMap.put("graduated", "卒業生掲示板");
@@ -196,7 +196,7 @@ public class CommunityController {
             int postId = cs.makeNewPost(postDTO);
             return ResponseEntity.ok(postId);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("게시글 등록 실패");
+            return ResponseEntity.badRequest().body("ポストの作成に失敗しました。");
         }
     }
 
@@ -247,7 +247,7 @@ public class CommunityController {
             log.debug("게시글 작성자 : {}", postDTO.getUsername());
             log.debug("현재 로그인 유저 : {}", user.getUsername());
 			if (!user.getUsername().equals(postDTO.getUsername())) {
-				throw new RuntimeException("수정 권한이 없습니다.");
+				throw new RuntimeException("修正の権限がありません。");
 			}
 			model.addAttribute("post", postDTO);
 
@@ -283,7 +283,7 @@ public class CommunityController {
             return ResponseEntity.ok(postDTO.getPostId());
 		} catch (Exception e) {
 			log.debug("[예외 발생] {}", e.getMessage());
-			return ResponseEntity.badRequest().body("게시글 수정 실패");
+			return ResponseEntity.badRequest().body("ポストの修正に失敗しました。");
 		}
 	}
 
@@ -320,7 +320,7 @@ public class CommunityController {
             return ResponseEntity.ok(likeCount);
         } catch (Exception e) {
             log.debug("좋아요 처리 실패");
-            return ResponseEntity.badRequest().body("좋아요 처리에 실패했습니다.");
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
@@ -339,7 +339,7 @@ public class CommunityController {
             return ResponseEntity.ok(isBookmarked);
         } catch (Exception e) {
             log.debug("북마크 토글 처리 실패");
-            return ResponseEntity.badRequest().body("북마크 처리에 실패했습니다.");
+            return ResponseEntity.badRequest().body("ブックマークの処理に失敗しました。");
         }
     }
 
@@ -379,7 +379,7 @@ public class CommunityController {
             cs.makeNewComment(commentDTO, user.getUsername());
             return ResponseEntity.ok("댓글 작성 성공!");
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("댓글 작성 실패");
+            return ResponseEntity.badRequest().body("コメントの作成に失敗しました。");
         }
     }
 
@@ -397,7 +397,7 @@ public class CommunityController {
             //cs.deleteComment(commentId, null);
             return ResponseEntity.ok("댓글 삭제 성공!");
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("댓글 삭제 실패");
+            return ResponseEntity.badRequest().body("コメントの削除に失敗しました。");
         }
     }
 
@@ -415,7 +415,7 @@ public class CommunityController {
             cs.updateComment(commentDTO, user.getUsername());
             return ResponseEntity.ok("댓글 수정 성공!");
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("댓글 수정 실패");
+            return ResponseEntity.badRequest().body("コメントの修正に失敗しました。");
         }
     }
 
