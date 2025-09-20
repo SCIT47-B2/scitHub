@@ -16,7 +16,7 @@ function loadComments() {
             commentListContainer.empty();
 
             if (!commentList || commentList.length === 0) {
-                commentListContainer.html('<div class="no-comments">아직 댓글이 없습니다.</div>');
+                commentListContainer.html('<div class="no-comments">コメントがありません。</div>');
                 return;
             }
 
@@ -27,7 +27,7 @@ function loadComments() {
             });
         },
         error: function() {
-            alert('댓글을 불러오는 데 실패했습니다.');
+            alert('コメントの読み込みに失敗しました。');
         }
     });
 }
@@ -91,7 +91,7 @@ function inputButtonClick() {
     const content = $('#commentBox').val().trim(); // 새 댓글 입력창 ID를 'commentBox'으로 가정
 
     if (content === '') {
-        alert('댓글 내용을 입력하세요.');
+        alert('コメントを入力して下さい。');
         return;
     }
 
@@ -107,7 +107,7 @@ function inputButtonClick() {
             loadComments(); // 댓글 목록 새로고침
         },
         error: function() {
-            alert('댓글 작성에 실패했습니다.');
+            alert('コメント送信に失敗しました。');
         }
     });
 }
@@ -122,19 +122,19 @@ $('#submit-comment-btn').on('click', inputButtonClick); // 버튼 ID를 'submit-
 $('.comment-list').on('click', '.delete-btn', function() {
     const commentId = $(this).data('comment-id');
     
-    if (confirm('정말로 이 댓글을 삭제하시겠습니까?')) {
+    if (confirm('本当にこのコメントを削除してよろしいですか?')) {
         $.ajax({
             url: `deleteComment/${commentId}`, // 삭제 처리를 위한 URL
             type: 'delete',
             success: function() {
-                alert('댓글이 삭제되었습니다.');
+                alert('コメントを削除しました。');
                 // 특정 댓글 엘리먼트만 삭제하여 성능 향상
                 $(`.comment[data-comment-id=${commentId}]`).remove();
                 // 또는 전체 목록 새로고침
                 // loadComments();
             },
             error: function() {
-                alert('댓글 삭제에 실패했습니다.');
+                alert('コメントの削除に失敗しました。');
             }
         });
     }
@@ -162,10 +162,10 @@ $('.comment-list').on('click', '.edit-btn', function() {
         <div class="comment-edit-form">
             <textarea class="comment-edit-textarea">${originalContent}</textarea>
             <div class="comment-edit-actions">
-                <button class="edit-action-btn cancel-edit-btn" data-comment-id="${commentId}" title="취소">
+                <button class="edit-action-btn cancel-edit-btn" data-comment-id="${commentId}" title="取り消し">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
-                <button class="edit-action-btn save-edit-btn" data-comment-id="${commentId}" title="수정 완료">
+                <button class="edit-action-btn save-edit-btn" data-comment-id="${commentId}" title="修正完了">
                     <i class="fa-solid fa-check"></i>
                 </button>
             </div>
@@ -189,7 +189,7 @@ $('.comment-list').on('click', '.save-edit-btn', function() {
     const newContent = commentDiv.find('.comment-edit-textarea').val().trim();
 
     if (newContent === '') {
-        alert('수정할 내용을 입력하세요.');
+        alert('コメントの修正内容を入力して下さい。');
         return;
     }
 
@@ -207,10 +207,10 @@ $('.comment-list').on('click', '.save-edit-btn', function() {
             commentTextP.html(newContent.replace(/\n/g, '<br>')).show();
             commentDiv.find('.comment-edit-form').remove();
             commentDiv.removeClass('comment-edit-mode');
-            alert('댓글이 수정되었습니다.');
+            alert('コメントが修正されました。');
         },
         error: function() {
-            alert('댓글 수정에 실패했습니다.');
+            alert('コメントの修正に失敗しました。');
             // 실패 시 원래 상태로 복구
             cancelEdit(commentId);
         }
