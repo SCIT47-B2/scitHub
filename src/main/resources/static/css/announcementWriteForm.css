@@ -1,0 +1,82 @@
+/* ================================== */
+/* 공지사항 작성 페이지 스타일          */
+/* ================================== */
+
+/* --- 상단 헤더 (페이지 제목, 등록 버튼) --- */
+.write-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.write-header h2 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.writeBtn {
+    padding: 10px 20px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 8px;
+    border: none;
+    background-color: var(--primary);
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+.writeBtn:hover {
+    background-color: #3b50b0; /* var(--primary)보다 약간 어두운 색 */
+}
+
+
+/* --- 메인 폼 카드 --- */
+.form-container {
+    background-color: var(--bg);
+    padding: 32px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+#postForm {
+    display: flex;
+    flex-direction: column;
+    gap: 24px; /* 제목과 에디터 사이 간격 */
+}
+
+
+/* --- 제목 입력창 스타일 --- */
+#title {
+    width: 100%;
+    padding: 10px 4px; /* 아래 테두리와의 여백 */
+    font-size: 28px;
+    font-weight: 700;
+    border: none;
+    border-bottom: 2px solid #e5e7eb; /* 연한 회색 밑줄 */
+    transition: border-color 0.2s;
+}
+#title:focus {
+    outline: none;
+    border-bottom-color: var(--primary); /* 포커스 시 파란색 밑줄 */
+}
+
+
+/* --- CKEditor 연동 스타일 --- */
+/* CKEditor의 전체적인 테두리를 폼 디자인에 맞게 수정 */
+.ck.ck-editor__main > .ck-editor__editable {
+    border: 1px solid #e5e7eb;
+    border-radius: 0 0 12px 12px; /* 하단 모서리만 둥글게 */
+    box-shadow: none; /* CKEditor 기본 그림자 제거 */
+}
+.ck.ck-editor__top .ck-sticky-panel .ck-toolbar {
+    border: 1px solid #e5e7eb;
+    border-bottom: none;
+    border-radius: 12px 12px 0 0; /* 상단 모서리만 둥글게 */
+}
+
+/* 에디터 포커스 시 전체 테두리 강조 */
+.ck.ck-editor.ck-focused {
+    --ck-focus-ring: 2px solid rgba(74, 103, 197, 0.2); /* var(--primary)와 유사한 색 */
+}
