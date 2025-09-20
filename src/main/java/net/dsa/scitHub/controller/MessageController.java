@@ -31,14 +31,20 @@ public class MessageController {
      * @return ResponseEntity<MessageResponseDto> - 생성된 메시지 정보와 201 Created 상태
      */
     @PostMapping
-    public ResponseEntity<MessageResponseDto> sendMessage(
+    // ResponseEntity<?> : body 안에 모든 타입의 데이터가 들어갈 수 있음
+    // 이를 통해 에러 발생 시 그 에러 메시지를 ResponseEntity에 넣을 수 있음
+    public ResponseEntity<?> sendMessage(
             @RequestBody MessageCreateRequestDto requestDto,
             @AuthenticationPrincipal UserDetails userDetails
     ) {
         String senderUsername = userDetails.getUsername();
-
-        MessageResponseDto responseDto = messageService.sendMessage(requestDto, senderUsername);
-        return ResponseEntity.created(URI.create("/mypage/api/messages/" + responseDto.getMessageId())).body(responseDto);
+        try {
+            MessageResponseDto responseDto = messageService.sendMessage(requestDto, senderUsername);
+            return ResponseEntity.created(URI.create("/mypage/api/messages/" + responseDto.getMessageId())).body(responseDto);
+        } catch (Exception e) {
+            // 예외 발생 시 에러 메시지를 반환
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     /**
