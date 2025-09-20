@@ -68,11 +68,11 @@ public class CommunityController {
         Map<String, String> boardMap = new LinkedHashMap<String,String>();
         // key:value = 영어이름(DB에 있는):일본어이름
         boardMap.put("free", "自由掲示板");
-        boardMap.put("it", "IT");
+        boardMap.put("it", "IT情報");
         boardMap.put("japanese", "日本語情報");
-        boardMap.put("jpCulture", "日本生活&文化");
+        boardMap.put("jpCulture", "日本文化&生活情報");
         boardMap.put("job", "就業情報&コツ");
-        boardMap.put("hobby", "趣味&旅行&グルメ");
+        boardMap.put("hobby", "趣味&旅行&グルメ情報");
         boardMap.put("certificate", "資格情報");
         boardMap.put("graduated", "卒業生掲示板");
 

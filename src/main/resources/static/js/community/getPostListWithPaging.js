@@ -32,10 +32,10 @@ function translateBoardNameToJp() {
                 result = "自由掲示板";
                 break;
             case "it":
-                result = "IT";
+                result = "IT情報";
                 break;
             case "japanese":
-                result = "日本語";
+                result = "日本語情報";
                 break;
             case "jpCulture":
                 result = "日本文化&生活情報";
