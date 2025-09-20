@@ -10,11 +10,12 @@ function likeFunc() {
         // 요청 성공 시 좋아요 개수 갱신
         success: function(data) {
             $(".likeCountDisplay").text(data);
-            // 좋아요 토글 처리 시 아이콘 변경
-            // 사실 좋아요 여부를 받아와서 처리해야 하지만, T/F이기 때문에 야매로 처리
-            const originalLetter = $(".isLikedDisplay").text();
-            const newLetter = originalLetter == '💙' ? '🤍' : '💙';
-            $(".isLikedDisplay").text(newLetter);
+            // 좋아요 토글 처리 시 아이콘 변경 (클래스 추가/삭제로 아이콘 색 변경)
+            if ($(".isLikedDisplay").hasClass('active')) {
+                $(".isLikedDisplay").removeClass('active');
+            } else {
+                $(".isLikedDisplay").addClass('active');
+            }
         },
         // 실패 시 alert창 띄우기
         error: function(e) {

@@ -1,114 +1,120 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org"
-    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-    layout:decorate="~{layouts/defaultLayout}"
-    xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-    <head>
-        <title>게시글 읽기</title>
-        <th:block layout:fragment="css">
-            <link rel="stylesheet" th:href="@{/css/home.css}">
-        </th:block>
-        <link rel="stylesheet" th:href="@{/css/searchBar.css}">
-        <link rel="stylesheet" th:href="@{/css/ckeditor5/editorStyle.css}">
-		<link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/46.0.3/ckeditor5.css" crossorigin>
-        <style>
-            .ck-content img,
-            .content-display img {
-                max-width: 100%;
-                height: auto;
-                /* 원본 비율 유지 */
-            }
-            .decoration {
-                width: 90%;
-                border-radius: 30px;
-                padding: 30px;
-                border: 1px solid black;
-                background-color: white;
-            }
-        </style>
-        <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
-    </head>
-    <body>
-        <section class="mainField" aria-label="메인 영역" layout:fragment="content">
-            <div class="searchSection">
-                <div class="categorySection">
-                    <select name="category" id="categoryDropdown">
-                        <option value="all" selected>전체</option>
-                        <option value="즐겨찾는 게시판">즐겨찾는 게시판</option>
-                        <option value="자유게시판">자유게시판</option>
-                        <option value="IT">IT</option>
-                        <option value="일본어">일본어</option>
-                        <option value="일본 생활&문화">일본 생활&문화</option>
-                        <option value="취업&꿀팁">취업&꿀팁</option>
-                        <option value="취미&여행&맛집">취미&여행&맛집</option>
-                        <option value="자격증">자격증</option>
-                        <option value="졸업생">졸업생</option>
-                    </select>
-                </div>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layouts/defaultLayout}" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
-                <div class="searchBar">
-                    <input type="text" placeholder="검색">
-                </div>
+<head>
+    <title>게시글 읽기</title>
+    <th:block layout:fragment="css">
+        <link rel="stylesheet" th:href='@{/css/community/pageFormat.css}'>
+        <link rel="stylesheet" th:href="@{/css/community/rightSidebar.css}">
+        <link rel="stylesheet" th:href="@{/css/community/readPost.css}">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    </th:block>
+    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+</head>
 
-                <button class="writeBtn" type="button" id="writePostBtn">글쓰기 ✏️</button>
-            </div>
-            <div class="decoration">
-                <a th:href="@{home}">홈으로 돌아가기</a>
-                <input type="hidden" id="postId" th:value="${post.postId}">
-                <div class="authorInfoAndBtns">
-                    <div class="authorInfo">
-                        <!-- 작성자 정보와 프로필 사진 불러오기 -->
-                        <div class="authorDislay" th:text="${post.username}"></div>
+<body>
+    <section class="mainField" aria-label="메인 영역" layout:fragment="content">
+        <div class="contentGrid">
+            <div class="page-container">
+                <!-- 메인 레이아웃 (화살표 + 게시글 컨텐츠) -->
+                <div class="main-layout">
+                    <!-- 좌측 네비게이션 (뒤로가기 화살표) -->
+                    <div class="nav-aside">
+                        <a href="javascript:history.back();" class="back-arrow">
+                            <i class="fa-solid fa-arrow-left"></i>
+                        </a>
                     </div>
-                    <th:block th:if="${post.username == #authentication.name}">
-                        <button type="button" id="deletePostBtn">삭제하기</button>
-                        <button type="button" id="updatePostBtn">수정하기</button>
-                    </th:block>
-                </div>
-                <div class="updatedTime">
-                    <div class="updatedTimeDisplay"
-                        th:text="${#strings.isEmpty(post.updatedAt) or (post.createdAt == post.updatedAt)}
-                                    ? ${#temporals.format(post.createdAt, 'yyyy년 MM월 dd일 HH:mm:ss')}
-                                    : |${#temporals.format(post.updatedAt, 'yyyy년 MM월 dd일 HH:mm:ss')}(에 수정됨)|"></div>
-                </div>
-                <input type="hidden" id="boardSection" th:value="@{post.board}">
-                <div class="title">
-                    <div class="titleDisplay" th:text="${post.title}"></div>
-                </div>
-                <div class="content">
-                    <div class="content-display" th:utext="${post.content}"></div>
-                </div>
-                <div class="likeAndCommentCount">
-                    <div class="likeDisplay">
-                        <button type="button" id="likeBtn">좋아요</button>
-                        <div class="likeDisplay">
-                            <input type="hidden" id="isLiked" th:value="${post.isLiked}">
-                            <span class="isLikedDisplay"
-                                  th:text="${post.isLiked} ? '💙' : '🤍'"></span>
-                            <span class="likeCountDisplay" th:text="${post.likeCount}"></span>
+
+                    <!-- 게시글 전체를 감싸는 흰색 컨테이너 -->
+                    <div class="post-wrapper">
+                        <!-- 게시글 상단: 작성자 정보 및 버튼 -->
+                        <div class="post-header">
+                            <div class="author-info">
+                                <img th:if="${!#strings.isEmpty(post.avatarUrl)}"
+                                th:src="@{/images/avatar/{f}(f=${post.avatarUrl})}" alt="プロフィールイメージ" class="profile-pic">
+                                <img th:unless="${!#strings.isEmpty(post.avatarUrl)}"
+                                    th:src="@{/images/chiikawaPuzzle.png}" alt="仮のプロフィールイメージ" class="profile-pic">
+                                <div class="author-details">
+                                    <span th:text="${post.username}" class="author-name"></span>
+                                    <span class="post-date" th:text="${#temporals.format(post.createdAt, 'yyyy年 MM月 dd日 HH:mm:ss')}"></span>
+                                </div>
+                            </div>
+                            <!-- 게시글 삭제/수정 버튼(해당 유저가 작성한 게시글일 시) -->
+                            <div class="post-actions">
+                                <th:block th:if="${post.username == #authentication.name}">
+                                    <button type="button" class="action-btn" id="deletePostBtn"><i class="fa-solid fa-trash"></i>削除する</button>
+                                    <button type="button" class="action-btn" id="updatePostBtn"><i class="fa-solid fa-pen-to-square"></i>修正する</button>
+                                </th:block>
+                                <!--
+                                <div class="bookmark">
+                                    <i class="fa-solid fa-bookmark"></i>
+                                </div>
+                                -->
+                            </div>
+                        </div>
+
+                        <!-- 게시글 본문 -->
+                        <div class="post-body">
+                            <h1 class="post-title" th:text="${post.title}"></h1>
+                            <!-- 게시글 식별자 (hidden) -->
+                            <input type="hidden" id="postId" th:value="${post.postId}">
+                            <div class="post-content">
+                                <div class="content-display" th:utext="${post.content}"></div>
+                            </div>
+                        </div>
+
+                        <!-- 게시글 하단: 좋아요, 댓글 수, 북마크 -->
+                        <div class="post-footer">
+                            <div class="interactions">
+                                <span class="likes"><i id="likeBtn" class="fa-solid fa-heart isLikedDisplay" th:classappend="${post.isLiked} ? 'active' : ''"></i> <span class = "likeCountDisplay" th:text="${post.likeCount}"></span></span>
+                                <span class="comments"><i class="fa-regular fa-comment-dots"></i> <span class="commentCountDisplay" th:text="${post.commentCount}"></span></span>
+                                <input type="hidden" id="tagsData" th:value="${post.tagList}">
+                                <div class="tags-section">
+                                    <div class="tags-container" id="tagsContainer">
+                                        <!-- 태그들이 동적으로 삽입될 영역 -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 댓글 섹션 구분선 -->
+                        <hr class="separator">
+
+                        <!-- 댓글 입력 -->
+                        <div class="comment-input-section">
+                            <img th:src="@{/images/avatar/{f}(f=${currentUser.avatarUrl})}" alt="私のプロフィールイメージ" class="profile-pic-small">
+                            <div class="comment-input-box">
+                                <input type="text" name="commentForm" id="commentBox" placeholder="コメント作成欄">
+                                <i id="inputCommentBtn" class="fa-solid fa-check"></i>
+                            </div>
+                        </div>
+
+                        <!-- 댓글 목록 -->
+                        <div class="comment-list">
+                            <!-- ajax 함수를 통해 컨트롤러에서 받아온 댓글을 동적으로 생성 -->
                         </div>
                     </div>
-                    <div class="commentCountDisplay"></div>
-                </div>
-                <input type="hidden" name="tagList" id="tagsData" th:value="${post.tagList}">
-                <div class="writeComment">
-                    <input type="text" name="commentForm" id="commentBox">
-                    <button type="button" id="inputCommentBtn">댓글 작성</button>
-                </div>
-                <div class="comments">
-                    <!-- 비동기 방식으로 댓글 불러오기 -->
-                    <table>
-                        <tbody id="commentTbody">
-                        </tbody>
-                    </table>
                 </div>
             </div>
-        </section>
-        <th:block layout:fragment="script">
-            <script th:src="@{/js/community/controlPost.js}"></script>
-            <script th:src="@{/js/community/controlComments.js}"></script>
-            <script th:src="@{/js/community/toggleLikePost.js}"></script>
-            <script th:src="@{/js/community/readPostInit.js}"></script>
-        </th:block>
-    </body>
+            <!-- 우측 사이드바 -->
+            <aside class="rightSidebar">
+                <nav class="categoryMenuList">
+                    <th:block th:each="board : ${boardMap}">
+                        <a th:href="@{board(boardId=${board.key})}" class="categoryMenuItem"
+                            th:classappend="${post.boardId == board.key} ? 'active' : ''" th:text="${board.value}"></a>
+                    </th:block>
+                </nav>
+            </aside>
+        </div>
+    </section>
+    <th:block layout:fragment="script">
+        <script th:src="@{/js/community/controlPost.js}"></script>
+        <script th:src="@{/js/community/toggleLikePost.js}"></script>
+        <script th:src="@{/js/community/displayTag.js}"></script>
+        <script th:src="@{/js/community/controlComments.js}"></script>
+        <script th:src="@{/js/community/readPostInit.js}"></script>
+    </th:block>
+</body>
+
 </html>

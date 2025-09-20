@@ -13,6 +13,10 @@ import java.util.Optional;
 @Repository
 public interface BoardRepository extends JpaRepository<Board, Integer> {
     
+    /** 게시판 목록에 출력할 게시판 조회 */
+    @Query("SELECT b FROM Board b WHERE b.boardId <= 8")
+    List<Board> findAllVisibleBoards();
+
     /** 게시판 이름으로 조회 */
     Optional<Board> findByName(String name);
     
