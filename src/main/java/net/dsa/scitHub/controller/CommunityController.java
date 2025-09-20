@@ -2,6 +2,7 @@ package net.dsa.scitHub.controller;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import net.dsa.scitHub.dto.CommentDTO;
+import net.dsa.scitHub.dto.BoardDTO;
 import net.dsa.scitHub.dto.MenuItem;
 import net.dsa.scitHub.dto.PostDTO;
 import net.dsa.scitHub.service.CommunityService;
@@ -62,8 +64,18 @@ public class CommunityController {
     }
 
     @ModelAttribute("boardMap")
-    public Map<Integer, String> boardMap() {
-        Map<Integer, String> boardMap = cs.getBoardMap();
+    public Map<String, String> boardMap() {
+        Map<String, String> boardMap = new LinkedHashMap<String,String>();
+        // key:value = 영어이름(DB에 있는):일본어이름
+        boardMap.put("free", "自由掲示板");
+        boardMap.put("it", "IT");
+        boardMap.put("japanese", "日本語情報");
+        boardMap.put("jpCulture", "日本生活&文化");
+        boardMap.put("job", "就業情報&コツ");
+        boardMap.put("hobby", "趣味&旅行&グルメ");
+        boardMap.put("certificate", "資格情報");
+        boardMap.put("graduated", "卒業生掲示板");
+
         log.debug("게시글 맵 정보 : {}", boardMap);
         return boardMap;
     }
@@ -78,7 +90,8 @@ public class CommunityController {
     public String communityPage(
         Model model,
         @AuthenticationPrincipal UserDetails user) {
-        return "community/home"; // templates/community/home.html
+        // return "community/home"; // templates/community/home.html
+        return "redirect:board?name=free";  // 일단 자유게시판 페이지로 이동시키기
     }
 
     /**
@@ -88,12 +101,12 @@ public class CommunityController {
      */
     @GetMapping("board")
     public String gotoBoard(
-        @RequestParam("boardId") Integer boardId,
+        @RequestParam("name") String name,
         Model model) {
         try {
-            String boardName = cs.getBoardName(boardId);
-            model.addAttribute("boardName", boardName);
-            model.addAttribute("boardId", boardId);
+            BoardDTO boardDTO = cs.getBoard(name);
+            model.addAttribute("boardName", boardDTO.getName());
+            model.addAttribute("boardId", boardDTO.getBoardId());
             return "community/board";     // templates/community/board
             // 페이징된 게시글 불러오기와 렌더링은 비동기 처리로 진행함
         } catch (Exception e) {

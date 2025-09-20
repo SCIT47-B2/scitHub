@@ -34,6 +34,8 @@ import net.dsa.scitHub.repository.board.PostRepository;
 import net.dsa.scitHub.repository.board.TagRepository;
 import net.dsa.scitHub.repository.user.UserRepository;
 
+import net.dsa.scitHub.dto.BoardDTO;
+
 @Service
 @Slf4j
 @Transactional
@@ -86,18 +88,67 @@ public class CommunityService {
      * @param pageable
      * @return
      */
-    public String getBoardName(Integer boardId) {
-        Board board = br.findById(boardId).orElseThrow(
+    public BoardDTO getBoard(String name) {
+        Board board = br.findByName(name).orElseThrow(
             () -> new EntityNotFoundException("해당 게시판을 찾을 수 없습니다.")
         );
 
-        return board.getName();
+        BoardDTO boardDTO = BoardDTO.builder()
+                                    .boardId(board.getBoardId())
+                                    .name(board.getName())
+                                    .description(board.getDescription())
+                                    .build();
+
+        return boardDTO;
     }
+
+    /**
+     * 게시판 이름 일본어로 바꾸기
+     * @param String
+     * @return String
+     */
+    public String translateToJp(String name) {
+        String result = "";
+        switch (name) {
+            case "free":
+                result = "自由掲示板";
+                break;
+            case "it":
+                result = "IT";
+                break;
+            case "japanese":
+                result = "日本語";
+                break;
+            case "jpCulture":
+                result = "日本文化&生活情報";
+                break;
+            case "job":
+                result = "就活情報&コツ";
+                break;
+            case "hobby":
+                result = "趣味&旅行&グルメ情報";
+                break;
+            case "certificate":
+                result = "資格情報";
+                break;
+            case "graduated":
+                result = "卒業生掲示板";
+                break;
+            default:
+                result = "掲示板の名前が間違っています";
+                break;
+        }
+
+        return result;
+    }
+
 
     /**
      * 게시판 맵 가져오기
      * @return Map<Integer, String>
      */
+    // DB 연동 이슈로 인해 미사용
+    /*
     public Map<Integer, String> getBoardMap() {
         // 목록에 노출할 게시판 가져오기
         List<Board> boardList = br.findAllVisibleBoards();
@@ -109,6 +160,7 @@ public class CommunityService {
         }
         return boardMap;
     }
+    */
 
     /**
      * 게시판 내의 게시글 가져오기(페이징)

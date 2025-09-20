@@ -34,13 +34,14 @@
                             <i class="fa-solid fa-magnifying-glass"></i>
                         </button>
                     </div>
+                    <!-- 게시판 식별자 정보 hidden 영역에 보관 -->
                     <input type="hidden" id="boardId" th:value="${boardId}">
 
                     <!-- 게시글 테이블 -->
                     <div class="board-section">
                         <div class="section-header">
                             <!-- 게시판 이름 -->
-                            <h2 class="boardNamem" th:text="${boardName}"></h2>
+                            <h2 class="boardName" th:text="${boardName}"></h2>
                             <!-- 게시글 작성 버튼 -->
                             <button type="button" class="writeBtn">글쓰기<i class="fa-solid fa-pencil"></i></button>
                         </div>
@@ -73,9 +74,10 @@
                 <aside class="rightSidebar">
                     <nav class="categoryMenuList">
                         <th:block th:each="board : ${boardMap}">
-                            <a th:href="@{board(boardId=${board.key})}"
+                            <!-- boardId -> name 연동으로 교체 -->
+                            <a th:href="@{board(name=${board.key})}"
                             class="categoryMenuItem"
-                            th:classappend="${boardId == board.key} ? 'active' : ''"
+                            th:classappend="${boardName == board.key} ? 'active' : ''"
                             th:text="${board.value}"></a>
                         </th:block>
                     </nav>

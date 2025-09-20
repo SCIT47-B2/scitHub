@@ -1,10 +1,10 @@
-$(document).ready( function () {
-    // URL에서 boardId 추출
-    const urlParams = new URLSearchParams(window.location.search);
-    const initialBoardId = parseInt(urlParams.get('boardId'), 10) || 1;
+$(document).ready(function () {
+    // hidden input 영역에서 boardId 추출
+    const initialBoardId = $('#boardId').val();
 
     // 1. 페이지 최초 로드
     loadPosts(initialBoardId, 0);
+    translateBoardNameToJp();
 
     // 2. 검색 버튼 클릭 이벤트
     $('#search-btn').on('click', function () {
@@ -20,6 +20,45 @@ $(document).ready( function () {
         loadPosts(initialBoardId, 0, searchType, keyword);
     });
 });
+
+/**
+ * 게시판 이름을 일본어로 해석
+ */
+function translateBoardNameToJp() {
+    const boardName = $('.boardName').text();
+    let result = '';
+    switch (boardName) {
+            case "free":
+                result = "自由掲示板";
+                break;
+            case "it":
+                result = "IT";
+                break;
+            case "japanese":
+                result = "日本語";
+                break;
+            case "jpCulture":
+                result = "日本文化&生活情報";
+                break;
+            case "job":
+                result = "就活情報&コツ";
+                break;
+            case "hobby":
+                result = "趣味&旅行&グルメ情報";
+                break;
+            case "certificate":
+                result = "資格情報";
+                break;
+            case "graduated":
+                result = "卒業生掲示板";
+                break;
+            default:
+                result = "掲示板の名前が間違っています";
+                break;
+        }
+    console.log(result);
+    $('.boardName').text(result);
+}
 
 /**
  * 게시글 목록 또는 검색 결과를 비동기적으로 로드
