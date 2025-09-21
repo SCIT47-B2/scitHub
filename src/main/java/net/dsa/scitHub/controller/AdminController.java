@@ -49,10 +49,6 @@ public class AdminController {
 	@Value("${board.linkSize}")
 	int linkSize;				// 페이지 이동 링크 수
 
-    int boardId;				// 게시판 ID
-    int upperBoardId;          // 위쪽 공지 게시판 ID
-    int lowerBoardId;          // 아래쪽 공지 게시판 ID
-
     /**
      * 운영실 메뉴 아이템
      * @return 메뉴 아이템 리스트
@@ -89,9 +85,9 @@ public class AdminController {
         @RequestParam(name = "boardName", defaultValue = "announcement") String boardName
     ) {
         log.debug("운영실 공지사항 페이지 요청: page={}, searchType={}, searchWord={}, boardName={}", page, searchType, searchWord, boardName);
-        boardId = bs.getBoardIdFromName(boardName);
-        upperBoardId = boardName.equals("announcement") ? bs.getBoardIdFromName("announcementIt") : bs.getBoardIdFromName("announcement");
-        lowerBoardId = boardName.equals("announcementJp") ? bs.getBoardIdFromName("announcementIt") : bs.getBoardIdFromName("announcementJp");
+        int boardId = bs.getBoardIdFromName(boardName);
+        int upperBoardId = boardName.equals("announcement") ? bs.getBoardIdFromName("announcementIt") : bs.getBoardIdFromName("announcement");
+        int lowerBoardId = boardName.equals("announcementJp") ? bs.getBoardIdFromName("announcementIt") : bs.getBoardIdFromName("announcementJp");
 
         log.debug("게시판 ID: {}", boardId);
         if (boardId == -1) {
@@ -138,7 +134,10 @@ public class AdminController {
         PostDTO postDTO = new PostDTO();
         postDTO.setBoardId(boardId);
 
+        log.debug("공지사항 글 작성 페이지 요청: boardName={}, boardId={}", boardName, boardId);
+
         model.addAttribute("postDTO", postDTO);
+        model.addAttribute("boardName", boardName);
 
         return "admin/announcementWriteForm";
     }
@@ -203,7 +202,7 @@ public class AdminController {
         @RequestParam(name = "boardName", defaultValue = "inquiry") String boardName
     ) {
         log.debug("운영실 문의 페이지 요청: page={}, searchType={}, searchWord={}, boardName={}", page, searchType, searchWord, boardName);
-        boardId = bs.getBoardIdFromName(boardName);
+        int boardId = bs.getBoardIdFromName(boardName);
 
         log.debug("게시판 ID: {}", boardId);
         if (boardId == -1) {
