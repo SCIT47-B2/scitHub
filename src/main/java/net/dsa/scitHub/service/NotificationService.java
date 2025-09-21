@@ -71,6 +71,9 @@ public class NotificationService {
      */
     private void sendToClient(Integer userId, Object data) {
         SseEmitter emitter = emitters.get(userId);
+        log.debug("SSE Emitter 조회 [userId={}, emitter={}]", userId, emitter);
+
+         // Emitter가 존재할 때만 전송 시도
         if (emitter != null) {
             try {
                 emitter.send(
@@ -103,6 +106,8 @@ public class NotificationService {
 
         // 2. DTO로 변환
         NotificationDTO notificationDTO = NotificationDTO.convertToDTO(notification);
+
+        log.debug("알림 전송 준비 완료 [userId={}]", recipient.getUserId());
 
         // 3. SSE로 실시간 알림 발송
         sendToClient(recipient.getUserId(), notificationDTO);
