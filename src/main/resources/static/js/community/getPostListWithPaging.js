@@ -82,7 +82,7 @@ function loadPosts(boardId, page = 0, searchType = null, keyword = null) {
     }
 
     $.ajax({
-        url: `getBoard?boardId=${boardId}`, // 동일한 엔드포인트 사용
+        url: `getBoard`, // 동일한 엔드포인트 사용
         type: 'GET',
         data: requestData,
         dataType: 'json',

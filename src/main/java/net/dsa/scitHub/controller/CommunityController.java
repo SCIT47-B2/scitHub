@@ -130,8 +130,8 @@ public class CommunityController {
     @GetMapping("getBoard")
     public ResponseEntity<Page<PostDTO>> getPostsByBoard(
         @RequestParam("boardId") Integer boardId,
-        @RequestParam(required = false) String searchType,
-        @RequestParam(required = false) String keyword,
+        @RequestParam(name = "searchType", required = false) String searchType,
+        @RequestParam(name = "keyword", required = false) String keyword,
         @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
 
         // 수신 데이터 로그
