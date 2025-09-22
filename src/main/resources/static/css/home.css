@@ -1,262 +1,345 @@
-/* =========================
-  홈 전용 스타일 (home.css)
-  - .home-container: 페이지 전체 너비와 좌우 여백 제어
-  - 헤더(homeHeader): 네비게이션 바
-  - 본문: 좌(운영실·질문) / 중(검색+좌석) / 우(일정) 3열
-  - 네비게이션 바 하단 간격 보장
-  - 좌석배치도 비율/밀도/톤 보정
-========================= */
+/* ===================================================================
+   Refactored CSS for SCIT Hub (home.css) - UPDATED
+   - Inspired by modern, monochrome design with color accents.
+   - Applies a consistent token system for colors, fonts, and spacing.
+   =================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&display=swap');
+/* ----------------------------------
+   1. Root Variables & Base Styles (Tokens)
+   ---------------------------------- */
+:root {
+    /* Colors */
+    --bg-primary: #FFFFFF;       /* Main background (White) */
+    --bg-secondary: #F7F8FA;     /* Lighter gray for backgrounds, cards */
+    --text-primary: #111827;     /* Main text color (Near Black) */
+    --text-secondary: #6B7280;   /* Muted text for subtitles, hints */
+    --border-color: #E5E7EB;     /* Standard border color */
+    
+    /* Accent Colors (Inspired by reference images) */
+    --accent-blue: #4F46E5;      /* A vibrant blue */
+    --accent-green: #10B981;     /* A clear green */
+    --accent-yellow: #F59E0B;    /* A warm yellow */
 
-html, body{
-  font-family: 'Noto Sans JP', sans-serif;
-}
+    /* Typography */
+    --font-sans: 'Noto Sans JP', sans-serif;
+    --font-brand: 'Poppins', var(--font-sans); /* Example for a distinct brand font */
 
-/** 카드 공통 */
-/* 페이지 전체 너비와 좌우 여백을 제어하는 컨테이너 */
-.home-container {
-    width: 100%;
-    max-width: 1400px; /* 페이지 최대 너비 설정 */
-    margin: 0 auto;    /* 중앙 정렬 */
-    padding: 0 32px;   /* 좌우 여백 */
-    box-sizing: border-box;
-}
-.card{
-  background:#fff; border:1px solid #eee; border-radius:16px;
-  /* box-shadow:0 2px 10px rgba(0,0,0,.04); */
-  box-shadow: var(--shadow);
-}
+    /* Spacing & Sizing */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
 
-/* ============ 메인 그리드 ============ */
-.mainGrid{
-    display:grid;
-    grid-template-columns: 320px minmax(0, 1fr) 300px;
-    gap:16px;
-    align-items:start;
-}
-@media (max-width: 1360px){
-    .mainGrid{ grid-template-columns: 280px 1fr 280px; }
-}
-@media (max-width: 1080px){
-    .mainGrid{ grid-template-columns: 1fr; }
+    /* Borders & Shadows */
+    --border-radius-sm: 8px;
+    --border-radius-md: 12px;
+    --border-radius-lg: 16px;
+    /* --- ADJUSTED: Reduced general shadow for a softer look --- */
+    --shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.04); 
 }
 
-/* ============ 본문 3열 ============ */
-/** 좌: 운영실·질문 / 중: 검색+좌석 / 우: 일정 */
-.leftCol{ display:flex; flex-direction:column; gap:12px; }
-.centerCol{ display:flex; flex-direction:column; gap:16px; }  /* 검색 ↔ 좌석 간격 */
-.rightCol{ display:flex; flex-direction:column; gap:12px; }
-
-/* ============ 검색(중앙 컬럼 내부) ============ */
-.search-row{ display:flex; gap:10px; align-items:center; }
-.search-input{
-  flex:1; height:40px; display:flex; align-items:center; gap:10px;
-  padding:0 14px; background:#fff; border:1px solid #e5e7eb; border-radius:999px;
-  box-shadow: var(--shadow);
-}
-.search-input i{ color:#9aa3b2; }
-.search-input input{
-  flex:1; height:100%; border:none; outline:none; background:transparent; font-size:14px;
-}
-.btn-search{
-  height:40px; padding:0 18px; background:#4f67d9; color:#fff; border:none; border-radius:12px;
-  font-weight:700; cursor:pointer;
-  box-shadow: var(--shadow);
-}
-.btn-search:hover{ filter:brightness(.95); }
-
-/* ============ 좌측: 운영실·새로운 질문 (2단 블록) ============ */
-/**
- * stackCard
- * @desc  시안처럼 [파란 헤더 블록] + [내용 블록]을 수직으로 쌓는 컨테이너
- * @html  <section class="stackCard"> <a class="sectionHead">..</a> <div class="sectionBody">..</div> </section>
- */
-.stackCard{
-  background:transparent; border:none; box-shadow:none; /* card 외곽선 제거 */
-  display:flex; flex-direction:column; gap:8px;
-  border-radius:16px; /* 내부 블록과 곡률 통일 */
-  
+body {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    margin: 0;
 }
 
-/**
- * sectionHead (클릭 영역)
- * @desc  텍스트만 들어가는 파란색 헤더. 전체가 링크로 동작
- * @param href  링크 목적지
- * @return 없음(UI)
- */
-.sectionHead{
-  display:block;
-  padding:10px 12px;
-  background:#4258BE;
-  color:#fff; text-decoration:none;
-  border-radius:12px;
-  font-weight:900; font-size:15px; letter-spacing:.2px;
-  box-shadow:0 2px 8px rgba(79,103,217,.15);
-}
-.sectionHead:hover{ filter:brightness(.97); }
-
-/**
- * sectionBody (실제 내용 영역)
- * @desc  운영실: 공지 리스트 / 새로운 질문: 입력창 등
- */
-.sectionBody{
-  padding:12px;
-  background:#fff;
-  border:1px solid #e5e7eb;
-  border-radius:12px;
-  box-shadow: var(--shadow);
+/* ----------------------------------
+   2. Main Layout Grid
+   ---------------------------------- */
+.mainGrid {
+    display: grid;
+    grid-template-columns: 280px minmax(0, 1fr) 280px; /* Adjusted fixed side columns */
+    gap: var(--spacing-lg);
+    padding: var(--spacing-xl);
+    max-width: 1440px;
+    margin: 0 auto;
+    align-items: start;
 }
 
-/* 좌측 컬럼 (운영실, 새로운 질문) */
-.leftCol {
-  display: flex;
-  flex-direction: column;
-  gap: 20px; /* 카드 사이의 간격 추가 */
+.leftCol, .centerCol, .rightCol {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
 }
 
-/** 운영실 공지 리스트(본문) */
-.noticeList{ margin:0; padding-left:18px; }
-.noticeList li{ font-size:13px; line-height:1.6; color:#333; }
-.noticeList li a{ color:var(--primary); text-decoration:none; font-weight:700; }
-.noticeList li a:hover{ text-decoration:underline; }
-
-/** 새로운 질문 입력 박스(본문) */
-.askBox{
-  display:flex; gap:10px; align-items:center;
-  padding:0; border:none; background:transparent; /* sectionBody가 이미 박스 역할 */
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+    .mainGrid {
+        grid-template-columns: 240px 1fr; /* Right column stacks below */
+        gap: var(--spacing-md);
+    }
+    .rightCol { grid-column: 1 / -1; } /* Right column takes full width */
 }
-.askBox input{
-  flex:1; border:1px solid #e5e7eb; outline:none; background:#fff; height:36px; font-size:14px;
-  border-radius:10px; padding:0 12px;
-}
-.askHint{ font-size:12px; color:var(--muted); }
-
-/* ============ 좌석배치도 ============ */
-.seatmapCard.card{ padding:16px; }
-
-/**
- * 좌석배치도 래퍼
- * - 중앙 컬럼 너비에 맞춰 확대/축소
- * - 세로는 aspect-ratio로 비율 유지
- * - --cols / --rows / --gap / --pad 로 미세 조정 가능
- */
-.seatmap{
-  --cols:16;      /* 가로 칸 수(시안 기준) */
-  --rows:14;      /* 세로 칸 수: 14 권장(13~15 조정) */
-  --gap:9px;      /* 칸 간격 */
-  --pad:12px;     /* 컨테이너 안쪽 여백 */
-
-  width:100%;
-  aspect-ratio: calc(var(--cols) / var(--rows));
-  display:grid;
-  grid-template-columns: repeat(var(--cols), 1fr);
-  grid-template-rows: repeat(var(--rows), 1fr);
-  gap:var(--gap);
-  padding:var(--pad);
-  border-radius:18px;
-  background:#f7f8fb;
-  box-sizing:border-box;
+@media (max-width: 900px) {
+    .mainGrid {
+        grid-template-columns: 1fr; /* Single column layout */
+    }
 }
 
-/** 좌석 타일(공통) */
-.block{
-  display:flex; align-items:center; justify-content:center; text-align:center;
-  background:#fff; border:1px solid #eceff4; color:#111; font-weight:800;
-  border-radius:16px;
-  padding:4px 6px; letter-spacing:-0.2px;
-}
-.block.small{
-  font-weight:700; font-size:12px; line-height:1.15; border-radius:10px;
-  word-break:keep-all;
-}
-.block.pill{ border-radius:20px; }
-.block.gray{ background:#f4f6fa; color:#111; }
-.block.blue{ background:#cfe0ff; }                 /* 파란 톤 다운 */
-.block.label{ background:#f3f4f6; color:#4258BE; border-style:dashed; }
 
-/* 클릭 가능한 블록에 대한 스타일 추가 */
-.clickable-block {
+/* ----------------------------------
+   3. Card & Section Styles
+   ---------------------------------- */
+.card {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-soft);
+}
+
+.stackCard {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.sectionHead {
+    display: block;
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--text-primary); /* Bold black header */
+    color: var(--bg-primary);
+    text-decoration: none;
+    border-radius: var(--border-radius-md);
+    font-weight: 700;
+    font-size: 16px;
+    transition: background-color 0.2s;
+}
+.sectionHead:hover {
+    background-color: #374151; /* Slightly lighter black on hover */
+}
+
+.sectionBody {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-md);
+    padding: var(--spacing-md);
+    box-shadow: var(--shadow-soft);
+}
+
+/* Right column card title */
+.sectionTitle {
+    margin: 0;
+    padding: var(--spacing-md);
+    padding-bottom: 0;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+/* ----------------------------------
+   4. Component Styles (Search, Lists, Seatmap)
+   ---------------------------------- */
+
+/* Search Bar */
+.search-row {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+.search-input {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: 0 var(--spacing-md);
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 999px; /* Pill shape */
+    height: 44px;
+    box-shadow: var(--shadow-soft);
+}
+.search-input i { color: var(--text-secondary); }
+.search-input input {
+    flex: 1;
+    height: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 14px;
+}
+.btn-search {
+    height: 44px;
+    padding: 0 20px;
+    background: var(--text-primary);
+    color: var(--bg-primary);
+    border: none;
+    border-radius: var(--border-radius-md);
+    font-weight: 700;
     cursor: pointer;
-    transition: filter 0.2s;
+    transition: background-color 0.2s;
 }
-.clickable-block:hover {
-    filter: brightness(0.95);
+.btn-search:hover { background-color: #374151; }
+
+/* Notice & Schedule Lists */
+.noticeList, .scheduleList {
+    margin: 0;
+    padding-left: 20px;
+    font-size: 14px;
+}
+.noticeList li, .scheduleList li {
+    margin-bottom: var(--spacing-sm);
+    color: var(--text-secondary);
+}
+.noticeList li a {
+    color: var(--text-primary);
+    text-decoration: none;
+    font-weight: 600;
+}
+.noticeList li a:hover { text-decoration: underline; }
+
+/* "New Question" Box */
+.askBox {
+    display: flex;
+    gap: var(--spacing-sm);
+    /* --- ADJUSTED: Ensure button stays within the card --- */
+    /* Remove padding from the box itself, it's handled by sectionBody */
+    padding: 0; 
+    width: 100%; /* Ensure it takes full width of its parent */
+    box-sizing: border-box; /* Include padding/border in width */
+}
+.askBox input {
+    flex: 1;
+    border: 1px solid var(--border-color);
+    background: var(--bg-secondary);
+    height: 38px;
+    font-size: 14px;
+    border-radius: var(--border-radius-sm);
+    padding: 0 var(--spacing-md);
+    outline-color: var(--accent-blue);
+}
+/* Ensure the button within askBox is styled correctly */
+.askBox .btn-search {
+    height: 38px; /* Match input height */
+    padding: 0 16px; /* Slightly less padding for smaller button */
+    font-size: 14px;
+    border-radius: var(--border-radius-sm);
 }
 
-/** 상단 슬림 라벨 바(대강의실/다목적라운지) */
-.labelBar{
-  background:linear-gradient(#eef2ff,#eef2ff);
-  border:1px solid rgba(17,17,17,.06);
-  border-radius:999px;
-  font-size:14px; font-weight:800;
-  padding:3px 8px;
+
+/* Seatmap */
+.seatmapCard.card {
+    padding: var(--spacing-md);
 }
 
-/** 복도(톤 완화) */
-.corridor{
-  background:#f3f6fb;
-  border:1px dashed rgba(0,0,0,.08);
-  border-radius:12px;
+.seatmap {
+    --cols: 16;
+    --rows: 10;
+    --gap: 8px;
+    width: 100%;
+    aspect-ratio: var(--cols) / var(--rows);
+    display: grid;
+    grid-template-columns: repeat(var(--cols), 1fr);
+    grid-template-rows: repeat(var(--rows), 1fr);
+    gap: var(--gap);
+    background-color: transparent; /* Remove the gray background */
 }
 
-/* Modal Styles */
+.block {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    font-weight: 600;
+    border-radius: var(--border-radius-sm);
+    padding: 4px;
+    font-size: 13px;
+    transition: all 0.2s ease;
+}
+.block.small {
+    font-size: 12px;
+    border-radius: 6px;
+}
+
+/* Different block types */
+.block.labelBar {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-weight: 700;
+    font-size: 12px;
+}
+.corridor {
+    background-color: transparent;
+    border-radius: var(--border-radius-sm);
+    border: 1px dashed var(--border-color);
+}
+.block.gray, .block.label {
+    background: var(--bg-secondary);
+    border-color: #D1D5DB; /* Slightly darker border */
+}
+
+/* Use accent colors for clickable rooms */
+.block.room {
+    cursor: pointer;
+}
+.block.room:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+/* This class provides the light blue accent style */
+.room.reservable {
+    background: #E0E7FF; /* Light blue accent */
+    color: #3730A3;      /* Darker blue text */
+    border-color: #C7D2FE;
+}
+/* Remove the direct 'blue' class styling, prefer 'reservable' for consistency */
+/* .block.blue { 
+    background: var(--bg-secondary);
+} */
+
+
+/* ----------------------------------
+   5. Modal Styles
+   ---------------------------------- */
 .modal-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.6); /* 배경을 약간 더 어둡게 */
-    display: none; /* 기본적으로 숨김. JS로 'flex'로 변경하여 표시 */
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(17, 24, 39, 0.6); /* Darker overlay */
+    backdrop-filter: blur(4px); /* Frosted glass effect */
+    display: none;
     justify-content: center;
     align-items: center;
-    z-index: 1000; /* Ensure it's on top */
+    z-index: 1000;
 }
-
 .modal-content {
     position: relative;
-    background: #fff;
-    padding: 16px;
-    border-radius: 12px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-    max-width: min(800px, 80vw); /* 최대 너비를 1000px 또는 화면의 85% 중 작은 값으로 제한 */
-    max-height: 85vh; /* 화면 높이의 85%를 넘지 않도록 */
+    background: var(--bg-primary);
+    padding: var(--spacing-sm);
+    border-radius: var(--border-radius-lg);
+    box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+    max-width: min(800px, 90vw);
+    max-height: 90vh;
 }
-
 .modal-content img {
     display: block;
     max-width: 100%;
     max-height: 100%;
-    object-fit: contain; /* 이미지 비율을 유지하며 컨테이너에 맞춤 */
+    object-fit: contain;
+    border-radius: var(--border-radius-md); /* Rounded corners inside modal */
 }
-
 .modal-content .close-button {
     position: absolute;
-    top: -15px;   /* 모달 박스 바깥 상단 */
-    right: -15px; /* 모달 박스 바깥 우측 */
-    width: 36px;
-    height: 36px;
-    background: white;
-    border: none;
+    top: -16px;
+    right: -16px;
+    width: 32px; height: 32px;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
     border-radius: 50%;
-    font-size: 24px;
-    font-weight: bold;
-    color: #333;
+    font-size: 20px;
+    color: var(--text-secondary);
     cursor: pointer;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    line-height: 1;
+    box-shadow: var(--shadow-soft);
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: all 0.2s;
 }
-
-/* 반응형: 좌석 내부 간격 축소 */
-@media (max-width: 1200px){ .seatmap{ --gap:8px; } }
-@media (max-width: 960px){  .seatmap{ --gap:7px; } }
-
-/* ============ 기타 ============ */
-.sectionTitle{ margin:0; font-size:15px; font-weight:900; letter-spacing:.2px; } /* (기존 h3 유지용) */
-.scheduleList{ margin:0; padding-left:16px; }
-.scheduleList li{ font-size:13px; line-height:1.6; color:#333; }
-.isHidden{ display:none; }
+.close-button:hover {
+    transform: scale(1.1);
+    color: var(--text-primary);
+}
