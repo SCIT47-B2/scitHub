@@ -139,7 +139,7 @@ public class ArchiveController {
         if (userDetails == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("ログインが必要です.");
         }
-        
+
         try {
             // 서비스 로직 호출
             crs.createReview(companyId, userDetails.getUsername(), reviewDTO);

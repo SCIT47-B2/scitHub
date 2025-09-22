@@ -23,6 +23,7 @@ import net.dsa.scitHub.entity.board.Comment;
 import net.dsa.scitHub.entity.board.Post;
 import net.dsa.scitHub.entity.interfaces.Authorizable;
 import net.dsa.scitHub.entity.user.User;
+import net.dsa.scitHub.enums.NotificationType;
 import net.dsa.scitHub.repository.board.BoardRepository;
 import net.dsa.scitHub.repository.board.CommentRepository;
 import net.dsa.scitHub.repository.board.PostRepository;
@@ -37,6 +38,7 @@ public class PostService {
     private final UserRepository ur;
     private final BoardRepository br;
     private final CommentRepository cr;
+    private final NotificationService ns;
 
     /**
      * 게시판 ID와 검색 조건에 따른 게시글 목록 조회 (페이징)
@@ -209,7 +211,10 @@ public class PostService {
             .post(post)
             .build();
 
-        cr.save(comment);
+        Comment savedComment = cr.save(comment);
+
+        // 게시글 작성자에게 댓글 알림 전송
+        ns.send(post.getUser(), NotificationType.NEW_COMMENT_ON_POST, savedComment);
     }
 
     /**

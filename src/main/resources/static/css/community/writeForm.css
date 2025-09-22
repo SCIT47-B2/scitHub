@@ -1,0 +1,111 @@
+/* 전체 폼 컨테이너 스타일 */
+.decoration {
+    width: 100%;
+    max-width: 900px; /* 에디터 폭과 유사하게 설정 */
+    margin: 24px auto;
+    padding: 32px;
+    background-color: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    box-sizing: border-box;
+}
+
+.formField {
+    display: flex;
+    flex-direction: column;
+    gap: 16px; /* 요소들 사이의 간격 */
+}
+
+/* 게시판 선택 + 제목 입력 헤더 */
+.form-header {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+/* 게시판 선택 드롭다운 */
+.boardSelectSection {
+    flex-shrink: 0; /* 너비가 줄어들지 않도록 설정 */
+}
+
+#boardDropdown {
+    width: 180px; /* 고정 너비 부여 */
+    height: 44px;
+    padding: 0 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background-color: #fff;
+    font-size: 14px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+
+#boardDropdown:focus {
+    outline: none;
+    border-color: var(--primary, #4258BE);
+}
+
+/* 제목 입력 필드 */
+#title {
+    flex-grow: 1; /* 남은 공간을 모두 차지 */
+    height: 44px;
+    padding: 0 16px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 300;
+    font-family: inherit;
+    transition: border-color 0.2s;
+}
+
+#title:focus {
+    outline: none;
+    border-color: var(--primary, #4258BE);
+}
+
+/* 태그 입력 영역 */
+.tagArea {
+    margin-top: 8px;
+}
+
+#tagInput {
+    width: 100%;
+    height: 44px;
+    padding: 0 16px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+/* 페이지 헤더 (제목 + 등록 버튼) */
+.write-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 900px; /* .decoration과 너비 맞춤 */
+    margin: 0 auto 16px auto;
+}
+
+.write-header h2 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+/* 등록 버튼 */
+.writeBtn {
+    padding: 10px 20px;
+    background: #6366f1; /* var(--primary) or a specific color */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: background-color 0.2s;
+    white-space: nowrap;
+}
+.writeBtn:hover { background: #4f46e5; }

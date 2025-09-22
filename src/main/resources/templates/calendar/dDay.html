@@ -11,16 +11,6 @@
         <!-- 아이콘 -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         <style>
-    /* ===== 리셋 & 기본 설정 ===== */
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-
-    body {
-
-    }
     /* ===== 메인 컨텐츠 영역 ===== */
     .main-content {
         padding: 24px;
@@ -244,7 +234,7 @@
         border-radius: 20px;
         padding: 32px;
         width: 90%;
-        max-width: 480px;
+        max-width: 400px;
         max-height: 85vh;
         overflow-y: auto;
         box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
@@ -261,18 +251,21 @@
     /* 폼 스타일 */
     .form-group {
         margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
     }
 
     .form-group label {
-        display: block;
-        margin-bottom: 8px;
         color: #475569;
         font-weight: 600;
         font-size: 14px;
+        flex-shrink: 0;
+        width: 70px; /* ラベルの幅を固定して入力欄を整列 */
     }
 
     .form-group input {
-        width: 100%;
+        flex-grow: 1; /* 残りのスペースをすべて使用 */
         padding: 12px 16px;
         border: 2px solid #e2e8f0;
         border-radius: 10px;
@@ -425,19 +418,19 @@
                 <h3 id="modalTitle">D-day登録</h3>
                 <form id="ddayForm">
                     <div class="form-group">
-                        <label for="ddayTitle">題目</label>
+                        <label for="ddayTitle">タイトル</label>
                         <input type="text" id="ddayTitle" name="title" placeholder="例:プロジェクト発表" required>
                     </div>
                     
                     <div class="form-group">
-                        <label for="ddayDate">目標日付</label>
+                        <label for="ddayDate">目標日</label>
                         <input type="date" id="ddayDate" name="date" required>
                     </div>
                     
                     <div class="modal-buttons">
                         <button type="button" class="btn btn-secondary" id="cancelBtn">キャンセル</button>
                         <button type="button" class="btn btn-danger" id="deleteBtn" style="display: none;">削除</button>
-                        <button type="submit" class="btn btn-primary">貯蔵</button>
+                        <button type="submit" class="btn btn-primary">登録</button>
                     </div>
                 </form>
                 </div>
@@ -585,7 +578,7 @@
                         try { 
                             const response = await fetch('/scitHub/api/ddays') // 명시하지 않으면 기본 GET 요청
                             if (!response.ok) {
-                                throw new Error('D-Day リストの読み込みに失敗しました.');
+                                throw new Error('D-Dayリストの読み込みに失敗しました.');
                             }
 
                             // JSON 문자열을 JavaScript가 사용할 수 있는 데이터 구조로 파싱
@@ -623,7 +616,7 @@
                         }
                         // 제목 값이 비어있다면 전송을 막음.
                         if(!ddayTitle) {
-                            alert('題目を必ず入力してください.');
+                            alert('タイトルを必ず入力してください.');
                             return;
                         }
 
@@ -655,12 +648,12 @@
 
                             if (!response.ok) {
                                 // 서버에서 에러 응답(4xx, 5xx)이 오면 예외를 발생
-                                throw new Error(`D-day ${method === 'POST' ? '登録' : '修整'}に失敗しました.`);
+                                throw new Error(`D-day${method === 'POST' ? '登録' : '修整'}に失敗しました.`);
                             }
 
                             const result = await response.json();   // 성공 응답을 JSON으로 변환
                             console.log(`서버 응답 (${method}):`, result);
-                            alert(`D-dayが成功的に ${method === 'POST' ? '登録' : '修整'} できました.`);
+                            alert(`D-dayが成功的に${method === 'POST'?'登録':'修整'}できました.`);
 
                             closeModal();               // 모달 닫기
                             fetchAndRenderDdays();      // 목록 새로고침

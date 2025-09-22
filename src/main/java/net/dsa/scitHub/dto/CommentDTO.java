@@ -18,6 +18,7 @@ public class CommentDTO {
     private Integer userId;
     private String username;       // 로그인 시에 입력하는 ID
     private String userNameKor;
+    private String avatarUrl;       // 댓글 작성자의 프로필 이미지
     private String content;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

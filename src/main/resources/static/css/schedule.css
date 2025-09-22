@@ -5,6 +5,10 @@
   display: grid;
   grid-template-columns: 1fr; /* 6:1 비율 */
   gap: 0;
+/* schedule.css의 .mainGrid에 추가된 두 줄 */
+
+padding: 0 32px;
+box-sizing: border-box;
 }
 
 .rightSection{

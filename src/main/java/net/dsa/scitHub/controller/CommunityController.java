@@ -1,9 +1,16 @@
 package net.dsa.scitHub.controller;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,9 +23,14 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import net.dsa.scitHub.dto.CommentDTO;
+import net.dsa.scitHub.dto.BoardDTO;
+import net.dsa.scitHub.dto.CourseDTO;
+import net.dsa.scitHub.dto.CourseReviewDTO;
 import net.dsa.scitHub.dto.MenuItem;
 import net.dsa.scitHub.dto.PostDTO;
 import net.dsa.scitHub.service.CommunityService;
+import net.dsa.scitHub.service.CourseReviewService;
+import net.dsa.scitHub.service.CourseService;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -48,10 +60,27 @@ public class CommunityController {
     @ModelAttribute("menuItems")
     public List<MenuItem> menuItems() {
         return List.of(
-            new MenuItem("게시판 홈", "/community/home"),
-            new MenuItem("Q&A", "/community/qna"),
-            new MenuItem("강의평", "/community/courseReview")
+            new MenuItem("掲示板ホーム", "/community/home"),
+            new MenuItem("講義評", "/community/courseList"),
+            new MenuItem("Q&A", "/community/qna")
         );
+    }
+
+    @ModelAttribute("boardMap")
+    public Map<String, String> boardMap() {
+        Map<String, String> boardMap = new LinkedHashMap<String,String>();
+        // key:value = 영어이름(DB에 있는):일본어이름
+        boardMap.put("free", "自由掲示板");
+        boardMap.put("it", "IT情報");
+        boardMap.put("japanese", "日本語情報");
+        boardMap.put("jpCulture", "日本文化&生活情報");
+        boardMap.put("job", "就活情報&コツ");
+        boardMap.put("hobby", "趣味&旅行&グルメ情報");
+        boardMap.put("certificate", "資格情報");
+        boardMap.put("graduated", "卒業生掲示板");
+
+        log.debug("게시글 맵 정보 : {}", boardMap);
+        return boardMap;
     }
 
     // 게시판 관련 ---------------------------------------------------------------------------------------------
@@ -64,8 +93,75 @@ public class CommunityController {
     public String communityPage(
         Model model,
         @AuthenticationPrincipal UserDetails user) {
-        return "community/home"; // templates/community/home.html
+        // return "community/home"; // templates/community/home.html
+        return "redirect:board?name=free";  // 일단 자유게시판 페이지로 이동시키기
     }
+
+    /**
+     * 각 게시판 페이지로 이동
+     * @param model
+     * @return community/board.html
+     */
+    @GetMapping("board")
+    public String gotoBoard(
+        @RequestParam("name") String name,
+        Model model) {
+        try {
+            BoardDTO boardDTO = cs.getBoard(name);
+            model.addAttribute("boardName", boardDTO.getName());
+            model.addAttribute("boardId", boardDTO.getBoardId());
+            return "community/board";     // templates/community/board
+            // 페이징된 게시글 불러오기와 렌더링은 비동기 처리로 진행함
+        } catch (Exception e) {
+            // 게시판 조회 실패 시 홈 화면으로
+            log.debug("게시판 조회 실패 : {}", e.getMessage());
+            return "redirect:home";
+        }
+    }
+
+    /**
+     * 페이징된 게시글 조회, 또는 페이징된 검색 목록 조회
+     * @param searchFrom
+     * @param searchType
+     * @param keyWord
+     * @param pageable
+     * @return
+     */
+    @GetMapping("getBoard")
+    public ResponseEntity<Page<PostDTO>> getPostsByBoard(
+        @RequestParam("boardId") Integer boardId,
+        @RequestParam(name = "searchType", required = false) String searchType,
+        @RequestParam(name = "keyword", required = false) String keyword,
+        @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+
+        // 수신 데이터 로그
+        log.debug("출력할 게시판의 id : {}", boardId);
+        log.debug("검색 범위 : {}", searchType);
+        log.debug("검색 키워드 : {}", keyword);
+
+        // postDTO 페이지 생성
+        Page<PostDTO> postPage;
+
+        try {
+            // keyword가 존재하면 검색 로직 수행, 없으면 일반 목록 조회
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                postPage = cs.searchPosts(boardId, searchType, keyword, pageable);
+            } else {
+                postPage = cs.findPostsByBoard(boardId, pageable);
+            }
+            log.debug("페이지 정보 : {}", postPage);
+            for (PostDTO postDTO : postPage) {
+                log.debug("각 게시글 정보 : {}", postDTO);
+            }
+            return ResponseEntity.ok(postPage);
+        } catch (Exception e) {
+            log.debug("게시글 검색 중 오류 발생 : {}", e);
+            Page<PostDTO> errorPostPage = Page.empty(pageable);
+            return ResponseEntity.badRequest().body(errorPostPage);
+        }
+    }
+
+
 
     // 게시글 작성 관련 ----------------------------------------------------------------------------------------
 
@@ -74,7 +170,10 @@ public class CommunityController {
      * @return community/writeForm.html
      */
     @GetMapping("writePost")
-    public String writePostPage() {
+    public String writePostPage(
+        @RequestParam("boardId") Integer boardId,
+        Model model) {
+        model.addAttribute("boardId", boardId);
         return "community/writeForm";
     }
 
@@ -97,7 +196,7 @@ public class CommunityController {
             int postId = cs.makeNewPost(postDTO);
             return ResponseEntity.ok(postId);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("게시글 등록 실패");
+            return ResponseEntity.badRequest().body("ポストの作成に失敗しました。");
         }
     }
 
@@ -126,7 +225,7 @@ public class CommunityController {
 			return "community/readPost";
 		} catch (Exception e) {
 			log.debug("[예외 발생] 글 정보 조회 실패..");
-			return "redirect:list";
+			return "redirect:home";
 		}
 	}
 
@@ -148,7 +247,7 @@ public class CommunityController {
             log.debug("게시글 작성자 : {}", postDTO.getUsername());
             log.debug("현재 로그인 유저 : {}", user.getUsername());
 			if (!user.getUsername().equals(postDTO.getUsername())) {
-				throw new RuntimeException("수정 권한이 없습니다.");
+				throw new RuntimeException("修正の権限がありません。");
 			}
 			model.addAttribute("post", postDTO);
 
@@ -161,7 +260,7 @@ public class CommunityController {
 			return "community/updateForm";
 		} catch (Exception e) {
 			log.debug("[예외 발생] {}", e.getMessage());
-			return "redirect:home";
+			return "redirect:";
 		}
 	}
 
@@ -184,7 +283,7 @@ public class CommunityController {
             return ResponseEntity.ok(postDTO.getPostId());
 		} catch (Exception e) {
 			log.debug("[예외 발생] {}", e.getMessage());
-			return ResponseEntity.badRequest().body("게시글 수정 실패");
+			return ResponseEntity.badRequest().body("ポストの修正に失敗しました。");
 		}
 	}
 
@@ -216,16 +315,35 @@ public class CommunityController {
             @AuthenticationPrincipal UserDetails user) {
         try {
             cs.toggleLikePost(postId, user.getUsername());
-            log.debug("좋아요 성공");
+            log.debug("좋아요 토글 처리 성공");
             int likeCount = cs.getLikeCount(postId);
             return ResponseEntity.ok(likeCount);
         } catch (Exception e) {
             log.debug("좋아요 처리 실패");
-            return ResponseEntity.badRequest().body("좋아요 처리에 실패했습니다.");
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
-     // 댓글 관련-------------------------------------------------------------------------------------------
+    /**
+     * 게시글 북마크 처리(비동기)
+     * @param postId
+     */
+    @PostMapping("bookmarkPost")
+    public ResponseEntity<?> bookmarkPost(
+            @RequestParam("postId") int postId,
+            @AuthenticationPrincipal UserDetails user) {
+        try {
+            // 북마크 토글 처리를 한 다음 결과값으로 북마크됐는지 여부를 가져옴
+            boolean isBookmarked = cs.toggleBookmarkPost(postId, user.getUsername());
+            log.debug("북마크 토글 처리 성공");
+            return ResponseEntity.ok(isBookmarked);
+        } catch (Exception e) {
+            log.debug("북마크 토글 처리 실패");
+            return ResponseEntity.badRequest().body("ブックマークの処理に失敗しました。");
+        }
+    }
+
+    // 댓글 관련-------------------------------------------------------------------------------------------
     /**
      * 댓글 목록 불러오기(비동기)
      * @return List<CommentDTO>
@@ -234,9 +352,12 @@ public class CommunityController {
     public ResponseEntity<List<CommentDTO>> commentList(
             @RequestParam("postId") int postId,
             @AuthenticationPrincipal UserDetails user) {
-        log.debug("요청된 게시글 번호", postId);
+        log.debug("요청된 게시글 번호 : {}", postId);
         try {
             List<CommentDTO> commentList = cs.getCommentList(postId, user.getUsername());
+            for (CommentDTO commentDTO : commentList) {
+                log.debug("댓글 정보 : {}", commentDTO);
+            }
             return ResponseEntity.ok(commentList);
         } catch (Exception e) {
             log.debug("댓글 불러오기 중 에러 발생 : {}", e.getMessage());
@@ -258,7 +379,7 @@ public class CommunityController {
             cs.makeNewComment(commentDTO, user.getUsername());
             return ResponseEntity.ok("댓글 작성 성공!");
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("댓글 작성 실패");
+            return ResponseEntity.badRequest().body("コメントの作成に失敗しました。");
         }
     }
 
@@ -276,7 +397,7 @@ public class CommunityController {
             //cs.deleteComment(commentId, null);
             return ResponseEntity.ok("댓글 삭제 성공!");
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("댓글 삭제 실패");
+            return ResponseEntity.badRequest().body("コメントの削除に失敗しました。");
         }
     }
 
@@ -292,10 +413,78 @@ public class CommunityController {
         log.debug("수정할 댓글과 내용 : {}", commentDTO);
         try {
             cs.updateComment(commentDTO, user.getUsername());
-            //cs.updateComment(commentDTO, null);
             return ResponseEntity.ok("댓글 수정 성공!");
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("댓글 삭제 실패");
+            return ResponseEntity.badRequest().body("コメントの修正に失敗しました。");
         }
     }
+
+
+    /** 강의평 */
+
+    private final CourseService ccs;
+    private final CourseReviewService crs;
+
+    /**
+     * 강의평 페이지
+     * @param model
+     * @param name 검색어 (강의명)
+     * @return courseList.html
+     */
+    @GetMapping("courseList")
+    public String courseList(
+            Model model,
+            @RequestParam(name="name", required=false) String name
+    ) {
+
+        // 이름으로 검색하거나 전체 강의 정보 가져오기
+        List<CourseDTO> courseList = ccs.getCourseList(name);
+
+        model.addAttribute("courseList", courseList);
+
+        return "community/courseList";
+    }
+
+    /**
+     * 강의 리뷰 페이지
+     * @param courseId
+     * @param model
+     * @return courseReview.html
+     */
+    @GetMapping("courseReview")
+    public String courseReview(
+        @RequestParam(name="id", required=true) Integer courseId,
+        Model model
+    ) {
+        CourseDTO course = ccs.selectById(courseId);
+        List<CourseReviewDTO> reviews = crs.selectByCourseId(courseId);
+
+        model.addAttribute("course", course);
+        model.addAttribute("reviews", reviews);
+
+        return "community/courseReview";
+    }
+
+    /**
+     * 강의 리뷰 작성 처리(비동기)
+     * @param courseId
+     * @return
+     */
+    @PostMapping("/courseReview/{courseId}")
+    public ResponseEntity<String> createReview(@PathVariable("courseId") Integer courseId,
+                                               @ModelAttribute CourseReviewDTO reviewDTO,
+                                               @AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("ログインが必要です.");
+        }
+        try {
+            crs.createReview(courseId, userDetails.getUsername(), reviewDTO);
+            return ResponseEntity.ok("レビューが正常に登録されました.");
+        } catch (Exception e) {
+            log.error("강의 리뷰 등록 실패", e); 
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("レビューの登録中にエラーが発生しました.");
+        }
+
+    }
+
 }

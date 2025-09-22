@@ -5,54 +5,35 @@
     <head>
         <title>게시글 작성</title>
         <th:block layout:fragment="css">
-            <link rel="stylesheet" th:href="@{/css/home.css}">
+            <link rel="stylesheet" th:href="@{/css/ckeditor5/editorStyle.css}">
+            <link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/46.0.3/ckeditor5.css" crossorigin>
+            <link rel="stylesheet" th:href="@{/css/community/writeForm.css}">
         </th:block>
-        <link rel="stylesheet" th:href="@{/css/searchBar.css}">
-        <link rel="stylesheet" th:href="@{/css/ckeditor5/editorStyle.css}">
-		<link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/46.0.3/ckeditor5.css" crossorigin>
-        <link rel="stylesheet" th:href="@{/css/community/writeForm.css}">
     </head>
     <body>
         <section class="mainField" aria-label="메인 영역" layout:fragment="content">
-            <div class="searchSection">
-                <div class="categorySection">
-                    <select name="category" id="categoryDropdown">
-                        <option value="all" selected>전체</option>
-                        <option value="즐겨찾는 게시판">즐겨찾는 게시판</option>
-                        <option value="자유게시판">자유게시판</option>
-                        <option value="IT">IT</option>
-                        <option value="일본어">일본어</option>
-                        <option value="일본 생활&문화">일본 생활&문화</option>
-                        <option value="취업&꿀팁">취업&꿀팁</option>
-                        <option value="취미&여행&맛집">취미&여행&맛집</option>
-                        <option value="자격증">자격증</option>
-                        <option value="졸업생">졸업생</option>
-                    </select>
-                </div>
-
-                <div class="searchBar">
-                    <input type="text" placeholder="검색">
-                </div>
-
-                <button class="writeBtn" type="button" id="submitPostBtn">등록하기 ✏️</button>
+            <!-- 페이지 헤더: 제목과 등록 버튼 -->
+            <div class="write-header">
+                <h2>新規投稿</h2>
+                <button class="writeBtn" type="button" id="submitPostBtn">投稿する ✏️</button>
             </div>
             <div class="decoration">
                 <div class="formField">
                     <form th:action="@{write}" method="post" id="postForm">
-                        <div class="boardSelectSection">
-                            <select name="board" id="boardDropdown">
-                                <option value="">게시판을 선택해주세요</option>
-                                <option value="자유게시판">자유게시판</option>
-                                <option value="IT">IT</option>
-                                <option value="일본어">일본어</option>
-                                <option value="일본 생활&문화">일본 생활&문화</option>
-                                <option value="취업&꿀팁">취업&꿀팁</option>
-                                <option value="취미&여행&맛집">취미&여행&맛집</option>
-                                <option value="자격증">자격증</option>
-                                <option value="졸업생">졸업생</option>
-                            </select>
+                        <!-- 게시판 선택과 제목 입력을 한 줄로 묶는 헤더 -->
+                        <div class="form-header">
+                            <div class="boardSelectSection">
+                                <select name="board" id="boardDropdown">
+                                    <option value="">掲示板を選択してください</option>
+                                    <!-- 게시판 목록 항목과 연동되게 바꿈 -->
+                                    <th:block  th:each="board : ${boardMap}">
+                                        <option th:value="${board.key}" th:text="${board.value}"></option>
+                                    </th:block>
+                                </select>
+                            </div>
+                            <input type="text" name="title" id="title" placeholder="제목을 입력하세요">
                         </div>
-                        <input type="text" name="title" id="title">
+                        <br>
                         <div class="main-container">
                             <div class="editor-container editor-container_classic-editor" id="editor-container">
                                 <div class="editor-container__editor"><div id="editor"></div></div>

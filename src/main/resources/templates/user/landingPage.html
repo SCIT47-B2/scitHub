@@ -9,7 +9,6 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script src="https://npmcdn.com/flatpickr/dist/l10n/ja.js"></script>
-
 </head>
 <body>
   <div class="mainContainer">
@@ -65,15 +64,15 @@
               <!-- 중복확인 상태 -->
               <input type="hidden" id="idChecked" name="idChecked" value="false">
               <input type="hidden" id="checkedId" name="checkedId" value="">
-              <!-- ■ ID 오류 메시지 표시 영역 -->
-              <p class="errorText" id="idError" role="alert" aria-live="polite"></p>
+              <!-- ■ ID 오류/안내 메시지 표시 영역 -->
+              <p id="idError" class="form-message" role="alert" aria-live="polite"></p>
             </div>
 
             <div class="formGroup" id="signupPwGroup">
               <!-- ■ PW: 공백/엔터 금지 + 8~20자, 영문/숫자/특수문자 각 1개 이상 -->
               <input type="password" class="formInput" placeholder="パスワード" id="pw" name="signupPassword" autocomplete="new-password" required aria-describedby="pwError">
-              <!-- ■ PW 오류 메시지 표시 영역 -->
-              <p class="errorText" id="pwError" role="alert" aria-live="polite"></p>
+              <!-- ■ PW 오류/안내 메시지 표시 영역 -->
+              <p id="pwError" class="form-message" role="alert" aria-live="polite"></p>
             </div>
             <div class="formGroup" id="signupPwCheckGroup">
               <input type="password" class="formInput" placeholder="パスワードの再入力" id="pwcheck" name="passwordConfirm" autocomplete="new-password" required>
@@ -132,6 +131,7 @@
       const step1 = document.getElementById('signupStep1');
       const step2 = document.getElementById('signupStep2');
       const signupNextBtn = document.getElementById('signupNextBtn');
+      const phoneInput = document.getElementById('phone');
 
       // ■ 에러 요소
       const idInput = document.getElementById('id');
@@ -139,6 +139,36 @@
       const pwCheckInput = document.getElementById('pwcheck');
       const idErrorEl = document.getElementById('idError');
       const pwErrorEl = document.getElementById('pwError');
+
+      const ID_INFO_MESSAGE = 'ID: 3〜10文字の英数字<br>（英字必須、空白なし）';
+      const PW_INFO_MESSAGE = 'PW: 8〜20文字 (英字、数字、記号を含む)';
+
+      /** ID 필드 메시지 표시 유틸 */
+      function displayIdMessage(message, isError) {
+        if (!idErrorEl) return;
+        idErrorEl.innerHTML = message;
+        if (isError) {
+          idErrorEl.classList.add('errorText');
+        } else {
+          idErrorEl.classList.remove('errorText');
+        }
+      }
+
+      /** PW 필드 메시지 표시 유틸 */
+      function displayPwMessage(message, isError) {
+        if (!pwErrorEl) return;
+        pwErrorEl.textContent = message;
+        if (isError) {
+          pwErrorEl.classList.add('errorText');
+        } else {
+          pwErrorEl.classList.remove('errorText');
+        }
+      }
+
+      // 초기 ID 안내 문구 설정
+      displayIdMessage(ID_INFO_MESSAGE, false);
+      // 초기 PW 안내 문구 설정
+      displayPwMessage(PW_INFO_MESSAGE, false);
 
       /** 기수 옵션 1회 생성(1~47, 기본 47) */
       if (classSelect && classSelect.options.length === 0) {
@@ -157,6 +187,14 @@
         maxDate: "today",
         locale: "ja",
         onReady: function(_, __, instance) { instance.input.placeholder = "生年月日"; },
+      });
+
+      /** 전화번호 자동 하이픈 추가 */
+      phoneInput?.addEventListener('input', (e) => {
+        // 숫자 이외의 문자를 모두 제거하고, 3-4-4 형식으로 그룹화
+        const match = e.target.value.replace(/\D/g, '').match(/(\d{0,3})(\d{0,4})(\d{0,4})/);
+        if (!match) return;
+        e.target.value = !match[2] ? match[1] : `${match[1]}-${match[2]}` + (match[3] ? `-${match[3]}` : '');
       });
 
       /** 로그인 버튼 토글 */
@@ -225,9 +263,6 @@
       pwInput.addEventListener('keydown', preventEnterKey);
       pwCheckInput.addEventListener('keydown', preventEnterKey);
 
-      /** ■ 에러 표시 유틸 */
-      function setErrorText(el, msg){ if(el) el.textContent = msg || ''; }
-
       /** ■ 회원가입 1단계 유효성(에러는 붉은 글씨로 필드 하단 표시)
        *  - ID: 3~10자, 영문+숫자 모두 포함, 공백/엔터 금지
        *  - PW: 8~20자, 영문/숫자/특수문자 각 1개 이상, 공백/엔터 금지
@@ -247,27 +282,31 @@
         const idRegex = /^(?=.*[A-Za-z])[A-Za-z\d]{3,10}$/;
         const pwRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~])(?!.*\s).{8,20}$/;
         // 초기화
-        setErrorText(idErrorEl, '');
-        setErrorText(pwErrorEl, '');
+        displayIdMessage(ID_INFO_MESSAGE, false);
+        displayPwMessage(PW_INFO_MESSAGE, false);
 
         let isValid = true;
 
         // ID 검증
         if (!idRegex.test(userId)){
-          setErrorText(idErrorEl, 'IDは3〜10文字、英字のみ、または英字+数字で入力してください（数字のみ不可・空白不可）。');
+          displayIdMessage(ID_INFO_MESSAGE, true);
           isValid = false;
         } else if (!idChecked || checkedId !== userId){
-          setErrorText(idErrorEl, 'IDの重複チェックを完了してください。');
+          displayIdMessage('IDの重複チェックを完了してください。', true);
           isValid = false;
         }
 
-        // PW 검증
-        if (!pwRegex.test(pw)){
-          setErrorText(pwErrorEl, 'パスワードは8〜20文字、英字・数字・記号を各1つ以上含め、空白を含めないでください。');
+        // PW 검증: 규칙 위반과 불일치 오류를 명확히 구분합니다.
+        if (!pwRegex.test(pw)) {
+          // 1. 비밀번호가 규칙을 만족하지 못하는 경우, 규칙 안내 메시지를 오류로 표시합니다.
+          displayPwMessage(PW_INFO_MESSAGE, true);
           isValid = false;
-        } else if (pw !== pwcheck){
-          setErrorText(pwErrorEl, 'パスワードが一致しません。');
-          isValid = false;
+        } else {
+          // 2. 비밀번호 규칙은 통과했을 때, 확인용 비밀번호와 일치하는지 확인합니다.
+          if (pw !== pwcheck) {
+            displayPwMessage('パスワードが一致しません。', true);
+            isValid = false;
+          }
         }
 
         return isValid;
@@ -283,7 +322,7 @@
 
         if (!name || !gender || !birth || !email || !phone) return '必須項目をすべて入力してください。';
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return 'メールアドレスを正しく入力してください。';
-        if (!/^\d{2,4}-?\d{3,4}-?\d{4}$/.test(phone)) return '電話番号を正しく入力してください。';
+        if (!/^\d{3}-\d{4}-\d{4}$/.test(phone)) return '電話番号は「000-0000-0000」の形式で入力してください。';
         return null;
       }
 
@@ -322,28 +361,38 @@
 
         // 형식 사전 검증
         const idRegex = /^(?=.*[A-Za-z])[A-Za-z\d]{3,10}$/;
-        setErrorText(idErrorEl, '');
+        displayIdMessage(ID_INFO_MESSAGE, false);
         if (!idRegex.test(userId)){
-          setErrorText(idErrorEl, 'IDは3〜10文字、英字のみ、または英字+数字で入力してください（数字のみ不ㅛ可・空白不可）。');
+          displayIdMessage(ID_INFO_MESSAGE, true);
           idInput.focus();
           return;
         }
 
         const url = `${baseUrl}?searchId=${encodeURIComponent(userId)}`;
-        window.open(url, 'idwin', 'top=200,left=600,width=300,height=300');
+        window.open(url, 'idwin', 'top=200,left=600,width=380,height=320');
       });
 
       /** ID 입력 변경 시 중복확인 상태 무효화 */
       idInput?.addEventListener('input', function(){
         document.getElementById('idChecked').value = 'false';
         document.getElementById('checkedId').value = '';
-        // 사용자가 다시 입력하는 동안, 기존 에러 숨김
-        setErrorText(idErrorEl, '');
+        // 사용자가 다시 입력하는 동안, 에러를 숨기고 안내 문구 표시
+        displayIdMessage(ID_INFO_MESSAGE, false);
       });
 
       /** PW/PW확인 입력 중 에러 숨김 */
-      pwInput?.addEventListener('input', function(){ setErrorText(pwErrorEl, ''); });
-      pwCheckInput?.addEventListener('input', function(){ setErrorText(pwErrorEl, ''); });
+      pwInput?.addEventListener('input', function(){ displayPwMessage(PW_INFO_MESSAGE, false); });
+      pwCheckInput?.addEventListener('input', function(){ displayPwMessage(PW_INFO_MESSAGE, false); });
+
+      /* 회원가입 성공 메시지 처리 */
+      const signupMessage = /*[[${signupMessage}]]*/ null;
+      if (signupMessage) {
+        alert(signupMessage);
+        if (window.history.replaceState) {
+          const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+          window.history.replaceState({ path: cleanUrl }, '', cleanUrl);
+        }
+      }
 
       /* 로그인 실패 메시지 처리(기존 유지) */
       const errorMessage = /*[[${errorMessage}]]*/ null;
