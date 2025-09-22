@@ -90,7 +90,7 @@ public class UserService {
      */
     public MypageDTO getMemberInfo(String username) {
         User entity = ur.findByUsername(username)
-                .orElseThrow(() -> new EntityNotFoundException(username + ": 아이디가 없습니다."));
+                .orElseThrow(() -> new EntityNotFoundException("該当するユーザーが見つかりません。IDをご確認のうえ、再度お試しください。"));
 
         return MypageDTO.builder()
                 .userId(entity.getUserId())
@@ -116,7 +116,7 @@ public class UserService {
      */
     public void edit(MypageDTO dto, String uploadPath, MultipartFile upload) throws Exception {
         User entity = ur.findByUsername(dto.getUserName())
-                .orElseThrow(() -> new EntityNotFoundException(dto.getUserName() + ": 아이디가 없습니다."));
+                .orElseThrow(() -> new EntityNotFoundException("該当するユーザーが見つかりません。IDをご確認のうえ、再度お試しください。"));
 
         // 1) 텍스트 필드 반영
         entity.setNameKor(dto.getName());
@@ -208,7 +208,7 @@ public class UserService {
     @Transactional
     public UserManageDTO toggleUserStatus(Integer userId) {
         User user = ur.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다: " + userId));
+                .orElseThrow(() -> new EntityNotFoundException("該当するユーザーが見つかりません。IDをご確認のうえ、再度お試しください。"));
 
         // 현재 상태를 반전시켜서 설정
         user.setIsActive(!user.getIsActive());
@@ -226,7 +226,7 @@ public class UserService {
     @Transactional
     public UserManageDTO changeUserRole(Integer userId) {
         User user = ur.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다: " + userId));
+                .orElseThrow(() -> new EntityNotFoundException("該当するユーザーが見つかりません。IDをご確認のうえ、再度お試しください。"));
 
         // 현재 역할을 ADMIN과 USER 사이에서 토글
         Role newRole = (user.getRole() == Role.ADMIN) ? Role.USER : Role.ADMIN;
