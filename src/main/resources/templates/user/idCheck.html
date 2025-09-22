@@ -18,7 +18,6 @@
         <p>
           <span th:text="|[${searchId}] は使用可能なIDです。|"></span>
         </p>
-        <br>
         <div class="btnRow">
           <!-- 사용하기: 부모창에 값 세팅 후 닫기 -->
           <button type="button" id="useButton" class="btnPrimary" th:data-id="${searchId}">このIDで加入する</button>
@@ -30,7 +29,7 @@
       <!-- 사용 불가능한 경우 -->
       <div th:if="${not result}">
         <p>
-          <span th:text="|${searchId} はすでに使用されています。|"></span>
+          <span th:text="|[${searchId}] はすでに使用されています。|"></span>
         </p>
         <p>他のIDを試してください。</p>
         <div class="btnRow">

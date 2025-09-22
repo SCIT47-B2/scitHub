@@ -143,12 +143,17 @@ body {
 }
 .checkBtn:hover{ background:#222; }
 
-.errorText{
-      color:#e11d48;        /* rose-600 */
-      font-size:12px;
-      line-height:1.4;
-      margin:6px 0 0;
-      min-height:1.2em;      /* 영역 유지 */
+/* ID/PW 안내 및 오류 메시지 스타일 */
+.form-message {
+  font-size: 13px;
+  line-height: 1.4;
+  margin: 6px 0 0;
+  min-height: 1.2em;      /* 영역 유지 */
+  color: #111;             /* 기본 안내 문구 색상 (검은색) */
+}
+
+.form-message.errorText {
+  color: #e11d48;        /* 에러 발생 시 색상 (붉은색) */
 }
 /* =========================
    Responsive

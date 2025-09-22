@@ -27,7 +27,7 @@ public class AuthenticatedUserDetailsService implements UserDetailsService {
 
         User userEntity = userRepository.findByUsername(id)
                 .orElseThrow(() -> {
-                        return new UsernameNotFoundException(id + " : 없는 ID입니다.");
+                        return new UsernameNotFoundException(id + "は存在しないIDです。");
                 });
 
         log.debug("조회정보 : {}", userEntity);
