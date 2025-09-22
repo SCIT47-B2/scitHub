@@ -102,7 +102,7 @@
                 <nav class="categoryMenuList">
                     <th:block th:each="board : ${boardMap}">
                         <a th:href="@{board(boardId=${board.key})}" class="categoryMenuItem"
-                            th:classappend="${post.boardId == board.key} ? 'active' : ''" th:text="${board.value}"></a>
+                            th:classappend="${post.board == board.key} ? 'active' : ''" th:text="${board.value}"></a>
                     </th:block>
                 </nav>
             </aside>
