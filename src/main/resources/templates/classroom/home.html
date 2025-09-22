@@ -6,6 +6,7 @@
         <title>Home</title>
         <th:block layout:fragment="css">
             <link rel="stylesheet" th:href="@{/css/home.css}">
+            <link rel="stylesheet" th:href="@{/css/reservation.css}">
         </th:block>
     </head>
     <body>
@@ -68,22 +69,22 @@
                         <div class="corridor" style="grid-column:13 / span 1; grid-row:3 / span 8;"></div>
 
                         <!-- 좌측 세로열 -->
-                        <a class="block small room" href="#" style="grid-column:1 / span 2; grid-row:3 / span 1; text-decoration:none;">ルーム5</a>
-                        <a class="block small room" href="#" style="grid-column:1 / span 2; grid-row:4 / span 1; text-decoration:none;">ルーム4</a>
-                        <a class="block small room" href="#" style="grid-column:1 / span 2; grid-row:5 / span 1; text-decoration:none;">ルーム3</a>
-                        <a class="block small room" href="#" style="grid-column:1 / span 2; grid-row:6 / span 1; text-decoration:none;">ルーム2</a>
-                        <a class="block small room" href="#" style="grid-column:1 / span 2; grid-row:7 / span 1; text-decoration:none;">ルーム1</a>
+                        <a class="block small room" href="#" data-room-id="5" th:data-room-name="${classroomMap.get(5).getClassroomName()}" style="grid-column:1 / span 2; grid-row:3 / span 1;" >ルーム5</a>
+                        <a class="block small room" href="#" data-room-id="4" th:data-room-name="${classroomMap.get(4).getClassroomName()}" style="grid-column:1 / span 2; grid-row:4 / span 1;">ルーム4</a>
+                        <a class="block small room" href="#" data-room-id="3" th:data-room-name="${classroomMap.get(3).getClassroomName()}" style="grid-column:1 / span 2; grid-row:5 / span 1;">ルーム3</a>
+                        <a class="block small room" href="#" data-room-id="2" th:data-room-name="${classroomMap.get(2).getClassroomName()}" style="grid-column:1 / span 2; grid-row:6 / span 1;">ルーム2</a>
+                        <a class="block small room" href="#" data-room-id="1" th:data-room-name="${classroomMap.get(1).getClassroomName()}" style="grid-column:1 / span 2; grid-row:7 / span 1;">ルーム1</a>
                         <div class="block small gray"  style="grid-column:1 / span 2; grid-row:8 / span 1;">倉庫</div>
                         <div class="block small label" style="grid-column:1 / span 2; grid-row:9 / span 1;">面接室2</div>
                         <div class="block small label" style="grid-column:1 / span 2; grid-row:10 / span 1;">面接室1</div>
 
                         <!-- 좌측 2열 -->
-                        <a class="block small room" href="#" style="grid-column:3 / span 2; grid-row:3 / span 1; text-decoration:none;">ルーム10</a>
-                        <a class="block small room" href="#" style="grid-column:3 / span 2; grid-row:4 / span 1; text-decoration:none; background:#cfe0ff;">ルーム9</a>
-                        <a class="block small room" href="#" style="grid-column:3 / span 2; grid-row:5 / span 1; text-decoration:none;">ルーム8</a>
-                        <a class="block small room" href="#" style="grid-column:3 / span 2; grid-row:6 / span 1; text-decoration:none; background:#cfe0ff;">ルーム7</a>
-                        <a class="block small room" href="#" style="grid-column:3 / span 2; grid-row:7 / span 1; text-decoration:none; background:#cfe0ff;">ルーム6</a>
-                        <div class="block gray" style="grid-column:3 / span 2; grid-row:8 / span 3; font-size:12px;">事務室</div>
+                        <a class="block small room" href="#" data-room-id="10" th:data-room-name="${classroomMap.get(10).getClassroomName()}" style="grid-column:3 / span 2; grid-row:3 / span 1;">ルーム10</a>
+                        <a class="block small room" href="#" data-room-id="9" th:data-room-name="${classroomMap.get(9).getClassroomName()}" style="grid-column:3 / span 2; grid-row:4 / span 1;">ルーム9</a>
+                        <a class="block small room" href="#" data-room-id="8" th:data-room-name="${classroomMap.get(8).getClassroomName()}" style="grid-column:3 / span 2; grid-row:5 / span 1;">ルーム8</a>
+                        <a class="block small room" href="#" data-room-id="7" th:data-room-name="${classroomMap.get(7).getClassroomName()}" style="grid-column:3 / span 2; grid-row:6 / span 1;">ルーム7</a>
+                        <a class="block small room" href="#" data-room-id="6" th:data-room-name="${classroomMap.get(6).getClassroomName()}" style="grid-column:3 / span 2; grid-row:7 / span 1;">ルーム6</a>
+                        <div class="block gray" style="grid-column:3 / span 2; grid-row:8 / span 3;">オフィス</div>
 
                         <!-- 가운데 왼 열 -->
                         <div class="block"      style="grid-column:6 / span 3; grid-row:3 / span 2;">講義室4</div>
@@ -125,33 +126,22 @@
                 </div>
             </div>
 
+            <!-- 예약 모달 -->
+            <div class="reservationModal" id="reservationModal">
+                <div class="reservation-modal">
+                    <div class="modal-tabs">
+                        <h2 class="tab-btn active" id="reservationModalTitle">スタディルーム</h2>
+                        <div id="adminControlsContainer" class="admin-controls" style="display: none;"></div>
+                    </div>
+
+                    <div class="modal-body">
+                    </div>
+                </div>
+            </div>
+        </div>
         </section>
-
         <th:block layout:fragment="script">
-            <script>
-                const openModalBtn = document.getElementById('lectureRoom3');
-                const modal = document.getElementById('seatModal');
-                const closeModalBtn = modal.querySelector('.close-button');
-                const modalOverlay = modal.closest('.modal-overlay');
-
-            // '講義室3' 클릭 시 모달 열기
-            openModalBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                modal.style.display = 'flex';
-            });
-
-            // 닫기 버튼 클릭 시 모달 닫기
-            closeModalBtn.addEventListener('click', () => {
-                modal.style.display = 'none';
-            });
-
-            // 모달 바깥 영역 클릭 시 모달 닫기
-            modalOverlay.addEventListener('click', (e) => {
-                if (e.target === modalOverlay) {
-                    modal.style.display = 'none';
-                }
-            });
-            </script>
+            <script th:src="@{/js/reservation.js}"></script>
         </th:block>
     </body>
 </html>
