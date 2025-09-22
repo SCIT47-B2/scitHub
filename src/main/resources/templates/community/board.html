@@ -27,7 +27,7 @@
                             <option value="title">タイトル</option>
                             <option value="content">内容</option>
                             <option value="author">投稿者</option>
-                            <option value="tag">ハッシュタグ</option>
+                            <option value="tag">タグ</option>
                         </select>
                         <input type="text" id="search-keyword" name="searchWord" placeholder="検索ワードを入力して下さい">
                         <button type="button" id="search-btn">
@@ -43,7 +43,7 @@
                             <!-- 게시판 이름 -->
                             <h2 class="boardName" th:text="${boardName}"></h2>
                             <!-- 게시글 작성 버튼 -->
-                            <button type="button" class="writeBtn">글쓰기<i class="fa-solid fa-pencil"></i></button>
+                            <button type="button" class="writeBtn">作成<i class="fa-solid fa-pencil"></i></button>
                         </div>
                         <div class="table-responsive">
                             <table class="post-table">

@@ -11,16 +11,6 @@
         <!-- 아이콘 -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         <style>
-    /* ===== 리셋 & 기본 설정 ===== */
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-
-    body {
-
-    }
     /* ===== 메인 컨텐츠 영역 ===== */
     .main-content {
         padding: 24px;
@@ -244,7 +234,7 @@
         border-radius: 20px;
         padding: 32px;
         width: 90%;
-        max-width: 480px;
+        max-width: 400px;
         max-height: 85vh;
         overflow-y: auto;
         box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
@@ -261,18 +251,21 @@
     /* 폼 스타일 */
     .form-group {
         margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
     }
 
     .form-group label {
-        display: block;
-        margin-bottom: 8px;
         color: #475569;
         font-weight: 600;
         font-size: 14px;
+        flex-shrink: 0;
+        width: 70px; /* ラベルの幅を固定して入力欄を整列 */
     }
 
     .form-group input {
-        width: 100%;
+        flex-grow: 1; /* 残りのスペースをすべて使用 */
         padding: 12px 16px;
         border: 2px solid #e2e8f0;
         border-radius: 10px;
