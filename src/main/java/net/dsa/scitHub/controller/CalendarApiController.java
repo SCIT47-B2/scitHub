@@ -172,8 +172,8 @@ public class CalendarApiController {
      * @param userDetails
      * @request ResponseEntity<Void> 삭제는 성공여부만 전달
      */
-    @DeleteMapping("/ddays/{ddayId}") 
-    public ResponseEntity<Void> deleteDday( 
+    @DeleteMapping("/ddays/{ddayId}")
+    public ResponseEntity<Void> deleteDday(
                     @AuthenticationPrincipal AuthenticatedUser userDetails,
                     @PathVariable("ddayId") Integer ddayId
                 ) {
