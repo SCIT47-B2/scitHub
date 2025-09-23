@@ -18,7 +18,7 @@ function displayTags() {
         let tagsHtml = '';
         tagsArray.forEach(function(tag) {
             if (tag.trim() !== '') {
-                tagsHtml += `<span class="tag-item" data-tag="${tag}">${tag} </span>`;
+                tagsHtml += `<div class="tag" data-tag="${tag}">${tag} </div>`;
                 console.log(tag);
             }
         });

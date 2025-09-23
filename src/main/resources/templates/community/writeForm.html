@@ -7,7 +7,7 @@
         <th:block layout:fragment="css">
             <link rel="stylesheet" th:href="@{/css/ckeditor5/editorStyle.css}">
             <link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/46.0.3/ckeditor5.css" crossorigin>
-            <link rel="stylesheet" th:href="@{/css/community/writeForm.css}">
+            <link rel="stylesheet" th:href="@{/css/community/writeAndUpdateForm.css}">
         </th:block>
     </head>
     <body>
@@ -15,9 +15,11 @@
             <!-- 페이지 헤더: 제목과 등록 버튼 -->
             <div class="write-header">
                 <h2>新規投稿</h2>
-                <button class="writeBtn" type="button" id="submitPostBtn">
-                    投稿する<i class="fa-solid fa-pencil"></i>
-                </button>
+                <div class="header-buttons">
+                    <button class="actionBtn" type="button" id="submitPostBtn">
+                        投稿する<i class="fa-solid fa-pencil"></i>
+                    </button>
+                </div>
             </div>
             <div class="decoration">
                 <div class="formField">
@@ -43,13 +45,15 @@
                         </div>
                         <!-- 태그 입력, 보여주기란 -->
                         <input type="hidden" name="tagList" id="tagsData">
-                        <div class="tagInputWrapper">
-                            <input type="text" id="tagInput" placeholder="#タグ入力欄">
-                            <!-- 유효성 검사 에러 메시지를 표시할 요소 -->
-                            <p id="tagError" class="error-message"></p>
+                        <div class="tagArea">
+                            <div class="tagInputWrapper">
+                                <input type="text" id="tagInput" placeholder="#タグ入力欄">
+                                <!-- 유효성 검사 에러 메시지를 표시할 요소 -->
+                                <p id="tagError" class="error-message"></p>
+                            </div>
+                            <!-- 생성된 태그가 표시될 컨테이너 -->
+                            <div id="tagContainer"></div>
                         </div>
-                        <!-- 생성된 태그가 표시될 컨테이너 -->
-                        <div id="tagContainer"></div>
                     </form>
                 </div>
             </div>

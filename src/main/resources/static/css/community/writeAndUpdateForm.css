@@ -1,3 +1,28 @@
+/* 게시글 작성/수정 페이지 상단 헤더 */
+.write-header {
+    display: flex;
+    /* flex 아이템(제목, 버튼 그룹)을 양 끝으로 정렬 */
+    justify-content: space-between;
+    /* 세로 중앙 정렬 */
+    align-items: center;
+    max-width: 900px;
+    margin: 0 auto 16px auto;
+}
+
+/* 헤더 제목 스타일 */
+.write-header h2 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+/* 버튼들을 감싸는 컨테이너 */
+.header-buttons {
+    display: flex;
+    /* 버튼들 사이의 간격 */
+    gap: 8px;
+}
+
 /* 전체 폼 컨테이너 스타일 */
 .decoration {
     width: 100%;
@@ -96,7 +121,7 @@
 }
 
 /* 등록 버튼 */
-.writeBtn {
+.actionBtn {
     padding: 10px 20px;
     background: var(--primary); /* var(--primary) or a specific color */
     color: white;
@@ -108,7 +133,7 @@
     transition: background-color 0.2s;
     white-space: nowrap;
 }
-.writeBtn:hover { background: #4f46e5; }
+.actionBtn:hover { background: #4f46e5; }
 
 /* 태그 입력 및 표시 영역 전체를 감싸는 컨테이너 */
 .tagArea {
@@ -134,9 +159,9 @@
 /* 태그 입력 필드와 에러 메시지를 감싸는 Wrapper */
 .tagInputWrapper {
     /* 부모 요소(.tagArea) 너비의 25%를 차지 */
-    flex: 0 0 25%;
     display: flex;
     flex-direction: column;
+    flex: 0 0 25%;
 }
 
 /* 태그 입력 필드 */
@@ -145,8 +170,6 @@
     width: 100%;
     padding: 8px 4px; /* 내부 여백 조정 */
     font-size: 15px;
-    border: none; /* Wrapper에 테두리가 있으므로 제거 */
-    outline: none;
     background-color: transparent;
     box-sizing: border-box;
 }

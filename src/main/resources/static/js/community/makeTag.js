@@ -11,10 +11,10 @@ $('#tagInput').on('keydown', function(event) {
         
         const inputValue = $(this).val().trim();
         
-        if (inputValue !== '' && !tags.includes(inputValue)) {
-            addTag(inputValue);
+        // 태그 입력이 정상적으로 종료되면
+        if(addTag(inputValue)) {
             $(this).val(''); // 입력 필드 초기화
-        }
+        };
     }
 });
 
@@ -30,10 +30,19 @@ function addTag(tagText) {
 
     // 태그 유효성 검사 실패 시 태그를 더하지 않음
     if (!tagValidation(tagText)) {
-        $tagError.text('#で始まる1~20字の空白なしの文字、数字、_を入力できます。');
+        $tagError.text('#で始まる2~20字のの文字、数字、_を空白無しで入力して下さい。');
         $tagError.show();
-        return;
+        return false;
     }
+
+    $tagError.hide();
+
+    if (tags.includes(tagText)) {
+        $tagError.text('既に付いているタグです。');
+        $tagError.show();
+        return false;
+    }
+
     // 유효성 검사 통과 시 태그 배열에 태그 추가
     tags.push(tagText);
     
@@ -47,6 +56,7 @@ function addTag(tagText) {
     updateHiddenInput();
     
     console.log('現在付いているタグ:', tags);
+    return true;
 }
 
 function tagValidation(tagText) {
