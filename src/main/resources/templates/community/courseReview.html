@@ -50,14 +50,17 @@
                                 <button class="btn-delete-review" th:data-review-id="${review.courseReviewId}"
                                         onclick="deleteReview(this.getAttribute('data-review-id'))"><i class="fa-solid fa-trash"></i></button>
                             </div>
+                            <!-- 작성자 표시 -->
                             <div class="reviewer-info-chip">
                                 <span th:text="${review.userCohortNo} + '期 ' + (${review.userCohortNo} == 47 ? '受講生' : '卒業生')"></span>
                             </div>
+                            <!-- 별점 -->
                             <div class="review-rating-stars">
                                 <th:block th:each="i : ${#numbers.sequence(1, 5)}">
                                     <i class="fa fa-star" th:classappend="${i <= review.rating} ? 'filled' : ''"></i>
                                 </th:block>
                             </div>
+                            <!-- 리뷰 내용 -->
                             <div class="review-content">
                                 <p th:text="${review.commentText}"></p>
                             </div>

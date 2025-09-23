@@ -12,7 +12,7 @@
     <body>
         <section class="mainGrid" aria-label="메인 영역" layout:fragment="content">
             <div class="container">
-                <!-- 검색바 -->
+                <!-- ===== 검색창 ===== -->
                 <div class="search-box">
                     <form th:action="@{/archive/companyList}" method="get">
                         <i class="fa fa-search"></i>
@@ -21,12 +21,13 @@
                     </form>
                 </div>
 
-                <!-- 테이블 -->
+                <!-- ===== 회사 목록 테이블 ===== -->
                 <div class="table-container">
                 <table>
                     <thead>
                     <tr>
                         <th>会社名</th>
+                        <!-- 업종 필터 드롭다운 -->
                         <th class="dropdown">
                             <button>業種 ▼</button>
                             <ul class="dropdown-menu">
@@ -39,6 +40,7 @@
                                 <li><a th:href="@{/archive/companyList(name=${name}, industry='OTHER', type=${type}, location=${location})}">その他</a></li>
                             </ul>
                         </th>
+                        <!-- 유형 필터 드롭다운 -->
                         <th class="dropdown">
                             <button>類型 ▼</button>
                             <ul class="dropdown-menu">
@@ -50,6 +52,7 @@
                                 <li><a th:href="@{/archive/companyList(name=${name}, industry=${industry}, type='OTHER', location=${location})}">その他</a></li>
                             </ul>
                         </th>
+                        <!-- 위치 필터 드롭다운 -->
                         <th class="dropdown">
                             <button>位置 ▼</button>
                             <ul class="dropdown-menu">
@@ -63,6 +66,7 @@
                                 <li><a th:href="@{/archive/companyList(name=${name}, industry=${industry}, type=${type}, location='北陸・甲信越')}">北陸、甲信越</a></li>
                             </ul>
                         </th>
+                        <!-- 졸업생 수 정렬 드롭다운 -->
                         <th class="dropdown">
                             <button>就業人員 ▼</button>
                             <ul class="dropdown-menu">
@@ -70,6 +74,7 @@
                                 <li><a th:href="@{/archive/companyList(name=${name}, industry=${industry}, type=${type}, location=${location}, headcount='asc')}">昇順</a></li>
                             </ul>
                         </th>
+                        <!-- 평점 정렬 드롭다운 -->
                         <th class="dropdown">
                             <button>評点 ▼</button>
                             <ul class="dropdown-menu">
@@ -80,11 +85,13 @@
                     </tr>
                     </thead>
                     <tbody>
+                        <!-- companyList 각 회사 정보 표시 -->
                         <tr th:each="c : ${companyList}">
                             <td>
                                 <div style="display: inline-flex; align-items: center;">
                                     <img th:src="@{${c.logoUrl}}" alt="logo"
                                         style="width:40px; height:auto; margin-right:8px;">
+                                    <!-- 회사 이름을 클릭하면 해당 회사의 리뷰 페이지로 이동 -->
                                     <a th:href="@{/archive/companyReview(id=${c.companyId})}" class="company-name-link">
                                         <span th:text="${c.name}"></span>
                                     </a>
@@ -99,20 +106,24 @@
                     </tbody>
                 </table>
 
-                <!-- 페이지네이션 -->
+                <!-- ===== 페이지네이션 ===== -->
                 <div class="pagination" th:if="${companyPage.totalPages > 0}">
+                    <!-- '이전' 버튼: 현재 페이지가 첫 페이지가 아닐 경우에만 표시 -->
                     <a th:if="${companyPage.hasPrevious()}"
                        th:href="@{/archive/companyList(page=${companyPage.number-1}, name=${name}, industry=${industry}, type=${type}, location=${location}, headcount=${headcount}, rating=${rating})}">
                         <span>&lt;</span>
                     </a>
 
+                    <!-- 페이지 번호 목록: 현재 페이지 주변의 번호만 표시 -->
                     <th:block th:each="i : ${#numbers.sequence(0, companyPage.totalPages - 1)}">
+                        <!-- 현재 페이지 번호를 기준으로 앞뒤 2개씩, 총 5개의 페이지 번호를 보여줌 -->
                         <a th:if="${i >= companyPage.number - 2 and i <= companyPage.number + 2}"
                            th:href="@{/archive/companyList(page=${i}, name=${name}, industry=${industry}, type=${type}, location=${location}, headcount=${headcount}, rating=${rating})}">
+                            <!-- 현재 페이지 번호는 'active' 클래스를 적용하여 강조 -->
                             <span th:class="${i == companyPage.number} ? 'active'" th:text="${i + 1}"></span>
                         </a>
                     </th:block>
-
+                    <!-- '다음' 버튼: 현재 페이지가 마지막 페이지가 아닐 경우에만 표시 -->
                     <a th:if="${companyPage.hasNext()}"
                        th:href="@{/archive/companyList(page=${companyPage.number+1}, name=${name}, industry=${industry}, type=${type}, location=${location}, headcount=${headcount}, rating=${rating})}">
                         <span>&gt;</span>

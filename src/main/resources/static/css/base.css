@@ -11,7 +11,7 @@ html,body{height:100%}
 body{
   margin:0;
   display:flex;              /* 좌: 사이드바, 우: 콘텐츠 */
-  background:var(--bg);
+  background-color:#F7F8FA;
   color:var(--ink);
   font-family:'Noto Sans JP', sans-serif;
 }

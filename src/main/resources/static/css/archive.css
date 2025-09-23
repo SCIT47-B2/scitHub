@@ -2,9 +2,6 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&display=swap');
 
-html, body{
-  font-family: 'Noto Sans JP', sans-serif;
-}
 
 .mainGrid {
     display: flex; /* 또는 grid로 변경 */
@@ -455,11 +452,7 @@ tbody tr:hover {
 }
 
 
-body {
-    font-family: sans-serif;
-    background-color: #f7f8fc;
-    padding: 20px;
-}
+
 .section {
     margin-bottom: 40px;
 }

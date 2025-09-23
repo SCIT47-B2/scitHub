@@ -16,6 +16,10 @@ import java.util.Optional;
 @Repository
 public interface CompanyReviewRepository extends JpaRepository<CompanyReview, Integer> {
     
+    // Fetch Join을 사용하여 Review와 User를 함께 조회
+    @Query("SELECT cr FROM CompanyReview cr JOIN FETCH cr.user u WHERE cr.company.companyId = :companyId")
+    List<CompanyReview> findByCompanyWithUser(@Param("companyId") Integer companyId);
+    
     /** 회사별 리뷰 조회 */
     List<CompanyReview> findByCompany_CompanyId(Integer companyId);
     

@@ -32,6 +32,16 @@ public interface CompanyRepository extends JpaRepository<Company, Integer> {
     @Query("SELECT c FROM Company c WHERE TRIM(c.location) IN :locations")
     List<Company> findByLocationIn(@Param("locations") List<String> locations);
 
+    /**
+     * 다양한 필터 조건(이름, 업종, 유형, 지역)을 적용하여 회사를 검색하고 페이징
+     * LEFT JOIN과 GROUP BY를 사용하여 각 회사 정보를 가져옴
+     * @param name       검색할 회사 이름 (LIKE 검색)
+     * @param industry   필터링할 업종
+     * @param type       필터링할 회사 유형
+     * @param locations  필터링할 세부 지역 목록
+     * @param pageable   페이징 및 정렬 정보 (Sort 객체 포함)
+     * @return           필터링 및 페이징된 회사 목록
+     */
     @Query("SELECT c FROM Company c " +
            "LEFT JOIN c.reviews cr " +
            "WHERE (:name IS NULL OR c.name LIKE %:name%) " +

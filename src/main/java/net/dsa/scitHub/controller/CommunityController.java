@@ -459,7 +459,7 @@ public class CommunityController {
             Model model,
             @AuthenticationPrincipal UserDetails userDetails
     ) {
-        // 현재 로그인한 사용자의 ID를 가져옵니다. 비로그인 상태일 수 있으므로 null 체크가 필요
+        // 현재 로그인한 사용자의 ID를 가져옴. 비로그인 상태일 수 있으므로 null 체크가 필요
         Integer currentUserId = (userDetails != null) ? ur.findByUsername(userDetails.getUsername()).get().getUserId() : null;
 
         CourseDTO course = ccs.selectById(courseId);
@@ -472,7 +472,7 @@ public class CommunityController {
         return "community/courseReview";
     }
 
-    // 리뷰 삭제를 위한 DELETE 메서드 추가
+    // 리뷰 삭제를 위한 DELETE 메서드
     @DeleteMapping("courseReview/{reviewId}")
     public ResponseEntity<?> deleteReview(@PathVariable("reviewId") Integer reviewId,
                                           @AuthenticationPrincipal UserDetails userDetails) {
