@@ -16,17 +16,22 @@ public class CompanyReviewDTO {
 
     Integer companyReviewId;
     Company company;
-    User user;
     Byte rating;
     String content;
 
-    public static CompanyReviewDTO convertToCompanyReviewDTO(CompanyReview entity) {
+    User user;
+    private Integer userCohortNo; // 작성자 기수
+    Boolean isAuthor; // 현재 로그인한 사용자가 작성자인지 여부
+
+    public static CompanyReviewDTO convertToCompanyReviewDTO(CompanyReview entity, Integer currentUserId) {
         return CompanyReviewDTO.builder()
             .companyReviewId(entity.getCompanyReviewId())
             .company(entity.getCompany())
             .user(entity.getUser())
             .rating(entity.getRating())
             .content(entity.getContent())
+            .userCohortNo(entity.getUser().getCohortNo())
+            .isAuthor(currentUserId != null && entity.getUser().getUserId().equals(currentUserId))
             .build();
     }
 }

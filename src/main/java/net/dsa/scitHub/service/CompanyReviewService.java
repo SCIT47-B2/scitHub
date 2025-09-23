@@ -31,41 +31,14 @@ public class CompanyReviewService {
      * @return 해당 회사의 리뷰 목록 (CompanyReviewDTO)
      */
     @Transactional(readOnly = true)
-    public List<CompanyReviewDTO> selectByCompanyId(Integer companyId) {
+    public List<CompanyReviewDTO> selectByCompanyId(Integer companyId, Integer currentUserId) {
 
-        List<CompanyReview> reviewEntities = crr.findByCompany_CompanyId(companyId);
+        List<CompanyReview> reviewEntities = crr.findByCompanyWithUser(companyId);
 
         return reviewEntities.stream()
-            .map(CompanyReviewDTO::convertToCompanyReviewDTO)
+            .map(reviewEntity -> CompanyReviewDTO.convertToCompanyReviewDTO(reviewEntity, currentUserId))
             .collect(Collectors.toList());
 
-    }
-
-    /**
-     * 새로운 회사 리뷰 생성 후 저장
-     * @param companyId
-     * @param userId
-     * @param rating
-     * @param content
-     */
-    public void createReview(Integer companyId, Integer userId, Byte rating, String content) {
-
-        //엔티티 조회하여 DTO로 변환
-        Company company = cr.findById(companyId)
-            .orElseThrow(() -> new IllegalArgumentException("Invalid company ID: " + companyId));
-
-        User user = ur.findById(userId)
-            .orElseThrow(() -> new IllegalArgumentException("Invalid user ID: " + userId));
-
-        //CompanyReview 엔티티 생성
-        CompanyReview newReview = CompanyReview.builder()
-            .company(company)
-            .user(user)
-            .rating(rating)
-            .content(content)
-            .build();
-        //엔티티 저장
-        crr.save(newReview);
     }
 
     /**
@@ -84,6 +57,11 @@ public class CompanyReviewService {
         User user = ur.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("ユーザーが見つかりません. username=" + username));
 
+        // 이미 해당 회사에 리뷰를 작성했는지 확인
+        crr.findByCompany_CompanyIdAndUser_UserId(companyId, user.getUserId()).ifPresent(review -> {
+            throw new IllegalStateException("1つの会社につき、レビューは1件のみ登録できます。");
+        });
+
         // DTO를 Entity로 변환
         CompanyReview review = CompanyReview.builder()
                 .company(company)
@@ -94,6 +72,22 @@ public class CompanyReviewService {
 
         // 리뷰 저장
         crr.save(review);
+    }
+
+    /**
+     * 리뷰 삭제
+     * @param reviewId
+     * @param currentUserId
+     */
+    public void deleteReview(Integer reviewId, Integer currentUserId) {
+        CompanyReview review = crr.findById(reviewId)
+                .orElseThrow(() -> new IllegalArgumentException("該当するレビューが見つかりません。"));
+
+        if (!review.getUser().getUserId().equals(currentUserId)) {
+            throw new IllegalStateException("レビューを削除する権限がありません。");
+        }
+
+        crr.delete(review);
     }
 
 

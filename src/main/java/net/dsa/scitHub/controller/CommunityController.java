@@ -31,6 +31,7 @@ import net.dsa.scitHub.dto.PostDTO;
 import net.dsa.scitHub.service.CommunityService;
 import net.dsa.scitHub.service.CourseReviewService;
 import net.dsa.scitHub.service.CourseService;
+import net.dsa.scitHub.repository.user.UserRepository;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -50,6 +51,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class CommunityController {
 
     private final CommunityService cs;
+    private final UserRepository ur;
 
     @Value("${board.pageSize}")
 	int pageSize;				// 페이지당 글 수
@@ -453,17 +455,42 @@ public class CommunityController {
      */
     @GetMapping("courseReview")
     public String courseReview(
-        @RequestParam(name="id", required=true) Integer courseId,
-        Model model
+            @RequestParam(name="id", required=true) Integer courseId,
+            Model model,
+            @AuthenticationPrincipal UserDetails userDetails
     ) {
+        // 현재 로그인한 사용자의 ID를 가져옴. 비로그인 상태일 수 있으므로 null 체크가 필요
+        Integer currentUserId = (userDetails != null) ? ur.findByUsername(userDetails.getUsername()).get().getUserId() : null;
+
         CourseDTO course = ccs.selectById(courseId);
-        List<CourseReviewDTO> reviews = crs.selectByCourseId(courseId);
+        // 서비스 메서드에 현재 사용자 ID를 전달
+        List<CourseReviewDTO> reviews = crs.selectByCourseId(courseId, currentUserId);
 
         model.addAttribute("course", course);
         model.addAttribute("reviews", reviews);
 
         return "community/courseReview";
     }
+
+    // 리뷰 삭제를 위한 DELETE 메서드
+    @DeleteMapping("courseReview/{reviewId}")
+    public ResponseEntity<?> deleteReview(@PathVariable("reviewId") Integer reviewId,
+                                          @AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("ログインが必要です。");
+        }
+        try {
+            Integer currentUserId = ur.findByUsername(userDetails.getUsername()).get().getUserId();
+            crs.deleteReview(reviewId, currentUserId);
+            return ResponseEntity.ok().build();
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+        } catch (Exception e) {
+            log.error("리뷰 삭제 중 에러 발생", e);
+            return ResponseEntity.badRequest().body("レビューの削除中にエラーが発生しました。");
+        }
+    }
+
 
     /**
      * 강의 리뷰 작성 처리(비동기)
@@ -472,14 +499,19 @@ public class CommunityController {
      */
     @PostMapping("/courseReview/{courseId}")
     public ResponseEntity<String> createReview(@PathVariable("courseId") Integer courseId,
+                                               // @ModelAttribute를 통해 form에서 전송된 데이터(rating, commentText)가 CourseReviewDTO에 자동으로 바인딩
                                                @ModelAttribute CourseReviewDTO reviewDTO,
                                                @AuthenticationPrincipal UserDetails userDetails) {
         if (userDetails == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("ログインが必要です.");
         }
         try {
+            // 서비스 레이어로 DTO를 전달하여 리뷰 생성 로직을 위임
             crs.createReview(courseId, userDetails.getUsername(), reviewDTO);
             return ResponseEntity.ok("レビューが正常に登録されました.");
+        } catch (IllegalStateException e) {
+            log.warn("강의 리뷰 중복 등록 시도: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         } catch (Exception e) {
             log.error("강의 리뷰 등록 실패", e); 
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("レビューの登録中にエラーが発生しました.");

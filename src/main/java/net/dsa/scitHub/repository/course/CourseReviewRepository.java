@@ -14,6 +14,10 @@ import java.util.Optional;
 @Repository
 public interface CourseReviewRepository extends JpaRepository<CourseReview, Integer> {
     
+    // Fetch Join을 사용하여 Review와 User를 함께 조회
+    @Query("SELECT cr FROM CourseReview cr JOIN FETCH cr.user u WHERE cr.course.courseId = :courseId")
+    List<CourseReview> findByCourseWithUser(@Param("courseId") Integer courseId);
+
     /** 강의별 리뷰 조회 */
     List<CourseReview> findByCourse_CourseId(Integer courseId);
     

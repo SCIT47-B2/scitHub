@@ -34,9 +34,10 @@ public class CourseReviewService {
      * @param courseId
      * @return
      */
-    public List<CourseReviewDTO> selectByCourseId(Integer courseId) {
-        return crr.findByCourse_CourseId(courseId).stream()
-                .map(CourseReviewDTO::convertToCourseReviewDTO)
+    public List<CourseReviewDTO>selectByCourseId(Integer courseId, Integer currentUserId) {
+        return crr.findByCourseWithUser(courseId).stream()
+                // DTO 변환 시 현재 사용자 ID를 전달
+                .map(review -> CourseReviewDTO.convertToCourseReviewDTO(review, currentUserId))
                 .toList();
     }
 
@@ -56,15 +57,36 @@ public class CourseReviewService {
         User user = ur.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("ユーザーが見つかりません. username=" + username));
 
+        // 이미 해당 강의에 리뷰를 작성했는지 확인
+        crr.findByUser_UserIdAndCourse_CourseId(user.getUserId(), courseId).ifPresent(review -> {
+            throw new IllegalStateException("1つの講義につき、レビューは1件のみ登録できます。");
+        });
+
         // DTO를 Entity로 변환
         CourseReview review = CourseReview.builder()
             .course(course)
             .user(user)
+            // DTO에 담겨온 별점(rating) 값을 엔티티에 설정.
             .rating(reviewDTO.getRating())
             .commentText(reviewDTO.getCommentText())
             .build();
 
         // 리뷰 저장
         crr.save(review);
+}
+
+    /**
+     * 리뷰 삭제
+     * @param reviewId
+     * @param currentUserId
+     */
+    public void deleteReview(Integer reviewId, Integer currentUserId) {
+        CourseReview review = crr.findById(reviewId)
+                .orElseThrow(() -> new IllegalArgumentException("該当するレビューが見つかりません。"));
+
+        if (!review.getUser().getUserId().equals(currentUserId)) {
+            throw new IllegalStateException("レビューを削除する権限がありません。");
+        }
+        crr.delete(review);
 	}
 }

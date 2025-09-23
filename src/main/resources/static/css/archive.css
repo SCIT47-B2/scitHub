@@ -2,9 +2,6 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&display=swap');
 
-html, body{
-  font-family: 'Noto Sans JP', sans-serif;
-}
 
 .mainGrid {
     display: flex; /* 또는 grid로 변경 */
@@ -284,6 +281,7 @@ tbody tr:hover {
 .review-card {
     border: 1px solid #e0e0e0;
     border-radius: 10px;
+    position: relative; /* 자식 요소의 absolute 위치 기준점 */
     padding: 20px;
     display: flex;
     flex-direction: column;
@@ -291,13 +289,44 @@ tbody tr:hover {
     box-shadow: var(--shadow);
     background-color: white;
 }
-
-.review-author {
-    font-weight: bold;
-    margin-bottom: 10px;
-    color: #333;
+/* 리뷰 카드 오른쪽 상단 액션 버튼 컨테이너 */
+.review-actions {
+    position: absolute;
+    top: 15px;
+    right: 15px;
 }
 
+/* 삭제 버튼 스타일 */
+.btn-delete-review {
+    background: none;
+    border: none;
+    color: #000; /* 검정색 글자 */
+    font-size: 13px;
+    cursor: pointer;
+    padding: 5px;
+    transition: color 0.2s;
+    line-height: 1; /* 아이콘 세로 정렬 */
+}
+
+.btn-delete-review:hover {
+    color: #e53e3e; /* 호버 시 빨간색 */
+}
+
+.btn-delete-review > i {
+    font-size: 16px; /* 아이콘 크기 조정 */
+}
+
+.reviewer-info-chip {
+    display: inline-block;
+    background-color: #e0e0e0; /* 칩 배경색 */
+    color: #555; /* 글자색 */
+    padding: 4px 8px; /* 안쪽 여백 */
+    border-radius: 16px; /* 모서리를 둥글게 */
+    font-size: 12px;
+    font-weight: bold;
+    margin-bottom: 8px; /* 별점과의 간격 */
+    align-self: flex-start; /* 내용의 너비만큼만 차지하도록 설정 */
+}
 /* Individual Review Rating Stars */
 .review-rating-stars {
     color: #d1d1d1; /* 기본 별 색상 */
@@ -423,11 +452,7 @@ tbody tr:hover {
 }
 
 
-body {
-    font-family: sans-serif;
-    background-color: #f7f8fc;
-    padding: 20px;
-}
+
 .section {
     margin-bottom: 40px;
 }

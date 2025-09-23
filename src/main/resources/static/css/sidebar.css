@@ -5,7 +5,7 @@
   left:0;
   width:var(--sidebar-w);
   min-height:100vh;
-  background:var(--panel);
+  background:#FFFFFF;
   border-top-right-radius:var(--radius);
   border-bottom-right-radius:var(--radius);
   padding:24px 18px;

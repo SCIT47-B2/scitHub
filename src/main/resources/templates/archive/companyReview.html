@@ -48,15 +48,22 @@
                 </div>
                 <div th:unless="${#lists.isEmpty(reviews)}" class="review-cards-grid">
                     <div class="review-card" th:each="review : ${reviews}">
-                        <!-- <div class="review-author">
-                            <span th:text="${review.user}">작성자</span>
-                        </div> -->
+                        <!-- 삭제 버튼 (작성자 본인일 경우에만 표시) -->
+                        <div class="review-actions" th:if="${review.isAuthor}">
+                            <button class="btn-delete-review" th:data-review-id="${review.companyReviewId}"
+                                    onclick="deleteReview(this.getAttribute('data-review-id'))"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                        <!-- 작성자 표시 -->
+                        <div class="reviewer-info-chip">
+                            <span th:text="${review.userCohortNo} + '期 ' + (${review.userCohortNo} == 47 ? '受講生' : '卒業生')"></span>
+                        </div>
+                        <!-- 별점 -->
                         <div class="review-rating-stars">
                             <th:block th:each="i : ${#numbers.sequence(1,5)}">
                                 <i class="fa fa-star" th:classappend="${i <= review.rating} ? 'filled' : ''"></i>
                             </th:block>
-                            <!-- <p><strong>평점:</strong> <span th:text="${review.rating}"></span></p> -->
                         </div>
+                        <!-- 리뷰 내용 -->
                         <div class="review-content">
                             <p th:text="${review.content}">리뷰 내용</p>
                         </div>
@@ -193,6 +200,37 @@
                     alert('エラーが発生しました.');
                 });
             });
+
+            /** 리뷰 삭제 기능 **/
+                function deleteReview(reviewId) {
+                    if (!confirm('本当にこのレビューを削除しますか？')) {
+                        return;
+                    }
+
+                    const url = `/scitHub/archive/companyReview/${reviewId}`;
+
+                    fetch(url, {
+                        method: 'DELETE',
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            alert('レビューが削除されました。');
+                            window.location.reload(); // 페이지 새로고침
+                        } else {
+                            return response.text().then(text => {
+                                throw new Error(text || '削除に失敗しました。');
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert(`エラーが発生しました: ${error.message}`);
+                    });
+                }
+
+            // 전역 스코프에 함수 노출
+            window.deleteReview = deleteReview;
+
         });
         </script>
     </th:block>
