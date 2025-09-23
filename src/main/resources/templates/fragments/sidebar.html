@@ -249,6 +249,7 @@
                     const list = document.getElementById('notification-list');
                     const newLi = document.createElement('li');
                     newLi.className = 'is-unread'; // 새로 온 알림은 항상 '읽지 않음'
+                    newLi.dataset.notificationId = noti.notificationId;
 
                     // 서버에서 받은 시간으로 "time ago" 텍스트 생성 (TimeUtil 로직을 JS로 구현)
                     const timeAgoText = formatTimeAgo(noti.createdAt);
@@ -257,7 +258,7 @@
                     const fullTargetUrl = ctx + noti.targetUrl;
 
                     newLi.innerHTML = `
-                        <a href="${fullTargetUrl}">
+                        <a href="${fullTargetUrl}" class="notification-link" data-notification-id="${noti.notificationId}">
                             <strong class="noti-title">${noti.title}</strong>
                             <p class="noti-content">${noti.content}</p>
                             <span class="noti-time" title="${fullTimeText}">${timeAgoText}</span>

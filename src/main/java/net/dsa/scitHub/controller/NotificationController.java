@@ -1,16 +1,14 @@
 package net.dsa.scitHub.controller;
 
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.dsa.scitHub.repository.board.SseEmitterRepository;
 import net.dsa.scitHub.service.NotificationService;
 
 @RestController
@@ -19,6 +17,8 @@ import net.dsa.scitHub.service.NotificationService;
 public class NotificationController {
 
     private final NotificationService ns;
+    private final SseEmitterRepository ser;
+    private static final Long DEFAULT_TIMEOUT = 60L * 1000 * 60; // 1시간
 
     /**
      * SSE 구독 엔드포인트
@@ -31,17 +31,21 @@ public class NotificationController {
             throw new IllegalArgumentException("로그인이 필요한 서비스입니다.");
         }
 
-        return ns.subscribe(userId);
-    }
+        SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
 
-    @PostMapping("/notifications/read/{notificationId}")
-    public ResponseEntity<Void> markAsRead(@PathVariable("notificationId") Integer notificationId) {
-        log.debug("notificationId가 {}로 설정되었습니다.", notificationId);
+        ser.save(userId, emitter);
 
-        // 알림을 '읽음' 상태로 업데이트
-        ns.markAsRead(notificationId);
+        emitter.onCompletion(() -> ser.deleteById(userId));
+        emitter.onTimeout(() -> ser.deleteById(userId));
 
-        // 성공적으로 처리되었음을 알리는 200 OK 응답 반환
-        return ResponseEntity.ok().build();
+        try {
+            emitter.send(SseEmitter.event().name("connect").data("SSE 연결 성공 [userId=" + userId + "]"));
+        } catch (Exception e) {
+            log.error("SSE 연결 중 오류 발생 [userId={}]: {}", userId, e.getMessage());
+            // 연결에 실패하면 Emitter를 제거
+            ser.deleteById(userId);
+        }
+
+        return emitter;
     }
 }
