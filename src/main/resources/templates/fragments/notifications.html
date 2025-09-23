@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+    <body>
+        <div class="notifications-panel" id="notifications-panel" th:fragment="notificationPanelFragment">
+            <div class="panel-header">
+                <h3>通知</h3>
+                <button type="button" id="notification-close-btn" title="閉じる">&times;</button>
+            </div>
+            <ul class="notification-list" id="notification-list">
+                <li th:if="${notifications == null or #lists.isEmpty(notifications)}" class="no-notifications">
+                    <p>新しい通知はありません。</p>
+                </li>
+                <li th:each="noti : ${notifications}" th:classappend="${!noti.isRead} ? 'is-unread' : ''"
+                    th:data-notification-id="${noti.notificationId}">
+                    <a th:href="@{${noti.targetUrl}}" class="notification-link" th:data-notification-id="${noti.notificationId}">
+                        <strong class="noti-title" th:text="${noti.title}"></strong>
+                        <p class="noti-content" th:text="${noti.content}"></p>
+                        <span class="noti-time"
+                            th:text="${@timeUtil.timeAgoJa(noti.createdAt)}"
+                            th:title="${#temporals.format(noti.createdAt, 'yyyy-MM-dd HH:mm')}">
+                        </span>
+                    </a>
+                </li>
+            </ul>
+            <div class="panel-footer">
+                <a th:href="@{/notifications/all}">すべての通知を見る</a>
+            </div>
+        </div>
+    </body>
+</html>

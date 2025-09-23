@@ -1,7 +1,6 @@
 package net.dsa.scitHub.service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -26,6 +25,7 @@ import net.dsa.scitHub.entity.board.PostBookmark;
 import net.dsa.scitHub.entity.board.PostLike;
 import net.dsa.scitHub.entity.board.Tag;
 import net.dsa.scitHub.entity.user.User;
+import net.dsa.scitHub.enums.NotificationType;
 import net.dsa.scitHub.repository.board.BoardRepository;
 import net.dsa.scitHub.repository.board.CommentRepository;
 import net.dsa.scitHub.repository.board.PostBookmarkRepository;
@@ -49,12 +49,13 @@ public class CommunityService {
     private final CommentRepository cr;
     private final PostLikeRepository plr;
     private final PostBookmarkRepository pbr;
+    private final NotificationService ns;
 
     // 게시판 관련 ----------------------------------------------------------------------------------
     /**
      * 유저가 즐겨찾기한 게시판 가져오기
      */
-    /* 
+    /*
     public List<BoardDTO> getFavoriteBoards(String username) {
 
         // 현재 로그인 계정의 User 엔티티 탐색
@@ -72,9 +73,9 @@ public class CommunityService {
                                         .name(board.getName())
                                         .description(board.getDescription())
                                         .build();
-            
+
             for (Post post : board.getPosts()) {
-                
+
             }
         }
 
@@ -138,14 +139,14 @@ public class CommunityService {
         List<PostDTO> postDTOList = new ArrayList<>();
         for (Post post : postPage) {
             PostDTO postDTO = PostDTO.builder()
-                                     .postId(post.getPostId())
-                                     .title(post.getTitle())
-                                     .username(post.getUser().getUsername())
-                                     .createdAt(post.getCreatedAt())
-                                     .viewCount(post.getViewCount())
-                                     .likeCount(post.getLikes().size())
-                                     .commentCount(post.getComments().size())
-                                     .build();
+                                    .postId(post.getPostId())
+                                    .title(post.getTitle())
+                                    .username(post.getUser().getUsername())
+                                    .createdAt(post.getCreatedAt())
+                                    .viewCount(post.getViewCount())
+                                    .likeCount(post.getLikes().size())
+                                    .commentCount(post.getComments().size())
+                                    .build();
             postDTOList.add(postDTO);
         }
 
@@ -198,19 +199,19 @@ public class CommunityService {
                 postPage = pr.findByBoard_BoardId(boardId, pageable);
                 break;
         }
-        
+
         // 페이지의 Entity -> DTO
         List<PostDTO> postDTOList = new ArrayList<>();
         for (Post post : postPage) {
             PostDTO postDTO = PostDTO.builder()
-                                     .postId(post.getPostId())
-                                     .title(post.getTitle())
-                                     .username(post.getUser().getUsername())
-                                     .createdAt(post.getCreatedAt())
-                                     .viewCount(post.getViewCount())
-                                     .likeCount(post.getLikes().size())
-                                     .commentCount(post.getComments().size())
-                                     .build();
+                                    .postId(post.getPostId())
+                                    .title(post.getTitle())
+                                    .username(post.getUser().getUsername())
+                                    .createdAt(post.getCreatedAt())
+                                    .viewCount(post.getViewCount())
+                                    .likeCount(post.getLikes().size())
+                                    .commentCount(post.getComments().size())
+                                    .build();
             postDTOList.add(postDTO);
         }
 
@@ -287,19 +288,19 @@ public class CommunityService {
 
         // Entity -> DTO 변환
         PostDTO postDTO = PostDTO.builder()
-                          .postId(post.getPostId())
-                          .boardId(post.getBoard().getBoardId())
-                          .board(post.getBoard().getName())
-                          .username(post.getUser().getUsername())
-                          .avatarUrl(post.getUser().getAvatarUrl())
-                          .title(post.getTitle())
-                          .content(post.getContent())
-                          .viewCount(post.getViewCount())
-                          .likeCount(post.getLikes().size())
-                          .createdAt(post.getCreatedAt())
-                          .updatedAt(post.getUpdatedAt())
-                          .commentList(post.getComments())
-                          .build();
+                            .postId(post.getPostId())
+                            .boardId(post.getBoard().getBoardId())
+                            .board(post.getBoard().getName())
+                            .username(post.getUser().getUsername())
+                            .avatarUrl(post.getUser().getAvatarUrl())
+                            .title(post.getTitle())
+                            .content(post.getContent())
+                            .viewCount(post.getViewCount())
+                            .likeCount(post.getLikes().size())
+                            .createdAt(post.getCreatedAt())
+                            .updatedAt(post.getUpdatedAt())
+                            .commentList(post.getComments())
+                            .build();
         // 현재 유저가 좋아요를 눌렀었는지 체크
         boolean isLiked = plr.existsByPost_PostIdAndUser_UserId(post.getPostId(), userEntity.getUserId());
         postDTO.setIsLiked(isLiked);
@@ -403,13 +404,16 @@ public class CommunityService {
         PostLike postLike = PostLike.builder().user(userEntity).post(post).build();
         // 해당 좋아요 존재 여부 확인
         Optional<PostLike> postLikeExisting = plr.findByPost_PostIdAndUser_UserId(post.getPostId(), userEntity.getUserId());
-        
+
         if (postLikeExisting.isPresent()) {
             // 이미 존재하는 좋아요면 삭제
             plr.delete(postLikeExisting.get());
         } else {
             // 없으면 추가
             plr.save(postLike);
+
+            // 좋아요 추가 시에만 게시글 작성자에게 알림 발송
+            ns.send(post.getUser(), NotificationType.NEW_LIKE_ON_POST, post);
         }
     }
     /** 게시글의 좋아요 개수 받아오기
@@ -478,7 +482,6 @@ public class CommunityService {
      * @param postId
      * @param List<Tag> newTags
      */
-    
     public void updateTagList(Integer postId, List<String> newTagList) {
         // 게시글 존재 여부 확인
         Post post = pr.findById(postId).orElseThrow(
@@ -499,23 +502,23 @@ public class CommunityService {
         // 기존 태그를 name으로 매핑
         Map<String, Tag> existingTagMap = existingTags.stream()
             .collect(Collectors.toMap(Tag::getName, tag -> tag));
-        
+
         // 새 태그를 name으로 매핑
         Map<String, Tag> newTagMap = newTags.stream()
             .collect(Collectors.toMap(Tag::getName, tag -> tag));
-        
+
         // 삭제할 태그들 (새 리스트에 없는 것)
         List<Tag> toDelete = existingTags.stream()
             .filter(tag -> !newTagMap.containsKey(tag.getName()))
             .collect(Collectors.toList());
         log.debug("삭제할 태그 : {}", toDelete);
-        
+
         // 추가할 태그들 (기존에 없는 새 태그)
         List<Tag> toAdd = newTags.stream()
             .filter(tag -> !existingTagMap.containsKey(tag.getName()))
             .collect(Collectors.toList());
         log.debug("추가할 태그 : {}", toAdd);
-        
+
         // DB에 반영
         if (!toDelete.isEmpty()) {
             tr.deleteAll(toDelete);
@@ -541,14 +544,14 @@ public class CommunityService {
             List<CommentDTO> commentList = new ArrayList<>();
             for (Comment comment : comments) {
                 CommentDTO commentDTO = CommentDTO.builder()
-                                                  .commentId(comment.getCommentId())
-                                                  .userId(comment.getUser().getUserId())
-                                                  .avatarUrl(comment.getUser().getAvatarUrl())
-                                                  .username(comment.getUser().getUsername())
-                                                  .content(comment.getContent())
-                                                  .createdAt(comment.getCreatedAt())
-                                                  .updatedAt(comment.getUpdatedAt())
-                                                  .build();
+                                                .commentId(comment.getCommentId())
+                                                .userId(comment.getUser().getUserId())
+                                                .avatarUrl(comment.getUser().getAvatarUrl())
+                                                .username(comment.getUser().getUsername())
+                                                .content(comment.getContent())
+                                                .createdAt(comment.getCreatedAt())
+                                                .updatedAt(comment.getUpdatedAt())
+                                                .build();
                 // 수정 가능 여부 추가
                 commentDTO.setCanEdit(  username != null
                                         && comment.getUser().getUsername().equals(username)
@@ -577,12 +580,15 @@ public class CommunityService {
             );
             // 댓글 엔티티 작성
             Comment comment = Comment.builder()
-                                     .user(user)
-                                     .content(commentDTO.getContent())
-                                     .post(post)
-                                     .build();
+                                    .user(user)
+                                    .content(commentDTO.getContent())
+                                    .post(post)
+                                    .build();
             // DB에 댓글 저장
-            cr.save(comment);
+            Comment savedComment = cr.save(comment);
+
+            // 댓글 저장 후, 본인 글이 아닐 경우 게시글 작성자에게 알림 발송
+            ns.send(post.getUser(), NotificationType.NEW_COMMENT_ON_POST, savedComment);
         } else { // 없으면
             // 에러 발생
             throw new Exception("해당 게시글이 존재하지 않습니다.");
@@ -599,7 +605,7 @@ public class CommunityService {
             () -> new EntityNotFoundException("해당 댓글이 존재하지 않습니다.")
         );
         // 삭제 권한 체크
-         User loginUser = ur.findByUsername(username).orElseThrow(
+        User loginUser = ur.findByUsername(username).orElseThrow(
                 () -> new EntityNotFoundException("해당 회원이 존재하지 않습니다.")
         );
         if ( (loginUser.getUserId() != comment.getUser().getUserId())) {

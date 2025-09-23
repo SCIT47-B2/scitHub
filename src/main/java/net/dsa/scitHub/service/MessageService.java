@@ -5,6 +5,7 @@ import net.dsa.scitHub.dto.MessageCreateRequestDto;
 import net.dsa.scitHub.dto.MessageResponseDto;
 import net.dsa.scitHub.entity.user.Message;
 import net.dsa.scitHub.entity.user.User;
+import net.dsa.scitHub.enums.NotificationType;
 import net.dsa.scitHub.repository.user.MessageRepository;
 import net.dsa.scitHub.repository.user.UserRepository;
 
@@ -20,6 +21,7 @@ public class MessageService {
 
     private final MessageRepository messageRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     /**
      * 새 메시지를 생성하고 저장합니다.
@@ -41,13 +43,15 @@ public class MessageService {
         Message message = requestDto.toEntity(sender, receiver);
         Message savedMessage = messageRepository.save(message);
 
+        notificationService.send(receiver, NotificationType.NEW_MESSAGE, savedMessage);
+
         return MessageResponseDto.from(savedMessage);
     }
 
     /**
      * 특정 사용자가 받은 메시지 목록을 페이징하여 조회합니다.
      *
-     * @param receiverUsername String - 수신자 아이디 
+     * @param receiverUsername String - 수신자 아이디
      * @param searchType       String - 검색 유형
      * @param searchKeyword    String - 검색어
      * @param pageable         Pageable - 페이징 정보

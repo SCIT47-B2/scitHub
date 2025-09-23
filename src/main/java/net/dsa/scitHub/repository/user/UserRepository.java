@@ -108,5 +108,8 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     // 기수 목록을 조회하기 위한 쿼리 (필터 드롭다운 용)
     @Query("SELECT DISTINCT u.cohortNo FROM User u WHERE u.cohortNo IS NOT NULL ORDER BY u.cohortNo DESC")
     List<Integer> findDistinctCohortNos();
+
+    // userId가 특정 값이 아닌 모든 사용자 조회
+    List<User> findByUserIdNot(Integer userId);
 }
 

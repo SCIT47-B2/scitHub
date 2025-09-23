@@ -1,7 +1,10 @@
 package net.dsa.scitHub.controller;
 
+import java.util.List;
+
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
@@ -9,6 +12,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dsa.scitHub.dto.MypageDTO;
+import net.dsa.scitHub.dto.NotificationDTO;
+import net.dsa.scitHub.service.NotificationService;
 import net.dsa.scitHub.service.UserService;
 
 /**
@@ -20,23 +25,33 @@ import net.dsa.scitHub.service.UserService;
 @Slf4j
 public class GlobalModel {
 
-    private final UserService userService;
+    private final UserService us;
+    private final NotificationService ns;
 
     /**
-     * 현재 로그인 사용자의 최신 정보 주입
-     * @param user UserDetails - 인증 사용자(미인증이면 null)
-     * @return MypageDTO|null  - 로그인 상태면 DTO, 아니면 null
+     * 현재 로그인 사용자의 최신 정보 및 알림 데이터를 모든 모델에 주입
      */
-    @ModelAttribute("currentUser")
-    public MypageDTO currentUser(@AuthenticationPrincipal UserDetails user) {
-        if (user == null) return null; // 로그인 안 된 페이지 대응
+    @ModelAttribute
+    public void addCommonAttributes(Model model, @AuthenticationPrincipal UserDetails user) {
+        if (user == null) {
+            return; // 로그인 안 된 페이지 대응
+        }
+
         try {
-            MypageDTO dto = userService.getMemberInfo(user.getUsername());
-            log.debug("currentUser injected: {}", dto);
-            return dto;
+            MypageDTO currentUserDTO = us.getMemberInfo(user.getUsername());
+            log.debug("currentUser injected: {}", currentUserDTO);
+            model.addAttribute("currentUser", currentUserDTO);
+
+            if (currentUserDTO != null) {
+                long unreadCount = ns.getUnreadNotificationCount(currentUserDTO.getUserId());
+                List<NotificationDTO> notifications = ns.getRecentNotifications(currentUserDTO.getUserId(), 10);
+
+                model.addAttribute("unreadCount", unreadCount);
+                model.addAttribute("notifications", notifications);
+                log.debug("Notification data injected: unreadCount={}, notificationSize={}", unreadCount, notifications.size());
+            }
         } catch (Exception e) {
-            log.warn("현재 사용자 조회 실패", e);
-            return null;
+            log.warn("글로벌 모델 주입 중 오류 발생", e);
         }
     }
 
