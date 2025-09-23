@@ -16,6 +16,8 @@
     <body>
         <div th:replace="~{fragments/sidebar :: sidebarFragment(${menuItems})}"></div>
 
+        <div th:replace="~{fragments/notifications :: notificationPanelFragment}"></div>
+
         <div class="content">
             <div th:replace="~{fragments/header :: headerFragment}"></div>
 

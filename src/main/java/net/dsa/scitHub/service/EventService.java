@@ -11,12 +11,11 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.dsa.scitHub.controller.AdminController;
 import net.dsa.scitHub.dto.EventDTO;
 import net.dsa.scitHub.entity.schedule.Event;
 import net.dsa.scitHub.entity.user.User;
+import net.dsa.scitHub.enums.NotificationType;
 import net.dsa.scitHub.enums.Visibility;
-import net.dsa.scitHub.repository.album.AlbumRepository;
 import net.dsa.scitHub.repository.schedule.EventRepository;
 import net.dsa.scitHub.repository.user.UserRepository;
 import net.dsa.scitHub.security.AuthenticatedUser;
@@ -26,10 +25,11 @@ import net.dsa.scitHub.security.AuthenticatedUser;
 @RequiredArgsConstructor
 @Transactional
 public class EventService {
-    
+
     // DB 저장을 위한 Repository 주입
     private final EventRepository er;
     private final UserRepository ur;
+    private final NotificationService ns;
 
     /**
      * 일정 등록 처리 함수
@@ -37,16 +37,19 @@ public class EventService {
     public EventDTO createEvent(EventDTO eventDTO, AuthenticatedUser user) {
         log.debug("createEvent 서비스 메서드 호출됨. 전달받은 DTO 내용: {}", eventDTO.toString());
 
+        // 관리자 플래그
+        boolean isAdmin = user.getRoleName().equals("ROLE_ADMIN");
+
         // ADMIN -> PUBLIC 일정, USER -> PRIVATE 일정
-        if(user.getRoleName().equals("ROLE_ADMIN")){
+        if(isAdmin){
             eventDTO.setVisibility(Visibility.valueOf("PUBLIC"));
-        } else if(user.getRoleName().equals("ROLE_USER")) {
+        } else {
             eventDTO.setVisibility(Visibility.valueOf("PRIVATE"));
         }
         eventDTO.setUserId(user.getId());
 
         log.debug("@@eventDTO 확인 {}", eventDTO);
-        
+
         User eventUser = ur.findByUsername(user.getId()).orElseThrow(
             () -> new EntityNotFoundException("해당 아이디가 없습니다.")
         );
@@ -62,6 +65,17 @@ public class EventService {
                         .build();
         Event savedEvent = er.save(event);
         log.debug("ENTITY최종 저장될 eventENTITY: {}", savedEvent.toString());
+
+        // 알림 전송
+        // 생성자가 관리자이고, 생성된 일정이 전체 공개(PUBLIC) 일정인 경우에만 알림 전송
+        if (isAdmin && savedEvent.getVisibility() == Visibility.PUBLIC) {
+            List<User> allUsersExceptCreator = ur.findByUserIdNot(eventUser.getUserId());
+            for (User recipient : allUsersExceptCreator) {
+                ns.send(recipient, NotificationType.NEW_EVENT, savedEvent);
+            }
+            log.info("관리자가 전체 일정을 등록하여 {}명에게 알림을 전송했습니다.", allUsersExceptCreator.size());
+        }
+
         return EventDTO.convertToEventDTO(savedEvent);
     }
 
@@ -87,7 +101,7 @@ public class EventService {
                                 .build();
             dtoList.add(dto);
         }
-        
+
         return dtoList;
     }
     /**
@@ -98,11 +112,11 @@ public class EventService {
      */
     public List<EventDTO> getVisibleEventsForUser(
         AuthenticatedUser userDetails, boolean showPublic, boolean showPrivate) {
-        
+
         // AuthenticatedUser가 null이 아니라면 username을 보관
         String currentUserId = (userDetails != null) ? userDetails.getUsername() : null;
         // 여기부터 해서repository query문 수정해야 함.
-        
+
         List<Event> entityList = er.findFilteredEvents(currentUserId, showPublic, showPrivate, Visibility.PUBLIC, Visibility.PRIVATE);
 
         // 조회된 엔티티 리스트를 DTO 리스트로 변환하여 반환.
@@ -134,7 +148,7 @@ public class EventService {
 
         // 업데이트 될 event의 Entity 호출
         Event eventEntity = er.findById(eventId).orElseThrow(() -> new EntityNotFoundException("해당 아이디가 없습니다."));
-        
+
         // 호출된 Entity에 직접 값을 바꿔주면 Spring을 통해서 자동으로 변경 save까지 해줌.
         if (eventDTO.getTitle() != null) {
             eventEntity.setTitle(eventDTO.getTitle());
@@ -146,7 +160,7 @@ public class EventService {
         eventEntity.setStartAt(eventDTO.getStart());
         eventEntity.setEndAt(eventDTO.getEnd());
         eventEntity.setIsAllDay(eventDTO.getAllDay());
-        
+
         // controller에 넘겨주기 위해 DTO로 변환
         EventDTO updateEventDTO = EventDTO.convertToEventDTO(eventEntity);
 
@@ -158,7 +172,7 @@ public class EventService {
      * @param eventId
      */
     public void deleteEvent(Integer eventId) {
-        
+
         // 삭제하기 전 eventId로 정말로 데이터가 존재하는 지 확인
         if (!er.existsById(eventId)) {
             throw new EntityNotFoundException("삭제할 이벤트를 찾을 수 없습니다. ID : " + eventId);

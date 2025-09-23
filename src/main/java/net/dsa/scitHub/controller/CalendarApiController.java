@@ -1,9 +1,7 @@
 package net.dsa.scitHub.controller;
 
 import java.net.URI;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -22,7 +20,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dsa.scitHub.dto.DdayDTO;
 import net.dsa.scitHub.dto.EventDTO;
-import net.dsa.scitHub.enums.Visibility;
 import net.dsa.scitHub.security.AuthenticatedUser;
 import net.dsa.scitHub.service.DdayService;
 import net.dsa.scitHub.service.EventService;
@@ -40,10 +37,9 @@ public class CalendarApiController {
 
     /**
      * 일정 등록하기 위한 Controller
-     * 
-     * @param AuthenticatedUser
-     * @param eventDTO
-     * @return
+     * @param AuthenticatedUser Spring Security 로그인 정보
+     * @param eventDTO 넘어온 JSON에 대한 정보가 담긴 DTO
+     * @return ResponseEntity (201 Created 상태와 함께 생성된 이벤트 정보 반환)
      */
     @PostMapping("/calendar/events")
     public ResponseEntity<?> createEvent(
@@ -74,14 +70,14 @@ public class CalendarApiController {
                 @RequestParam(name = "showPublic", defaultValue = "true") boolean showPublic,
                 @RequestParam(name = "showPrivate",defaultValue = "true") boolean showPrivate) {
         List<EventDTO> events = es.getVisibleEventsForUser(user, showPublic, showPrivate);
-        
+
         return ResponseEntity.ok(events);
     }
 
 
     /**
      * 일정을 수정하는 메서드
-     * 
+     * @param user 현재 로그인한 사용자 정보
      * @param eventId  URL 경로에서 추출한 eventId
      * @param eventDTO 요청 본문의 JSON 데이터를 매핑한 DTO 객체
      * @return 성공 여부를 담은 HTTP 응답
@@ -123,7 +119,6 @@ public class CalendarApiController {
     }
 
     // ---- dday 영역 시작
-    
     /**
      * dday를 등록하는 함수
      * @param AuthenticatedUser Spring Security 로그인 정보
@@ -146,14 +141,14 @@ public class CalendarApiController {
                                 .path("/{id}")  // 경로에 '/{id}'를 추가합니다.
                                 .buildAndExpand(newDdayDTO.getDdayId()) // 
                                 .toUri();   // 최종 URI객체를 생성합니다.
-                
-                
+
         return ResponseEntity.created(location).body(newDdayDTO);
     }
 
     /**
      * 현재 로그인한 사용자의 모든 디데이 목록을 반환
      * @param userDetails 로그인한 사용자 정보
+     * @return ResponseEntity<List<DdayDTO>> 200 OK 상태와 함께 디데이 목록 반환
      */
     @GetMapping("/ddays")
     public ResponseEntity<List<DdayDTO>> getAllDdays(
@@ -182,7 +177,7 @@ public class CalendarApiController {
         // 성공적으로 삭제되었음을 알림.
         return ResponseEntity.ok().build();
     }
-    
+
     /**
      * 디데이 수정 함수
      * @param ddayId   url에서 ddayId 추출
@@ -198,7 +193,7 @@ public class CalendarApiController {
                 ) {
         // param 값을 들고 service의 수정 함수 호출
         DdayDTO updatedDTO = ds.updateDday(userDetails, ddayId, ddayDTO);
-        
+
         // 200 OK와 DTO반환.
         return ResponseEntity.ok(updatedDTO);
     }
