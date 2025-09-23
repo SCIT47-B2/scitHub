@@ -247,7 +247,7 @@ const editorConfig = {
 	menuBar: {
 		isVisible: true
 	},
-	placeholder: 'Type or paste your content here!',
+	placeholder: 'このエリアにポストの内容を作成して下さい。画像も貼れます。',
 	simpleUpload: {
 		uploadUrl: '/scitHub/ckEditor5/uploadPostImage'
 	},

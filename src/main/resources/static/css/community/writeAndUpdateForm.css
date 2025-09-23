@@ -1,0 +1,226 @@
+/* 게시글 작성/수정 페이지 상단 헤더 */
+.write-header {
+    display: flex;
+    /* flex 아이템(제목, 버튼 그룹)을 양 끝으로 정렬 */
+    justify-content: space-between;
+    /* 세로 중앙 정렬 */
+    align-items: center;
+    max-width: 900px;
+    margin: 0 auto 16px auto;
+}
+
+/* 헤더 제목 스타일 */
+.write-header h2 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+/* 버튼들을 감싸는 컨테이너 */
+.header-buttons {
+    display: flex;
+    /* 버튼들 사이의 간격 */
+    gap: 8px;
+}
+
+/* 전체 폼 컨테이너 스타일 */
+.decoration {
+    width: 100%;
+    max-width: 900px; /* 에디터 폭과 유사하게 설정 */
+    margin: 24px auto;
+    padding: 32px;
+    background-color: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    box-sizing: border-box;
+}
+
+.formField {
+    display: flex;
+    flex-direction: column;
+    gap: 16px; /* 요소들 사이의 간격 */
+}
+
+/* 게시판 선택 + 제목 입력 헤더 */
+.form-header {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+/* 게시판 선택 드롭다운 */
+.boardSelectSection {
+    flex-shrink: 0; /* 너비가 줄어들지 않도록 설정 */
+}
+
+#boardDropdown {
+    width: 180px; /* 고정 너비 부여 */
+    height: 44px;
+    padding: 0 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background-color: #fff;
+    font-size: 14px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+
+#boardDropdown:focus {
+    outline: none;
+    border-color: var(--primary, #4258BE);
+}
+
+/* 제목 입력 필드 */
+#title {
+    flex-grow: 1; /* 남은 공간을 모두 차지 */
+    height: 44px;
+    padding: 0 16px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 300;
+    font-family: inherit;
+    transition: border-color 0.2s;
+}
+
+#title:focus {
+    outline: none;
+    border-color: var(--primary, #4258BE);
+}
+
+/* 태그 입력 영역 */
+.tagArea {
+    margin-top: 8px;
+}
+
+#tagInput {
+    width: 100%;
+    height: 44px;
+    padding: 0 16px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+/* 페이지 헤더 (제목 + 등록 버튼) */
+.write-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 900px; /* .decoration과 너비 맞춤 */
+    margin: 0 auto 16px auto;
+}
+
+.write-header h2 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+/* 등록 버튼 */
+.actionBtn {
+    padding: 10px 20px;
+    background: var(--primary); /* var(--primary) or a specific color */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: background-color 0.2s;
+    white-space: nowrap;
+}
+.actionBtn:hover { background: #4f46e5; }
+
+/* 태그 입력 및 표시 영역 전체를 감싸는 컨테이너 */
+.tagArea {
+    display: flex;
+    /* 입력 필드와 태그 목록을 상단 기준으로 정렬 */
+    align-items: flex-start; 
+    gap: 15px;
+    margin-top: 8px;
+    border: 1px solid #d1d5db; /* 전체 영역에 테두리 추가 */
+    border-radius: 8px;
+    padding: 10px;
+    min-height: 50px; /* 최소 높이 조정 */
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+}
+
+/* 포커스 시 테두리 색상 변경 */
+.tagArea:focus-within {
+    border-color: var(--primary, #4258BE);
+}
+
+
+/* 태그 입력 필드와 에러 메시지를 감싸는 Wrapper */
+.tagInputWrapper {
+    /* 부모 요소(.tagArea) 너비의 25%를 차지 */
+    display: flex;
+    flex-direction: column;
+    flex: 0 0 25%;
+}
+
+/* 태그 입력 필드 */
+#tagInput {
+    /* 부모(.tagInputWrapper)의 전체 너비를 사용 */
+    width: 100%;
+    padding: 8px 4px; /* 내부 여백 조정 */
+    font-size: 15px;
+    background-color: transparent;
+    box-sizing: border-box;
+}
+
+/* 에러 메시지 스타일 */
+.error-message {
+    display: none; /* 기본적으로 숨김 */
+    margin: 4px 0 0 0;
+    color: #ef4444; /* 빨간색 계열 */
+    font-size: 12px;
+    font-weight: 500;
+}
+
+
+/* 생성된 태그들이 표시될 컨테이너 */
+#tagContainer {
+    /* 남은 공간을 모두 차지하도록 설정 */
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px; /* 태그들 사이의 간격 */
+    padding-top: 2px; /* 입력 필드와 높이를 맞추기 위한 미세 조정 */
+}
+
+/* 개별 태그 + 삭제 버튼을 감싸는 박스 */
+.tag {
+    display: inline-flex;
+    align-items: center;
+    background-color: #e9ecef;
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-size: 14px;
+    color: #495057;
+    white-space: nowrap;
+    height: 32px;
+    box-sizing: border-box;
+}
+
+/* 태그 삭제 버튼 */
+.tagRemove {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    margin-left: 6px;
+    padding: 0;
+    font-size: 16px;
+    font-weight: bold;
+    color: #adb5bd;
+    line-height: 1;
+}
+
+.tagRemove:hover {
+    color: #495057;
+}

@@ -101,7 +101,7 @@
             <aside class="rightSidebar">
                 <nav class="categoryMenuList">
                     <th:block th:each="board : ${boardMap}">
-                        <a th:href="@{board(boardId=${board.key})}" class="categoryMenuItem"
+                        <a th:href="@{board(name=${board.key})}" class="categoryMenuItem"
                             th:classappend="${post.board == board.key} ? 'active' : ''" th:text="${board.value}"></a>
                     </th:block>
                 </nav>

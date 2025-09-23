@@ -2,6 +2,12 @@ $('#updatePostBtn').click(function() {
     updatePost();
 });
 
+$('#cancelBtn').click(function() {
+    // 게시글 식별자 저장
+    const postId = $('#postId').val();
+    location.href = `readPost?postId=${postId}`;
+});
+
 // 게시글 수정 요청(비동기)
 function updatePost() {
 
