@@ -14,7 +14,7 @@ function displayTag() {
         $('#tagContainer').append($tagDiv);
         updateHiddenInput();
 
-        console.log('현재 태그들:', tags);
+        console.log('現在付いているタグ:', tags);
     });
 }
 // 초기 실행 시 기존 태그 불러오기

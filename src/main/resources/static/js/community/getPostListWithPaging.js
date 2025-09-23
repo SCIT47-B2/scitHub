@@ -12,7 +12,7 @@ $(document).ready(function () {
         const keyword = $('#search-keyword').val();
 
         if (keyword.trim() === "") {
-            alert("検索ワードを入力してください。");
+            alert("検査ワードを入力して下さい。");
             return;
         }
 
@@ -92,8 +92,8 @@ function loadPosts(boardId, page = 0, searchType = null, keyword = null) {
             renderPagination(pageData, boardId, searchType, keyword);
         },
         error: function (xhr, status, error) {
-            console.error('데이터 로드 실패:', error);
-            $('#post-list-body').html('<tr class="no-posts-message"><td colspan="6">エラーが発生しました。</td></tr>');
+            console.error('データのロードに失敗しました:', error);
+            $('#post-list-body').html('<tr class="no-posts-message"><td colspan="6">データの読込み中エラーが生じました。</td></tr>');
         }
     });
 }
@@ -106,7 +106,7 @@ function renderPosts(posts) {
     $postListBody.empty();
 
     if (!posts || posts.length === 0) {
-        $postListBody.html('<tr class="no-posts-message"><td colspan="6">表示できる投稿がありません</td></tr>');
+        $postListBody.html('<tr class="no-posts-message"><td colspan="6">表示するポストがありません。</td></tr>');
         return;
     }
 

@@ -19,6 +19,7 @@ function likeFunc() {
         },
         // 실패 시 alert창 띄우기
         error: function(e) {
+            // alert 창에 오류 메시지 출력
             alert(e.responseText);
         }
     });

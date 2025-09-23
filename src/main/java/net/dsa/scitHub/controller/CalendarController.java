@@ -41,7 +41,7 @@ public class CalendarController {
             // 비로그인시 landingPage로 리다이렉트
             return "redirect:/user/landingPage";
         }
-        
+
         log.debug("유저 정보가 담겼는지 확인 {}",user.getId());
         log.debug("유저 정보가 담겼는지 확인 {}",user.getRoleName());
 

@@ -231,3 +231,110 @@
 @media (max-width: 920px){
   main{padding:20px;}
 }
+
+/* =========================
+    알림 버튼 및 패널 스타일
+   ========================= */
+/* --- 알림 버튼 스타일 --- */
+.menu-bottom a#notification-bell {
+  position: relative; /* 뱃지 위치의 기준점 */
+}
+
+.notification-badge {
+  position: absolute;
+  top: 8px;           /* 버튼 상단에서의 위치 */
+  right: 12px;          /* 버튼 오른쪽에서의 위치 */
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;     /* 숫자 길이에 따라 유연하게 늘어나도록 */
+  border-radius: 10px;/* 원 모양 */
+  background-color: #ef4444; /* 눈에 띄는 빨간색 */
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 20px; /* 텍스트 세로 중앙 정렬 */
+  text-align: center;
+  box-sizing: border-box;
+}
+
+/* --- 알림 패널 스타일 --- */
+.notifications-panel {
+  position: fixed; /* 화면 기준 고정 */
+  top: 0;
+  left: var(--sidebar-w); /* 사이드바 바로 오른쪽에 위치 */
+  width: 320px; /* 패널 너비 */
+  height: 100%;
+  background-color: var(--bg); /* 사이트 기본 배경색 */
+
+  border-radius: var(--radius);
+  box-shadow: 4px 0 20px rgba(0,0,0,0.08);
+
+  display: flex;
+  flex-direction: column;
+
+  /* ✨ 애니메이션을 위한 초기 상태 (왼쪽으로 숨김) */
+  transform: translateX(-100%);
+  visibility: hidden;
+  opacity: 0;
+  transition: transform 0.3s ease-in-out, visibility 0.3s, opacity 0.3s;
+  z-index: 998; /* 다른 요소들 위에 보이도록 */
+}
+
+/* --- 알림 패널이 열렸을 때의 스타일 --- */
+/* ✨ body에 is-notification-open 클래스가 추가되면 동작 */
+body.is-notification-open .notifications-panel {
+  transform: translateX(0); /* 알림 패널을 제자리로 이동 */
+  visibility: visible;
+  opacity: 1;
+}
+
+
+/* --- 알림 패널 내부 요소 스타일 --- */
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid #e5e7eb;
+  flex-shrink: 0; /* 크기가 줄어들지 않도록 */
+}
+.panel-header h3 { margin: 0; font-size: 18px; }
+#notification-close-btn {
+  background: none; border: none; font-size: 24px; cursor: pointer; color: #9ca3af;
+  padding: 0; line-height: 1;
+}
+
+.notification-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  overflow-y: auto; /* 내용이 길어지면 스크롤 */
+  flex-grow: 1; /* 남은 공간을 모두 차지 */
+}
+.notification-list li a,
+.notification-list li p {
+  display: block;
+  padding: 12px 20px;
+  border-bottom: 1px solid #f3f4f6;
+  text-decoration: none;
+  transition: background-color 0.2s;
+}
+.notification-list li a:hover,
+.notification-list li p:hover { background-color: var(--panel); }
+
+/* ✨ 읽지 않은 알림은 is-unread 클래스로 구분 */
+.notification-list li.is-unread a {
+  background-color: rgba(66, 88, 190, 0.05); /* var(--primary)의 연한 버전 */
+}
+
+.noti-title { color: var(--ink); font-weight: 600; font-size: 14px; }
+.noti-content { color: var(--muted); font-size: 13px; margin: 4px 0; }
+.noti-time { color: #9ca3af; font-size: 12px; }
+
+.panel-footer {
+  padding: 16px 20px;
+  text-align: center;
+  border-top: 1px solid #e5e7eb;
+  flex-shrink: 0;
+}
+.panel-footer a { color: var(--primary); text-decoration: none; font-weight: 600; }

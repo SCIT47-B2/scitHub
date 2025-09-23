@@ -2,7 +2,7 @@ $('#writePostBtn').click(function() {
     location.href = 'writePost';
 });
 $('#deletePostBtn').click(function() {
-    const flag = confirm("정말로 이 게시글을 삭제하시겠습니까?");
+    const flag = confirm("本当にこのポストを削除してもよろしいですか?");
     if(flag) {
         const postId = $('#postId').val();
         location.href = `deletePost?postId=${postId}`;

@@ -116,6 +116,21 @@
 .comments i { color: #ccc; font-size: 18px; }
 .bookmark i { color: #845ef7; font-size: 22px; cursor: pointer; }
 
+/* 개별 태그를 감싸는 박스 */
+.tag {
+    display: inline-flex;
+    align-items: center;
+    background-color: #e9ecef;
+    border-radius: 20px;
+    padding: 0 10px;
+    margin: 0 5px;
+    font-size: 12px;
+    color: #495057;
+    white-space: nowrap;
+    height: 32px;
+    box-sizing: border-box;
+}
+
 
 /* --- 댓글 섹션 --- */
 .separator {

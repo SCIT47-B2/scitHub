@@ -1,13 +1,16 @@
 package net.dsa.scitHub.service;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dsa.scitHub.dto.NotificationDTO;
@@ -22,17 +25,24 @@ import net.dsa.scitHub.repository.board.BoardRepository;
 import net.dsa.scitHub.repository.user.NotificationRepository;
 
 @Service
-@RequiredArgsConstructor
 @Transactional
 @Slf4j
 public class NotificationService {
 
-    private final NotificationRepository nr;
-    private final BoardRepository br;
-
     // 1. Thread-safe한 ConcurrentHashMap을 사용하여 여러 사용자의 SseEmitter를 관리
     private static final Map<Integer, SseEmitter> emitters = new ConcurrentHashMap<>();
     private static final Long DEFAULT_TIMEOUT = 60L * 1000 * 60; // 1시간 타임아웃
+
+    private final NotificationRepository nr;
+    private final BoardRepository br;
+    private SseEmitter emitter;
+
+    public NotificationService(NotificationRepository nr, BoardRepository br) {
+        this.nr = nr;
+        this.br = br;
+
+        this.emitter = new SseEmitter(DEFAULT_TIMEOUT);
+    }
 
     // 2. 사용자가 알림을 구독할 때 호출되는 메서드
     /**
@@ -41,15 +51,23 @@ public class NotificationService {
      * @return SseEmitter 객체
      */
     public SseEmitter subscribe(Integer userId) {
-        SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
         emitters.put(userId, emitter);
 
         // 연결이 끊어지거나(onCompletion), 타임아웃(onTimeout)될 때 Emitter를 제거
         emitter.onCompletion(() -> emitters.remove(userId));
         emitter.onTimeout(() -> emitters.remove(userId));
 
-        //  Mime Type T-Mobile 오류 방지를 위한 더미 데이터 전송
-        sendToClient(userId, "EventStream Created. [userId=" + userId + "]");
+        //  Mime Type T-Mobile 오류 방지를 위한 'connect'라는 이름의 더미 데이터 전송
+        try {
+            emitter.send(SseEmitter.event()
+                .id(String.valueOf(userId))
+                .name("connect")
+                .data("EventStream Created. [userId=" + userId + "]"));
+            log.info("SSE 연결 성공 및 더미 데이터 전송 완료 [userId={}]", userId);
+        } catch (IOException e) {
+            emitters.remove(userId);
+            log.error("SSE 연결 중 오류 발생", e);
+        }
 
         return emitter;
     }
@@ -255,8 +273,8 @@ public class NotificationService {
                 Post post = comment.getPost();
                 yield resolvePostUrlByBoard(post);
             }
-            case NEW_MESSAGE -> "/scitHub/mypage/messages";
-            case NEW_EVENT -> "/scitHub/calendar/schedule";
+            case NEW_MESSAGE -> "/mypage/messages";
+            case NEW_EVENT -> "/calendar/schedule";
         };
     }
 
@@ -267,9 +285,53 @@ public class NotificationService {
      */
     private String resolvePostUrlByBoard(Post post) {
         if (post.getBoard().getBoardId() == br.findByName("inquiry").get().getBoardId()) {
-            return "/scitHub/admin/inquiryRead?postId=" + post.getPostId();
+            return "/admin/inquiryRead?postId=" + post.getPostId();
         } else {
-            return "/scitHub/community/readPost?postId=" + post.getPostId();
+            return "/community/readPost?postId=" + post.getPostId();
+        }
+    }
+
+    /**
+     * 특정 사용자의 읽지 않은 알림 개수 조회
+     * @param userId 사용자 ID
+     * @return 읽지 않은 알림 개수
+     */
+    public long getUnreadNotificationCount(Integer userId) {
+        User user = User.builder().userId(userId).build();  // 간단히 ID만 가진 User 객체 생성
+        return nr.countByUserAndIsReadFalse(user);
+    }
+
+    /**
+     * 특정 사용자의 최근 알림 목록 조회
+     * @param userId 사용자 ID
+     * @param limit 조회할 알림 개수
+     * @return 최근 알림 목록
+     */
+    public List<NotificationDTO> getRecentNotifications(Integer userId, int limit) {
+        User user = User.builder().userId(userId).build();  // 간단히 ID만 가진 User 객체 생성
+        // PageRequest.of(0, limit)로 최신 limit개 알림 조회
+        List<Notification> notifications = nr.findByUserOrderByCreatedAtDesc(user, PageRequest.of(0, limit));
+
+        // Entity List -> DTO List 변환
+        return notifications.stream()
+                .map(NotificationDTO::convertToDTO)
+                .toList();
+    }
+
+    /**
+     * 알림을 '읽음' 상태로 표시
+     * @param notificationId 읽음 처리할 알림 ID
+     */
+    @Transactional
+    public void markAsRead(Integer notificationId) {
+        Notification notification = nr.findById(notificationId)
+                .orElseThrow(() -> new EntityNotFoundException("알림을 찾을 수 없습니다. ID=" + notificationId));
+
+        // 이미 읽은 상태가 아니라면 '읽음'으로 변경
+        if (!notification.getIsRead()) {
+            notification.setIsRead(true);
+            // @Transactional 덕분에 별도의 save 호출 없이 변경 사항이 자동으로 저장됩니다.
+            log.debug("알림 읽음 처리 완료 [notificationId={}]", notificationId);
         }
     }
 }
