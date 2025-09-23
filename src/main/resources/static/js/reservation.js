@@ -120,7 +120,7 @@ async function makeReservation(clickedButton, roomId, timeSlotId) {
         }
     } catch (error) {
         console.error('예약 처리 중 오류 발생:', error);
-        alert('エラーが発生し、予約に失敗しました。しばらくしてから再度お試しください。');
+        alert('エラーが発生し、予約に失敗しました。');
     }
 }
 
@@ -275,7 +275,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log('예약취소 버튼이 클릭되었습니다.');
                 
                 const reservationId = clickedButton.dataset.reservationId;
-                if (confirm('本当に予約をキャンセルしますか。')) {
+                if (confirm('本当に予約をキャンセルしますか?')) {
                     cancelReservation(clickedButton, reservationId);
                 }
             }
