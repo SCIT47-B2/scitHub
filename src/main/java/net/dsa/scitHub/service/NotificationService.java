@@ -25,17 +25,24 @@ import net.dsa.scitHub.repository.board.BoardRepository;
 import net.dsa.scitHub.repository.user.NotificationRepository;
 
 @Service
-@RequiredArgsConstructor
 @Transactional
 @Slf4j
 public class NotificationService {
 
-    private final NotificationRepository nr;
-    private final BoardRepository br;
-
     // 1. Thread-safe한 ConcurrentHashMap을 사용하여 여러 사용자의 SseEmitter를 관리
     private static final Map<Integer, SseEmitter> emitters = new ConcurrentHashMap<>();
     private static final Long DEFAULT_TIMEOUT = 60L * 1000 * 60; // 1시간 타임아웃
+
+    private final NotificationRepository nr;
+    private final BoardRepository br;
+    private SseEmitter emitter;
+
+    public NotificationService(NotificationRepository nr, BoardRepository br) {
+        this.nr = nr;
+        this.br = br;
+
+        this.emitter = new SseEmitter(DEFAULT_TIMEOUT);
+    }
 
     // 2. 사용자가 알림을 구독할 때 호출되는 메서드
     /**
@@ -44,7 +51,6 @@ public class NotificationService {
      * @return SseEmitter 객체
      */
     public SseEmitter subscribe(Integer userId) {
-        SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
         emitters.put(userId, emitter);
 
         // 연결이 끊어지거나(onCompletion), 타임아웃(onTimeout)될 때 Emitter를 제거
