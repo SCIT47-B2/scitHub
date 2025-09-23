@@ -20,7 +20,21 @@ import net.dsa.scitHub.service.UserService;
  * 전역 모델 주입
  * - 모든 뷰 렌더링 시 공통으로 필요한 값들을 내려줍니다.
  */
-@ControllerAdvice
+@ControllerAdvice(assignableTypes = {
+    AdminController.class,
+    ArchiveController.class,
+    CalendarApiController.class,
+    CalendarController.class,
+    CkEditor5Controller.class,
+    ClassroomController.class,
+    CommunityController.class,
+    HomeController.class,
+    MessageController.class,
+    MypageController.class,
+    NotificationReadController.class,
+    ReservationApiController.class,
+    UserController.class
+})
 @RequiredArgsConstructor
 @Slf4j
 public class GlobalModel {
@@ -39,7 +53,7 @@ public class GlobalModel {
 
         try {
             MypageDTO currentUserDTO = us.getMemberInfo(user.getUsername());
-            log.debug("currentUser injected: {}", currentUserDTO);
+            log.debug("현재 로그인 사용자: {}", currentUserDTO);
             model.addAttribute("currentUser", currentUserDTO);
 
             if (currentUserDTO != null) {
@@ -48,7 +62,7 @@ public class GlobalModel {
 
                 model.addAttribute("unreadCount", unreadCount);
                 model.addAttribute("notifications", notifications);
-                log.debug("Notification data injected: unreadCount={}, notificationSize={}", unreadCount, notifications.size());
+                log.debug("알림 데이터 주입됨: unreadCount={}, notificationSize={}", unreadCount, notifications.size());
             }
         } catch (Exception e) {
             log.warn("글로벌 모델 주입 중 오류 발생", e);

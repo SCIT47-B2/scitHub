@@ -2,8 +2,6 @@ package net.dsa.scitHub.service;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -22,91 +20,17 @@ import net.dsa.scitHub.entity.user.Notification;
 import net.dsa.scitHub.entity.user.User;
 import net.dsa.scitHub.enums.NotificationType;
 import net.dsa.scitHub.repository.board.BoardRepository;
+import net.dsa.scitHub.repository.board.SseEmitterRepository;
 import net.dsa.scitHub.repository.user.NotificationRepository;
 
 @Service
-@Transactional
+@RequiredArgsConstructor
 @Slf4j
 public class NotificationService {
 
-    // 1. Thread-safe한 ConcurrentHashMap을 사용하여 여러 사용자의 SseEmitter를 관리
-    private static final Map<Integer, SseEmitter> emitters = new ConcurrentHashMap<>();
-    private static final Long DEFAULT_TIMEOUT = 60L * 1000 * 60; // 1시간 타임아웃
-
     private final NotificationRepository nr;
+    private final SseEmitterRepository ser;
     private final BoardRepository br;
-    private SseEmitter emitter;
-
-    public NotificationService(NotificationRepository nr, BoardRepository br) {
-        this.nr = nr;
-        this.br = br;
-
-        this.emitter = new SseEmitter(DEFAULT_TIMEOUT);
-    }
-
-    // 2. 사용자가 알림을 구독할 때 호출되는 메서드
-    /**
-     * 사용자가 알림을 구독
-     * @param userId 구독하는 사용자의 ID
-     * @return SseEmitter 객체
-     */
-    public SseEmitter subscribe(Integer userId) {
-        emitters.put(userId, emitter);
-
-        // 연결이 끊어지거나(onCompletion), 타임아웃(onTimeout)될 때 Emitter를 제거
-        emitter.onCompletion(() -> emitters.remove(userId));
-        emitter.onTimeout(() -> emitters.remove(userId));
-
-        //  Mime Type T-Mobile 오류 방지를 위한 'connect'라는 이름의 더미 데이터 전송
-        try {
-            emitter.send(SseEmitter.event()
-                .id(String.valueOf(userId))
-                .name("connect")
-                .data("EventStream Created. [userId=" + userId + "]"));
-            log.info("SSE 연결 성공 및 더미 데이터 전송 완료 [userId={}]", userId);
-        } catch (IOException e) {
-            emitters.remove(userId);
-            log.error("SSE 연결 중 오류 발생", e);
-        }
-
-        return emitter;
-    }
-
-    // 3. 특정 사용자에게 알림을 전송하는 메서드
-    /**
-     * 특정 사용자에게 알림 전송
-     * @param userId 알림을 받을 사용자의 ID
-     * @param data 전송할 데이터
-     */
-    public void sendNotification(Integer userId, Object data) {
-        sendToClient(userId, data);
-    }
-
-    /**
-     * 클라이언트로 데이터 전송
-     * @param userId 사용자 ID
-     * @param data 전송할 데이터
-     */
-    private void sendToClient(Integer userId, Object data) {
-        SseEmitter emitter = emitters.get(userId);
-        log.debug("SSE Emitter 조회 [userId={}, emitter={}]", userId, emitter);
-
-         // Emitter가 존재할 때만 전송 시도
-        if (emitter != null) {
-            try {
-                emitter.send(
-                    SseEmitter.event()
-                        .id(String.valueOf(userId)) // 이벤트 ID 설정
-                        .name("newNotification") // 이벤트 이름 설정(클라이언트에서 수신할 때 사용)
-                        .data(data) // 전송할 데이터 설정(실제 데이터)
-                );
-                log.info("SSE 전송 완료 [userId={}]", userId);
-            } catch (IOException e) {
-                emitters.remove(userId); // 전송 실패 시 Emitter 제거
-                log.error("SSE 전송 중 오류 발생", e);
-            }
-        }
-    }
 
     /**
      * 알림을 생성, 저장하고 실시간으로 발송하는 통합 메서드
@@ -114,6 +38,7 @@ public class NotificationService {
      * @param type 알림 종류
      * @param relatedEntity 알림의 원인이 된 객체 (Post, Comment, Message, Event)
      */
+    @Transactional
     public void send(User recipient, NotificationType type, Object relatedEntity) {
         // 1. 알림 엔티티 생성
         Notification notification = createNotification(recipient, type, relatedEntity);
@@ -125,10 +50,25 @@ public class NotificationService {
         // 2. DTO로 변환
         NotificationDTO notificationDTO = NotificationDTO.convertToDTO(notification);
 
-        log.debug("알림 전송 준비 완료 [userId={}]", recipient.getUserId());
+        // 3. 실시간 알림 발송
+        // SseEmitterRepository에서 해당 사용자의 Emitter를 찾음
+        SseEmitter emitter = ser.findById(recipient.getUserId());
 
-        // 3. SSE로 실시간 알림 발송
-        sendToClient(recipient.getUserId(), notificationDTO);
+        if (emitter == null) {
+            log.debug("SSE Emitter가 존재하지 않습니다. 실시간 알림을 보낼 수 없습니다. [userId={}]", recipient.getUserId());
+            return;
+        }
+
+        // 4. Emitter를 통해 클라이언트로 알림 전송
+        try {
+            emitter.send(SseEmitter.event()
+                .name("newNotification")
+                .data(notificationDTO));
+        } catch (IOException e) {
+            // 전송 실패 시 Emitter 제거
+            log.error("SSE 전송 중 오류 발생 [userId={}]: {}", recipient.getUserId(), e.getMessage());
+            ser.deleteById(recipient.getUserId());
+        }
     }
 
     /**
@@ -296,6 +236,7 @@ public class NotificationService {
      * @param userId 사용자 ID
      * @return 읽지 않은 알림 개수
      */
+    @Transactional(readOnly = true)
     public long getUnreadNotificationCount(Integer userId) {
         User user = User.builder().userId(userId).build();  // 간단히 ID만 가진 User 객체 생성
         return nr.countByUserAndIsReadFalse(user);
@@ -307,6 +248,7 @@ public class NotificationService {
      * @param limit 조회할 알림 개수
      * @return 최근 알림 목록
      */
+    @Transactional(readOnly = true)
     public List<NotificationDTO> getRecentNotifications(Integer userId, int limit) {
         User user = User.builder().userId(userId).build();  // 간단히 ID만 가진 User 객체 생성
         // PageRequest.of(0, limit)로 최신 limit개 알림 조회
