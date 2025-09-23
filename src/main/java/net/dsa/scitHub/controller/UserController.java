@@ -43,7 +43,7 @@ public class UserController {
 			log.debug("가입실패..");
 		}
 		
-		return "redirect:/user/loginPage";
+		return "redirect:/user/landingPage?signup=success";
 	}
 
 	/**
@@ -53,19 +53,23 @@ public class UserController {
 	 */
 	@GetMapping("landingPage")
 	public String landingPage(@RequestParam(value = "error", required = false) String error,
+							  @RequestParam(value = "signup", required = false) String signup,
 							  HttpServletRequest request, Model model) {
 		if (error != null) {
 			HttpSession session = request.getSession(false);
-			String errorMessage = "로그인에 실패했습니다. 다시 시도해주세요."; // 기본 에러 메시지
+			String errorMessage = "ログインに失敗しました。再度お試しください。"; // 기본 에러 메시지
 			if (session != null) {
 				AuthenticationException ex = (AuthenticationException) session.getAttribute(WebAttributes.AUTHENTICATION_EXCEPTION);
 				if (ex instanceof DisabledException) {
-					errorMessage = "차단된 사용자입니다. 관리자에게 문의하세요.";
+					errorMessage = "アカウントがブロックされています。管理者にお問い合わせください。";
 				} else if (ex instanceof BadCredentialsException) {
-					errorMessage = "아이디 또는 비밀번호가 일치하지 않습니다.";
+					errorMessage = "ユーザーIDまたはパスワードが一致しません。";
 				}
 			}
 			model.addAttribute("errorMessage", errorMessage);
+		}
+		if ("success".equals(signup)) {
+			model.addAttribute("signupMessage", "会員登録が完了しました！ご登録のIDでログインしてください。");
 		}
 		return "user/landingPage";
 	}

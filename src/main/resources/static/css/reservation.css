@@ -1,0 +1,136 @@
+/* 모달 전체 컨테이너 */
+.reservation-modal {
+    background-color: #FFFFFF;
+    border-radius: 16px;
+    padding: 20px;
+    width: 380px;
+    font-family: 'Pretendard', sans-serif; /* 예쁜 폰트로 설정 (없으면 기본 폰트로 보임) */
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+/* 시간대 목록 스타일 */
+.time-slots-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.time-slot-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 8px;
+    border-bottom: 1px solid #F0F0F0;
+}
+.time-slot-item:last-child {
+    border-bottom: none;
+}
+.time-range {
+    font-size: 15px;
+    color: #333;
+}
+.reserver-name {
+    font-size: 15px;
+    color: #666;
+    flex-grow: 1; /* 남는 공간을 모두 차지 */
+    text-align: center; /* 가운데 정렬 */
+}
+/* 버튼 기본 스타일 */
+.reservation-btn {
+    border: none;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    min-width: 80px; /* 버튼 최소 너비 고정 */
+}
+/* 상태별 버튼 스타일 */
+.reservation-btn.available {
+    background-color: #4A6DFF; /* 진한 파란색 */
+    color: white;
+}
+.reservation-btn.available:hover {
+    background-color: #3858d4;
+}
+.reservation-btn.reserved {
+    background-color: #F0F0F0; /* 연한 회색 */
+    color: #A0A0A0; /* 진한 회색 */
+    cursor: not-allowed;
+}
+.reservation-btn.cancelable {
+    background-color: #E9ECFF; /* 연한 하늘색 */
+    color: #4A6DFF; /* 진한 파란색 */
+}
+.reservation-btn.cancelable:hover {
+    background-color: #d8dff7;
+}
+/* 모달 기본 상태 (숨김) */
+.reservationModal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* 반투명 검은 배경 */
+    z-index: 1000; /* 다른 요소들 위로 올리기 */
+    display: none; /* ⭐️ 기본적으로는 보이지 않게 설정 */
+}
+/* 'show' 클래스가 추가되었을 때의 상태 (보임) */
+.reservationModal.show {
+    display: flex; /* ⭐️ Flexbox를 이용해 화면에 보이게 함 */
+    justify-content: center; /* 자식 요소(모달 내용)를 가로 중앙에 배치 */
+    align-items: center; /* 자식 요소(모달 내용)를 세로 중앙에 배치 */
+}
+/* 모든 a 태그의 밑줄 제거 및 기본 색상 설정 */
+a {
+    text-decoration: none; /* 밑줄 제거 */
+    color: inherit; /* 부모 요소의 색상을 상속받음 */
+}
+/* 스터디룸 블록에 대한 스타일 */
+.seatmap a.block.room {
+    /* 부드러운 전환 효과를 위해 transition 추가 */
+    transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out;
+}
+/* 스터디룸 블록에 마우스를 올렸을 때(hover) 스타일 */
+.seatmap a.block.room:hover {
+    background-color: #e9ecff; /* 연한 하늘색 배경 (cancelable 버튼과 유사) */
+    transform: scale(1.03); /* 약간 확대되는 효과 */
+    cursor: pointer; /* 마우스 커서를 포인터로 변경 */
+}
+
+
+/* 제목과 관리자 버튼을 가로로 정렬하기 위한 Flexbox 설정 */
+.modal-tabs {
+    display: flex;
+    justify-content: space-between; /* 양쪽 끝으로 밀어냄 */
+    align-items: center;            /* 세로 중앙 정렬 */
+    padding-bottom: 15px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+
+/* 관리자 토글 버튼 스타일*/
+.btn-toggle-room {
+    border: none;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.2s ease-in-out;
+}
+
+/* 두 상태(.active, .inactive) 모두 동일한 붉은색으로 설정 */
+.btn-toggle-room.active,
+.btn-toggle-room.inactive {
+    background-color: #dc3545; /* 기본 붉은색 */
+}
+
+/* 마우스를 올렸을 때 배경색만 살짝 어둡게 변경 */
+.btn-toggle-room:hover {
+    background-color: #c82333; /* 살짝 어두운 붉은색 */
+}

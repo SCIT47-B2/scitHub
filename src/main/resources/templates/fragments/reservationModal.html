@@ -1,0 +1,52 @@
+<!-- 관리자용 강의실 상태 토글 버튼 -->
+<div th:if="${isAdmin}" class="admin-controls">
+    <button class="btn-toggle-room"
+            th:data-room-id="${roomId}"
+            th:data-room-name="${roomName}"
+            th:onclick="toggleRoomStatus(this)"
+            th:classappend="${isRoomActive ? 'active' : 'inactive'}">
+        <span th:text="${isRoomActive ? '講義室を無効化' : '講義室を有効化'}"></span>
+    </button>
+</div>
+<!-- 비활성화 상태 알림 -->
+<div th:if="${!isRoomActive}" class="alert alert-warning" style="text-align: center; margin: 10px 0;">
+    ⚠️ この講義室は現在、利用できません。
+</div>
+
+<ul class="time-slots-list" th:data-room-id="${roomId}">
+    <li class="time-slot-item" th:each="slotId : ${allSlotIds}" th:data-timeslot-id="${slotId}">
+        <th:block th:with="reservation = ${timeSlots.get(slotId)}, startHour = ${17 + slotId}">
+
+            <span class="time-range" th:text="${startHour} + ':00 - ' + (${startHour} + 1) + ':00'">18:00 - 19:00</span>
+            
+            <span class="reserver-name" th:text="${startHour < currentHour or reservation == null} ? '-' : ${reservation.username}">-</span>
+
+            <button th:if="${startHour < currentHour}" class="reservation-btn reserved" disabled>
+                終了
+            </button>
+
+            <th:block th:if="${startHour >= currentHour}">
+
+                <button th:if="${reservation != null and (reservation.userId == currentUser.userId or isAdmin)}"
+                        class="reservation-btn cancelable"
+                        th:data-reservation-id="${reservation.reservationId}"
+                        th:text="${isAdmin and reservation.userId != currentUser.userId} ? '取り消し' : '取り消し'">
+                </button>
+                <button th:if="${reservation != null and reservation.userId != currentUser.userId and !isAdmin}"
+                        class="reservation-btn reserved" disabled>
+                    予約済み
+                </button>
+                
+                <button th:if="${reservation == null}"
+                        class="reservation-btn"
+                        th:classappend="${isAdmin ? 'reserved' : (isRoomActive ? 'available' : 'reserved')}"
+                        th:disabled="${isAdmin or !isRoomActive}"
+                        th:text="${isAdmin ? '予約なし' : (!isRoomActive ? '利用不可' : '予約する')}">
+                </button>
+
+            </th:block>
+
+        </th:block>
+    </li>
+
+</ul>

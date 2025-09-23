@@ -172,7 +172,7 @@ public class MessageService {
      */
     private User findUserByUsername(String username) {
         return userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다. id=" + username));
+                .orElseThrow(() -> new IllegalArgumentException("該当するユーザーが見つかりません。IDをご確認のうえ、再度お試しください。"));
     }
 
     /**
@@ -183,7 +183,7 @@ public class MessageService {
      */
     private Message findMessageById(Integer messageId) {
         return messageRepository.findById(messageId)
-                .orElseThrow(() -> new IllegalArgumentException("메시지를 찾을 수 없습니다. id=" + messageId));
+                .orElseThrow(() -> new IllegalArgumentException("メッセージが見つかりませんでした。"));
     }
 
     /**
@@ -198,7 +198,7 @@ public class MessageService {
         boolean isReceiver = message.getReceiver() != null && message.getReceiver().getUserId().equals(userId);
 
         if (!isSender && !isReceiver) {
-            throw new SecurityException("메시지를 보거나 삭제할 권한이 없습니다.");
+            throw new SecurityException("アクセス権限がないため、メッセージを表示/削除できません。");
         }
     }
 }
