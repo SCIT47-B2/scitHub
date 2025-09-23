@@ -284,12 +284,39 @@ tbody tr:hover {
 .review-card {
     border: 1px solid #e0e0e0;
     border-radius: 10px;
+    position: relative; /* 자식 요소의 absolute 위치 기준점 */
     padding: 20px;
     display: flex;
     flex-direction: column;
     /* box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); 카드 그림자 */
     box-shadow: var(--shadow);
     background-color: white;
+}
+/* 리뷰 카드 오른쪽 상단 액션 버튼 컨테이너 */
+.review-actions {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+}
+
+/* 삭제 버튼 스타일 */
+.btn-delete-review {
+    background: none;
+    border: none;
+    color: #000; /* 검정색 글자 */
+    font-size: 13px;
+    cursor: pointer;
+    padding: 5px;
+    transition: color 0.2s;
+    line-height: 1; /* 아이콘 세로 정렬 */
+}
+
+.btn-delete-review:hover {
+    color: #e53e3e; /* 호버 시 빨간색 */
+}
+
+.btn-delete-review > i {
+    font-size: 16px; /* 아이콘 크기 조정 */
 }
 
 .reviewer-info-chip {
