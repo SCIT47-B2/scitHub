@@ -142,6 +142,7 @@ public class CommunityService {
                                     .postId(post.getPostId())
                                     .title(post.getTitle())
                                     .username(post.getUser().getUsername())
+                                    .userNameKor(post.getUser().getNameKor())
                                     .createdAt(post.getCreatedAt())
                                     .viewCount(post.getViewCount())
                                     .likeCount(post.getLikes().size())
@@ -207,6 +208,7 @@ public class CommunityService {
                                     .postId(post.getPostId())
                                     .title(post.getTitle())
                                     .username(post.getUser().getUsername())
+                                    .userNameKor(post.getUser().getNameKor())
                                     .createdAt(post.getCreatedAt())
                                     .viewCount(post.getViewCount())
                                     .likeCount(post.getLikes().size())
@@ -300,6 +302,7 @@ public class CommunityService {
                             .createdAt(post.getCreatedAt())
                             .updatedAt(post.getUpdatedAt())
                             .commentList(post.getComments())
+                            .commentCount(post.getComments().size())
                             .build();
         // 현재 유저가 좋아요를 눌렀었는지 체크
         boolean isLiked = plr.existsByPost_PostIdAndUser_UserId(post.getPostId(), userEntity.getUserId());
@@ -546,6 +549,7 @@ public class CommunityService {
                 CommentDTO commentDTO = CommentDTO.builder()
                                                 .commentId(comment.getCommentId())
                                                 .userId(comment.getUser().getUserId())
+                                                .userNameKor(comment.getUser().getNameKor())
                                                 .avatarUrl(comment.getUser().getAvatarUrl())
                                                 .username(comment.getUser().getUsername())
                                                 .content(comment.getContent())

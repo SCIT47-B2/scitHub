@@ -36,6 +36,7 @@
                     </div>
                     <!-- 게시판 식별자 정보 hidden 영역에 보관 -->
                     <input type="hidden" id="boardId" th:value="${boardId}">
+                    <input type="hidden" id="boardName" th:value="${boardName}">
 
                     <!-- 게시글 테이블 -->
                     <div class="board-section">
@@ -43,7 +44,9 @@
                             <!-- 게시판 이름 -->
                             <h2 class="boardName" th:text="${boardName}"></h2>
                             <!-- 게시글 작성 버튼 -->
-                            <button type="button" class="writeBtn">投稿する<i class="fa-solid fa-pencil"></i></button>
+                            <button type="button" class="writeBtn">
+                                投稿する<i class="fa-solid fa-pencil"></i>
+                            </button>
                         </div>
                         <div class="table-responsive">
                             <table class="post-table">
