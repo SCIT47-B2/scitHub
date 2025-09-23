@@ -15,7 +15,9 @@
             <!-- 페이지 헤더: 제목과 등록 버튼 -->
             <div class="write-header">
                 <h2>新規投稿</h2>
-                <button class="writeBtn" type="button" id="submitPostBtn">投稿する ✏️</button>
+                <button class="writeBtn" type="button" id="submitPostBtn">
+                    投稿する<i class="fa-solid fa-pencil"></i>
+                </button>
             </div>
             <div class="decoration">
                 <div class="formField">
@@ -31,7 +33,7 @@
                                     </th:block>
                                 </select>
                             </div>
-                            <input type="text" name="title" id="title" placeholder="제목을 입력하세요">
+                            <input type="text" name="title" id="title" placeholder="タイトルを入力して下さい。">
                         </div>
                         <br>
                         <div class="main-container">
@@ -39,11 +41,15 @@
                                 <div class="editor-container__editor"><div id="editor"></div></div>
                             </div>
                         </div>
+                        <!-- 태그 입력, 보여주기란 -->
                         <input type="hidden" name="tagList" id="tagsData">
-                        <div class="tagArea">
-                            <input type="text" placeholder="#태그 입력" id="tagInput">
-                            <div id="tagContainer"></div>
+                        <div class="tagInputWrapper">
+                            <input type="text" id="tagInput" placeholder="#タグ入力欄">
+                            <!-- 유효성 검사 에러 메시지를 표시할 요소 -->
+                            <p id="tagError" class="error-message"></p>
                         </div>
+                        <!-- 생성된 태그가 표시될 컨테이너 -->
+                        <div id="tagContainer"></div>
                     </form>
                 </div>
             </div>

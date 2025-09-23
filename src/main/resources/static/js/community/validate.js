@@ -8,15 +8,15 @@ function validateForm() {
 
     // 각 부분에 내용이 없을 시 알림 문구
     if (!board) {
-        alert('게시판을 선택해주세요');
+        alert('ポストを作成する掲示板を選択して下さい。');
         return;
     }
     if (!title) {
-        alert('제목을 입력해주세요');
+        alert('タイトルを入力して下さい。');
         return;
     }
     if (!content) {
-        alert('내용을 입력해주세요');
+        alert('ポストの内容を入力して下さい。');
         return;
     }
 

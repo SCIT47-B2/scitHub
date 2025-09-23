@@ -1,3 +1,4 @@
+/* 해당 기능 구현 중단
 $("#bookmarkBtn").click(bookmarkFunc);
 
 function bookmarkFunc() {
@@ -21,3 +22,4 @@ function bookmarkFunc() {
         }
     });
 }
+*/

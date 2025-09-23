@@ -1,6 +1,9 @@
 // 태그를 저장할 배열
 let tags = [];
 
+// 에러 메시지를 출력할 div
+const $tagError = $('#tagError');
+
 // 엔터 키 이벤트 처리
 $('#tagInput').on('keydown', function(event) {
     if (event.key === 'Enter') {
@@ -15,8 +18,23 @@ $('#tagInput').on('keydown', function(event) {
     }
 });
 
+// 사용자가 입력을 시작하면 에러 메시지 숨김
+$('#tagInput').on('input', function() {
+    if ($tagError.is(':visible')) {
+        $tagError.hide();
+    }
+});
+
 // 태그 추가 함수
 function addTag(tagText) {
+
+    // 태그 유효성 검사 실패 시 태그를 더하지 않음
+    if (!tagValidation(tagText)) {
+        $tagError.text('#で始まる1~20字の空白なしの文字、数字、_を入力できます。');
+        $tagError.show();
+        return;
+    }
+    // 유효성 검사 통과 시 태그 배열에 태그 추가
     tags.push(tagText);
     
     // DOM에 태그 div 생성
@@ -28,7 +46,13 @@ function addTag(tagText) {
     $('#tagContainer').append($tagDiv);
     updateHiddenInput();
     
-    console.log('현재 태그들:', tags);
+    console.log('現在付いているタグ:', tags);
+}
+
+function tagValidation(tagText) {
+    const regex = /^#[\p{L}\p{N}_]{1,19}$/u;
+    return regex.test(tagText);
+
 }
 
 // 태그 제거 이벤트 (동적 이벤트 바인딩)
@@ -47,7 +71,7 @@ function removeTag(tagText, $tagElement) {
     $tagElement.remove();
     updateHiddenInput();
     
-    console.log('제거 후 태그들:', tags);
+    console.log('除去後付いているタグ:', tags);
 }
 
 // Hidden input 업데이트

@@ -6,7 +6,7 @@ function displayTags() {
     
     // 태그 데이터가 없거나 빈 문자열인 경우 처리
     if (!tagsData || tagsData.trim() === '' || tagsData === '[]') {
-        $('#tagsContainer').html('<span class="no-tags">태그가 없습니다</span>');
+        $('#tagsContainer').html('<span class="no-tags">このポストにはタグが付いていません。</span>');
         return;
     }
     
@@ -25,7 +25,7 @@ function displayTags() {
         
         // 태그가 없는 경우
         if (tagsHtml === '') {
-            $('#tagsContainer').html('<span class="no-tags">태그가 없습니다</span>');
+            $('#tagsContainer').html('<span class="no-tags">このポストにはタグが付いていません。</span>');
         } else {
             $('#tagsContainer').html(tagsHtml);
         }
@@ -34,8 +34,8 @@ function displayTags() {
         bindTagClickEvents();
         
     } catch (error) {
-        console.error('태그 파싱 중 오류 발생:', error);
-        $('#tagsContainer').html('<span class="no-tags">태그를 불러올 수 없습니다</span>');
+        console.error('タグのパーシング中エラー発生:', error);
+        $('#tagsContainer').html('<span class="no-tags">タグの読込みに失敗しました。</span>');
     }
 }
 
@@ -89,7 +89,7 @@ function parseTagsWithJSON(tagsString) {
         // 서버에서 ["#태그1", "#태그2", "#태그3"] 형식으로 전달되는 경우
         return JSON.parse(tagsString);
     } catch (error) {
-        console.error('JSON 파싱 실패:', error);
+        console.error('JSON パーシングエラー:', error);
         return parseTagsString(tagsString); // 기본 파싱 방법으로 대체
     }
 }
