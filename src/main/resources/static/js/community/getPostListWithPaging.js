@@ -119,7 +119,7 @@ function renderPosts(posts) {
                         ${post.title}
                     </span>
                 </td>
-                <td class="post-writer">${post.username}</td>
+                <td class="post-writer">${post.userNameKor}</td>
                 <td class="post-createdAt">${new Date(post.createdAt).toLocaleDateString()}</td>
                 <td class="post-viewCount">${post.viewCount}</td>
                 <td class="post-likeCount">${post.likeCount}</td>

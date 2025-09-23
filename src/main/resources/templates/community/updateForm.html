@@ -32,7 +32,7 @@
                         <!-- 게시판 선택과 제목 입력을 한 줄로 묶는 헤더 -->
                         <div class="form-header">
                             <div class="boardSelectSection">
-                                <select name="board" id="boardDropdown">
+                                <select name="board" id="boardDropdown" disabled>
                                     <option value="">掲示板を選択してください</option>
                                     <!-- 게시판 목록 항목과 연동되게 바꿈 -->
                                     <th:block  th:each="board : ${boardMap}">
@@ -74,8 +74,8 @@
 		    <script src="https://cdn.ckeditor.com/ckeditor5/46.0.3/translations/ko.umd.js" crossorigin></script>
             <script th:src="@{/js/ckeditor5/ckeditor5.js}"></script>
             <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
-            <script th:src="@{/js/community/makeTag.js}"></script>
             <script th:src="@{/js/community/getTag.js}"></script>
+            <script th:src="@{/js/community/makeTag.js}"></script>
             <script th:src="@{/js/community/validate.js}"></script>
             <script th:src="@{/js/community/updatePost.js}"></script>
         </th:block>

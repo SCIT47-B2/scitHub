@@ -170,9 +170,9 @@ public class CommunityController {
      */
     @GetMapping("writePost")
     public String writePostPage(
-        @RequestParam("boardId") Integer boardId,
+        @RequestParam("name") String name,
         Model model) {
-        model.addAttribute("boardId", boardId);
+        model.addAttribute("boardName", name);
         return "community/writeForm";
     }
 

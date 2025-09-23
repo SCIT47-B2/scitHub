@@ -31,7 +31,9 @@
                                     <option value="">掲示板を選択してください</option>
                                     <!-- 게시판 목록 항목과 연동되게 바꿈 -->
                                     <th:block  th:each="board : ${boardMap}">
-                                        <option th:value="${board.key}" th:text="${board.value}"></option>
+                                        <option th:value="${board.key}"
+                                                th:text="${board.value}"
+                                                th:selected="${board.key} == ${boardName}"></option>
                                     </th:block>
                                 </select>
                             </div>

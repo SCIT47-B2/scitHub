@@ -8,11 +8,11 @@ const $tagError = $('#tagError');
 $('#tagInput').on('keydown', function(event) {
     if (event.key === 'Enter') {
         event.preventDefault();
-        
+
         const inputValue = $(this).val().trim();
-        
+
         // 태그 입력이 정상적으로 종료되면
-        if(addTag(inputValue)) {
+        if (addTag(inputValue)) {
             $(this).val(''); // 입력 필드 초기화
         };
     }
@@ -37,12 +37,14 @@ function addTag(tagText) {
 
     $tagError.hide();
 
-    if (tags.includes(tagText)) {
+    // 태그 배열이 빈칸이 아니고 태그 배열에 해당 태그가 이미 존재할 경우 에러 메시지
+    if (tags && tags.includes(tagText)) {
         $tagError.text('既に付いているタグです。');
         $tagError.show();
         return false;
     }
 
+    console.log(tags);
     // 유효성 검사 통과 시 태그 배열에 태그 추가
     tags.push(tagText);
     
