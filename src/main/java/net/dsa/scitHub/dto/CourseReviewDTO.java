@@ -15,27 +15,26 @@ public class CourseReviewDTO {
     private Integer courseReviewId;
     private Integer courseId;
     private Integer userId;
-    private String username;
-    // private Integer scorePreparedness;
-    // private Integer scoreProfesion;
-    // private Integer scoreCommunication;
-    // private Integer scoreEngagement;
-    // private Integer scoreFairness;
-    // private Integer courseDifficulty; 
-    // private Integer courseAssignment;
-    // private Integer courseConnectivity;
+    private String username; // 작성자 ID
+    private Integer userCohortNo; // 작성자 기수
     private String commentText;
     private Byte rating;
  
     public static CourseReviewDTO convertToCourseReviewDTO(CourseReview entity) {
-        return CourseReviewDTO.builder()
+        CourseReviewDTO.CourseReviewDTOBuilder builder = CourseReviewDTO.builder()
             .courseReviewId(entity.getCourseReviewId())
             .courseId(entity.getCourse().getCourseId())
-            .userId(entity.getUser().getUserId())
-            .username(entity.getUser().getUsername())
             .commentText(entity.getCommentText())
-            .rating(entity.getRating())
-            .build();
+            .rating(entity.getRating());
+        
+        // 유저 정보 매핑
+        if (entity.getUser() != null) {
+            builder.userId(entity.getUser().getUserId())
+                   .username(entity.getUser().getUsername())
+                   .userCohortNo(entity.getUser().getCohortNo());
+        }
+        
+        return builder.build();
     }
     
 }

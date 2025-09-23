@@ -292,12 +292,17 @@ tbody tr:hover {
     background-color: white;
 }
 
-.review-author {
+.reviewer-info-chip {
+    display: inline-block;
+    background-color: #e0e0e0; /* 칩 배경색 */
+    color: #555; /* 글자색 */
+    padding: 4px 8px; /* 안쪽 여백 */
+    border-radius: 16px; /* 모서리를 둥글게 */
+    font-size: 12px;
     font-weight: bold;
-    margin-bottom: 10px;
-    color: #333;
+    margin-bottom: 8px; /* 별점과의 간격 */
+    align-self: flex-start; /* 내용의 너비만큼만 차지하도록 설정 */
 }
-
 /* Individual Review Rating Stars */
 .review-rating-stars {
     color: #d1d1d1; /* 기본 별 색상 */

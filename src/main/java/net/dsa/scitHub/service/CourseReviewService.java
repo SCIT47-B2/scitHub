@@ -35,7 +35,7 @@ public class CourseReviewService {
      * @return
      */
     public List<CourseReviewDTO> selectByCourseId(Integer courseId) {
-        return crr.findByCourse_CourseId(courseId).stream()
+        return crr.findByCourseWithUser(courseId).stream()
                 .map(CourseReviewDTO::convertToCourseReviewDTO)
                 .toList();
     }

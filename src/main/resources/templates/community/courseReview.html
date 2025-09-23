@@ -45,6 +45,9 @@
                     </div>
                     <div th:unless="${#lists.isEmpty(reviews)}" class="review-cards-grid">
                         <div class="review-card" th:each="review : ${reviews}">
+                            <div class="reviewer-info-chip">
+                                <span th:text="${review.userCohortNo} + '期 ' + (${review.userCohortNo} == 47 ? '受講生' : '卒業生')"></span>
+                            </div>
                             <div class="review-rating-start">
                                 <th:block th:each="i : ${#numbers.sequence(1, 5)}">
                                     <i class="fa fa-star" th:classappend="${i <= review.rating} ? 'filled' : ''"></i>
