@@ -132,8 +132,7 @@ function renderPosts(posts) {
 
 /**
  * 페이지네이션 UI 생성
- * - 현재 페이지의 앞뒤 2개씩 렌더링
- * - 맨 앞/뒤에서 두 번째 페이지일 경우, 이전/다음 버튼만 각각 표시
+ * - 고정된 페이지 블록과 맨 처음/맨 끝 이동 버튼을 포함합니다.
  *
  * @param {Page<PostDTO>} pageData - Spring의 Page 객체
  * @param {number} boardId - 현재 게시판 ID
@@ -144,43 +143,40 @@ function renderPagination(pageData, boardId, searchType, keyword) {
     const $pagination = $('#pagination-container');
     $pagination.empty();
 
-    if (!pageData || pageData.totalPages == 0) { // 페이지가 1개 이하면
-        // 페이지가 없으면 종료
+    // 표시할 데이터가 없으면 종료
+    if (!pageData || pageData.totalPages === 0) {
         return;
     }
 
-    if (pageData.totalPages == 1) {
-        // 1개면 1만 렌더링
-        const $page1 = $('<b>').text(1).addClass('active')
+    // 전체 페이지가 1개뿐인 경우, '1'을 현재 페이지로 표시하고 종료
+    if (pageData.totalPages === 1) {
+        const $page1 = $('<b>').text(1).addClass('active');
         $pagination.append($page1);
         return;
     }
 
-    const currentPage = pageData.number;       // 현재 페이지 (0-indexed)
+    const currentPage = pageData.number;      // 현재 페이지 (0-indexed)
     const totalPages = pageData.totalPages;    // 전체 페이지 수
+    const pagesPerBlock = 5;                  // 한 블록에 표시할 페이지 수
 
-    // '맨 처음'과 '이전' 버튼 렌더링 조건
-    if (currentPage > 0) { // 첫 페이지가 아닐 때
-        // 현재 페이지가 1(두 번째 페이지)일 때는 '이전' 버튼만 표시
-        if (currentPage > 1) {
-            const $firstLink = $('<a>').html('&laquo;').on('click', () => loadPosts(boardId, 0, searchType, keyword));
-            $pagination.append($firstLink);
-        }
-        const $prevLink = $('<a>').html('&lsaquo;').on('click', () => loadPosts(boardId, currentPage - 1, searchType, keyword));
-        $pagination.append($prevLink);
+    // 현재 페이지가 속한 블록의 시작과 끝 페이지를 계산
+    const currentBlock = Math.floor(currentPage / pagesPerBlock);
+    const startPage = currentBlock * pagesPerBlock;
+    const endPage = Math.min(startPage + pagesPerBlock - 1, totalPages - 1);
+
+    // '맨 처음' (<<) 버튼: 현재 페이지가 1, 2가 아닐 때만 표시
+    if (currentPage > 1) {
+        const $firstLink = $('<a>').html('&laquo;').on('click', () => loadPosts(boardId, 0, searchType, keyword));
+        $pagination.append($firstLink);
     }
 
-    // 페이지 번호 버튼 렌더링
-    let startPage = Math.max(0, currentPage - 2);
-    let endPage = Math.min(totalPages - 1, currentPage + 2);
-
-    if (currentPage < 2) {
-        endPage = Math.min(totalPages - 1, 4);
-    }
-    if (currentPage > totalPages - 3) {
-        startPage = Math.max(0, totalPages - 5);
+    // '이전 페이지' (<) 버튼: 첫 페이지가 아닐 때만 표시
+    if (currentPage > 0) {
+        const $prevPageLink = $('<a>').html('&lsaquo;').on('click', () => loadPosts(boardId, currentPage - 1, searchType, keyword));
+        $pagination.append($prevPageLink);
     }
 
+    // 페이지 번호 버튼 렌더링 (블록 단위)
     for (let i = startPage; i <= endPage; i++) {
         const pageNum = i;
         const $pageLink = (pageNum === currentPage)
@@ -189,14 +185,15 @@ function renderPagination(pageData, boardId, searchType, keyword) {
         $pagination.append($pageLink);
     }
 
-    // '다음'과 '맨 끝' 버튼 렌더링 조건
-    if (currentPage < totalPages - 1) { // 마지막 페이지가 아닐 때
-        // 현재 페이지가 마지막에서 두 번째 페이지일 때는 '다음' 버튼만 표시
-        if (currentPage < totalPages - 2) {
-            const $lastLink = $('<a>').html('&raquo;').on('click', () => loadPosts(boardId, totalPages - 1, searchType, keyword));
-            $pagination.append($lastLink);
-        }
-        const $nextLink = $('<a>').html('&rsaquo;').on('click', () => loadPosts(boardId, currentPage + 1, searchType, keyword));
-        $pagination.append($nextLink);
+    // '다음 페이지' (>) 버튼: 마지막 페이지가 아닐 때만 표시
+    if (currentPage < totalPages - 1) {
+        const $nextPageLink = $('<a>').html('&rsaquo;').on('click', () => loadPosts(boardId, currentPage + 1, searchType, keyword));
+        $pagination.append($nextPageLink);
+    }
+
+    // '맨 끝' (>>) 버튼: 마지막 또는 마지막 전 페이지가 아닐 때만 표시
+    if (currentPage < totalPages - 2) {
+        const $lastLink = $('<a>').html('&raquo;').on('click', () => loadPosts(boardId, totalPages - 1, searchType, keyword));
+        $pagination.append($lastLink);
     }
 }

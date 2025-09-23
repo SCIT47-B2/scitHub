@@ -21,7 +21,7 @@
                 <div class="main-layout">
                     <!-- 좌측 네비게이션 (뒤로가기 화살표) -->
                     <div class="nav-aside">
-                        <a href="javascript:history.back();" class="back-arrow">
+                        <a class="back-arrow">
                             <i class="fa-solid fa-arrow-left"></i>
                         </a>
                     </div>
@@ -59,6 +59,8 @@
                             <h1 class="post-title" th:text="${post.title}"></h1>
                             <!-- 게시글 식별자 (hidden) -->
                             <input type="hidden" id="postId" th:value="${post.postId}">
+                            <!-- 게시판 이름 (hidden) -->
+                            <input type="hidden" id="board" th:value="${post.board}">
                             <div class="post-content">
                                 <div class="content-display" th:utext="${post.content}"></div>
                             </div>

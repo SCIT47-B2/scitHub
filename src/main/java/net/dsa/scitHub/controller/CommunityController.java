@@ -61,8 +61,7 @@ public class CommunityController {
     public List<MenuItem> menuItems() {
         return List.of(
             new MenuItem("掲示板", "/community/home"),
-            new MenuItem("講義評", "/community/courseList"),
-            new MenuItem("Q&A", "/community/qna")
+            new MenuItem("講義評", "/community/courseList")
         );
     }
 
