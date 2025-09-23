@@ -75,9 +75,9 @@ public class ArchiveController {
         if (headcount != null) {
             sort = Sort.by(headcount.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, "headcount");
         // 평균 평점(averageRating) 파라미터가 있으면 해당 기준으로 정렬
-        } else if (averageRating != null) {
-            // 실제 정렬은 Repository의 JPQL에서 처리하지만, Controller에서는 정렬 기준 필드명을 지정
-            sort = Sort.by(averageRating.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, "companyId");
+        } else if (averageRating != null) {            
+            // Repository의 JPQL에서 정의한 별칭(avgRating)을 기준으로 정렬
+            sort = Sort.by(averageRating.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, "avgRating");
         }
 
         // 페이징 객체 생성 (페이지당 15개, 정렬 조건 적용)
