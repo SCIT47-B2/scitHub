@@ -6,8 +6,10 @@
     <title>게시글 읽기</title>
     <th:block layout:fragment="css">
         <link rel="stylesheet" th:href='@{/css/community/pageFormat.css}'>
+        <link rel="stylesheet" th:href="@{/css/community/searchBar.css}">
         <link rel="stylesheet" th:href="@{/css/community/rightSidebar.css}">
         <link rel="stylesheet" th:href="@{/css/community/readPost.css}">
+        <link rel="stylesheet" th:href="@{/css/community/postSection.css}">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     </th:block>
     <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
@@ -16,7 +18,8 @@
 <body>
     <section class="mainField" aria-label="메인 영역" layout:fragment="content">
         <div class="contentGrid">
-            <div class="page-container">
+            <div class="mainContent">
+
                 <!-- 메인 레이아웃 (화살표 + 게시글 컨텐츠) -->
                 <div class="main-layout">
                     <!-- 좌측 네비게이션 (뒤로가기 화살표) -->
@@ -69,13 +72,15 @@
                         <!-- 게시글 하단: 좋아요, 댓글 수, 북마크 -->
                         <div class="post-footer">
                             <div class="interactions">
-                                <span class="likes"><i id="likeBtn" class="fa-solid fa-heart isLikedDisplay" th:classappend="${post.isLiked} ? 'active' : ''"></i> <span class = "likeCountDisplay" th:text="${post.likeCount}"></span></span>
-                                <span class="comments"><i class="fa-regular fa-comment-dots"></i> <span class="commentCountDisplay" th:text="${post.commentCount}"></span></span>
                                 <input type="hidden" id="tagsData" th:value="${post.tagList}">
                                 <div class="tags-section">
                                     <div class="tags-container" id="tagsContainer">
                                         <!-- 태그들이 동적으로 삽입될 영역 -->
                                     </div>
+                                </div>
+                                <div class="meta-info">
+                                    <span class="likes"><i id="likeBtn" class="fa-solid fa-heart isLikedDisplay" th:classappend="${post.isLiked} ? 'active' : ''"></i> <span class = "likeCountDisplay" th:text="${post.likeCount}"></span></span>
+                                    <span class="comments"><i class="fa-regular fa-comment-dots"></i> <span class="commentCountDisplay" th:text="${post.commentCount}"></span></span>
                                 </div>
                             </div>
                         </div>
@@ -88,7 +93,7 @@
                             <img th:src="@{/images/avatar/{f}(f=${currentUser.avatarUrl})}" alt="私のプロフィールイメージ" class="profile-pic-small">
                             <div class="comment-input-box">
                                 <input type="text" name="commentForm" id="commentBox" placeholder="コメント作成欄">
-                                <i id="inputCommentBtn" class="fa-solid fa-check"></i>
+                                <i id="inputCommentBtn" class="fa-solid fa-arrow-up"></i>
                             </div>
                         </div>
 
@@ -99,15 +104,6 @@
                     </div>
                 </div>
             </div>
-            <!-- 우측 사이드바 -->
-            <aside class="rightSidebar">
-                <nav class="categoryMenuList">
-                    <th:block th:each="board : ${boardMap}">
-                        <a th:href="@{board(name=${board.key})}" class="categoryMenuItem"
-                            th:classappend="${post.board == board.key} ? 'active' : ''" th:text="${board.value}"></a>
-                    </th:block>
-                </nav>
-            </aside>
         </div>
     </section>
     <th:block layout:fragment="script">
