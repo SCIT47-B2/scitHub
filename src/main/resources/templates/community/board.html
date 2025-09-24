@@ -7,7 +7,7 @@
         <title>게시판</title>
         <th:block layout:fragment="css">
             <link rel="stylesheet" th:href="@{/css/community/pageFormat.css}">
-            <!-- <link rel="stylesheet" th:href="@{/css/community/rightSidebar.css}"> -->
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
             <link rel="stylesheet" th:href="@{/css/community/searchBar.css}">
             <link rel="stylesheet" th:href="@{/css/community/postSection.css}">
         </th:block>
@@ -66,9 +66,9 @@
                                         <th class="post-title">タイトル</th>
                                         <th class="post-writer">投稿者</th>
                                         <th class="post-createdAt">投稿日</th>
-                                        <th class="post-viewCount">閲覧数</th>
-                                        <th class="post-likeCount">いいね!</th>
-                                        <th class="post-commentCount">コメント</th>
+                                        <th class="post-viewCount"><i class="fa-regular fa-eye"></i></th>
+                                        <th class="post-likeCount"><i class="fa-regular fa-heart"></i></th>
+                                        <th class="post-commentCount"><i class="fa-regular fa-comment"></i></th>
                                     </tr>
                                 </thead>
                                 <tbody class="post-list-body" id="post-list-body">
