@@ -1,3 +1,12 @@
+// 게시글 작성 취소 버튼 이벤트 리스너
+$('#cancelBtn').click(function() {
+    const boardName = $('#boardName').val();
+    // alert(boardName);
+    location.href = `board?name=${boardName}`
+});
+
+
+// 게시글 작성 버튼 이벤트 리스너
 $('#submitPostBtn').click(function() {
     writePost();
 });

@@ -47,16 +47,16 @@ function addTag(tagText) {
     console.log(tags);
     // 유효성 검사 통과 시 태그 배열에 태그 추가
     tags.push(tagText);
-    
+
     // DOM에 태그 div 생성
     const $tagDiv = $('<div>').addClass('tag').html(`
         ${tagText}
         <button class="tagRemove" data-tag="${tagText}">×</button>
     `);
-    
+
     $('#tagContainer').append($tagDiv);
     updateHiddenInput();
-    
+
     console.log('現在付いているタグ:', tags);
     return true;
 }
@@ -79,10 +79,10 @@ function removeTag(tagText, $tagElement) {
     if (index > -1) {
         tags.splice(index, 1);
     }
-    
+
     $tagElement.remove();
     updateHiddenInput();
-    
+
     console.log('除去後付いているタグ:', tags);
 }
 
@@ -100,3 +100,33 @@ window.clearAllTags = function() {
     $('#tagContainer').empty();
     updateHiddenInput();
 };
+
+/**
+기존에 존재하는 태그 불러오기 함수
+*/
+function displayTag() {
+
+    // 서버에서 받아온 기존 태그 리스트 불러오기
+    const tagList = $('#tagsData').val();
+
+    // 태그가 없으면 종료
+    if(!tagList) return;
+
+    // 태그 목록을 JSON으로 파싱
+    tags = JSON.parse($('#tagsData').val());
+
+    // DOM에 태그 div 생성
+    tags.forEach(tag => {
+        const $tagDiv = $('<div>').addClass('tag').html(`
+            ${tag}
+            <button class="tagRemove" data-tag="${tag}">×</button>
+        `);
+
+        $('#tagContainer').append($tagDiv);
+        updateHiddenInput();
+
+        console.log('現在付いているタグ:', tags);
+    });
+}
+// 초기 실행 시 기존 태그 불러오기
+$(document).ready(displayTag());

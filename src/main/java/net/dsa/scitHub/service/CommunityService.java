@@ -190,7 +190,7 @@ public class CommunityService {
                 postPage = pr.findByBoard_BoardIdAndContentContaining(boardId, keyword, pageable);
                 break;
             case "author":
-                postPage = pr.findByBoard_BoardIdAndUser_UsernameContaining(boardId, keyword, pageable);
+                postPage = pr.findByBoard_BoardIdAndUser_NameKorContaining(boardId, keyword, pageable);
                 break;
             case "tag":
                 // 특정 게시판에서 특정 태그를 포함한 게시글의 페이지
@@ -360,8 +360,9 @@ public class CommunityService {
      * 게시글 삭제 처리
      * @param postId
      * @param userId
+     * @return 속했던 게시판 이름
      */
-    public void deletePost(Integer postId, String username)
+    public String deletePost(Integer postId, String username)
         throws Exception {
         // DB에서 해당 엔티티 탐색
         Post post = pr.findById(postId).orElseThrow(
@@ -378,8 +379,12 @@ public class CommunityService {
             throw new Exception("수정 권한이 없습니다.");
         }
 
+        // 속했던 게시판 이름 가져오기
+        String boardName = post.getBoard().getName();
+
         // 게시글 삭제 처리
         pr.delete(post);
+        return boardName;
     }
 
     // 게시글 부가 기능 관련 --------------------------------------------------------------------------------

@@ -7,19 +7,32 @@ $(document).ready(function () {
     translateBoardNameToJp();
 
     // 2. 검색 버튼 클릭 이벤트
-    $('#search-btn').on('click', function () {
-        const searchType = $('#searchType').val();
-        const keyword = $('#search-keyword').val();
-
-        if (keyword.trim() === "") {
-            alert("検査ワードを入力して下さい。");
-            return;
+    // 검색 버튼 클릭 시
+    $('#search-btn').on('click', searchPosts);
+    // 엔터 키 입력 시
+    $('#search-keyword').on('keydown', function(event) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            searchPosts();
         }
-
-        // 검색 실행 시, 첫 페이지부터 조회
-        loadPosts(initialBoardId, 0, searchType, keyword);
     });
 });
+
+// 검색 이벤트와 바인딩된 함수
+function searchPosts() {
+    // hidden input 영역에서 boardId 추출
+    const boardId = $('#boardId').val();
+    const searchType = $('#searchType').val();
+    const keyword = $('#search-keyword').val();
+
+    if (keyword.trim() === "") {
+        alert("検査ワードを入力して下さい。");
+        return;
+    }
+
+    // 검색 실행 시, 첫 페이지부터 조회
+    loadPosts(boardId, 0, searchType, keyword);
+}
 
 /**
  * 게시판 이름을 일본어로 해석
@@ -72,7 +85,7 @@ function loadPosts(boardId, page = 0, searchType = null, keyword = null) {
         boardId: boardId,
         page: page,
         size: 10,
-        sort: 'createdAt,desc'
+        sort: ['createdAt,desc', 'postId, desc']
     };
 
     // 검색 파라미터가 존재하면 data 객체에 추가
