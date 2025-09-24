@@ -1,18 +1,18 @@
 /* 메인 콘텐츠 그리드 레이아웃 */
-.contentGrid {
+/* .contentGrid {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 190px; /* 280px -> 190px로 축소 */
+    grid-template-columns: minmax(0, 1fr) 190px; 
     gap: 20px;
     max-width: 1400px;
     margin: 0 auto;
     padding: 20px;
     align-items: start;
-}
+} */
 
 /* 반응형 설정 */
-@media (max-width: 1200px) {
+/* @media (max-width: 1200px) {
     .contentGrid {
-        grid-template-columns: 1fr 170px; /* 250px -> 170px로 축소 */
+        grid-template-columns: 1fr 170px; 
         gap: 15px;
     }
 }
@@ -30,4 +30,50 @@
     .mainContent {
         order: 1;
     }
+} */
+
+
+/* 메인 콘텐츠 그리드 레이아웃 (수정) */
+.contentGrid {
+    display: grid;
+    /* --- UPDATED: Changed to a single column layout --- */
+    grid-template-columns: minmax(0, 1fr); 
+    max-width: 1100px; /* A comfortable width for content */
+    margin: 0 auto;
+    padding: 20px;
 }
+
+/* ===== NEW: Category Pill Tabs CSS ===== */
+.category-tabs {
+    display: flex;
+    flex-wrap: wrap; /* Allow tabs to wrap on smaller screens */
+    gap: 10px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.tab-item {
+    display: block;
+    padding: 8px 18px;
+    border-radius: 999px; /* Pill shape */
+    background-color: #f3f4f6;
+    color: #4b5563;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.tab-item:hover {
+    background-color: #e5e7eb;
+    color: #1f2937;
+}
+
+.tab-item.active {
+    background-color: #374151; /* Dark gray for active state */
+    color: white;
+    font-weight: 600;
+}
+
+
