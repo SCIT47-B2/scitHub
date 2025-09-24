@@ -73,6 +73,7 @@ public class Post implements Authorizable{
 
     /** 게시글 태그 목록 */
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    @OrderBy("tagId ASC")
     private List<Tag> tags;
 
     /** 게시글 좋아요 목록 */
