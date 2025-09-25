@@ -8,6 +8,63 @@
             <link rel="stylesheet" th:href="@{/css/home.css}">
             <link rel="stylesheet" th:href="@{/css/reservation.css}">
         </th:block>
+        <style>
+            /* 홈 화면 위젯 컨테이너 */
+            .home-schedule-widget {
+                max-width: 400px;
+                margin: 20px auto;
+                padding: 20px;
+                background-color: #fff;
+                border-radius: 20px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            }
+
+            .widget-header h3 {
+                font-size: 1.5em;
+                margin-bottom: 15px;
+            }
+
+            /* FullCalendar 기본 UI 숨기기 및 수정 */
+            #mini-calendar .fc-theme-standard {
+                border: none; /* 전체 테두리 제거 */
+            }
+
+            #mini-calendar .fc-timegrid-slot-label {
+                border: none; /* 시간 축 라인 제거 */
+            }
+
+            #mini-calendar .fc-timegrid-col.fc-day-today {
+                background-color: transparent; /* 오늘 날짜 배경색 제거 */
+            }
+
+            /* 커스텀 이벤트 블록 스타일 */
+            #mini-calendar .fc-timegrid-event {
+                border-radius: 15px !important; /* 모서리 둥글게 */
+                border: none;
+                padding: 8px;
+                box-shadow: none;
+            }
+
+            .custom-event-title {
+                font-weight: bold;
+                font-size: 1em;
+            }
+
+            .custom-event-time {
+                font-size: 0.8em;
+                opacity: 0.9;
+            }
+
+            /* 겹치는 이벤트 사이에 흰색 테두리를 추가하여 시각적으로 분리 */
+            #mini-calendar .fc-timegrid-event {
+                border: 2px solid white !important;
+            }
+
+            /* 종일 이벤트 슬롯의 스타일링 (선택사항) */
+            #mini-calendar .fc-daygrid-day-frame {
+                padding: 5px;
+            }
+        </style>
     </head>
     <body>
         <section class="mainGrid" aria-label="메인 영역" layout:fragment="content">
@@ -107,7 +164,7 @@
             </div>
 
             <!-- 우: 일정 -->
-            <div class="rightCol">
+            <!-- <div class="rightCol">
                 <section class="card" aria-label="일정">
                     <h3 class="sectionTitle">日程</h3>
                     <ul class="scheduleList">
@@ -115,6 +172,12 @@
                     <li>예시) 09/05(금) 과제 제출 마감</li>
                     </ul>
                 </section>
+            </div> -->
+            <div class="home-schedule-widget">
+                <div class="widget-header">
+                    <h3 id="widget-date-title"></h3>
+                </div>
+                <div id="mini-calendar"></div>
             </div>
 
             <!-- 3강의실 좌석배치도 -->
@@ -140,7 +203,108 @@
         </div>
         </section>
         <th:block layout:fragment="script">
+            <!-- FullCalendar CDN -->
+            <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.19/index.global.min.js"></script>
             <script th:src="@{/js/reservation.js}"></script>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const calendarEl = document.getElementById('mini-calendar');
+                    const titleEl = document.getElementById('widget-date-title');
+
+                    // 캘린더 엘리먼트가 페이지에 존재하는지 확인
+                    if (!calendarEl || !titleEl) {
+                        console.error("캘린더 위젯을 위한 HTML 엘리먼트(#mini-calendar, #widget-date-title)를 찾을 수 없습니다.");
+                        return;
+                    }
+
+                    const calendar = new FullCalendar.Calendar(calendarEl, {
+                         locale: 'ja', // FullCalendar의 기본 언어를 일본어로 설정
+                        // 뷰 설정
+                        initialView: 'timeGridDay', // 하루의 시간 그리드 뷰
+                        initialDate: new Date(),    // 오늘 날짜로 시작
+
+                        // UI 커스텀
+                        headerToolbar: false,     // 기본 헤더(제목, 이전/다음 버튼) 숨기기
+                        allDaySlot: true,        // '종일' 슬롯 나타내기
+                        height: 'auto',           // 내용에 따라 높이 자동 조절
+                        
+                        // 시간 축 설정
+                        slotMinTime: '08:00:00',  // 캘린더 시작 시간
+                        slotMaxTime: '18:00:00',  // 캘린더 종료 시간
+                        slotLabelFormat: {        // 시간 축 라벨 형식
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: false
+                        },
+
+                        /**
+                         * 이벤트 데이터 로드
+                         * - 개인/전체 일정 파라미터를 모두 true로 설정하여 API 호출
+                         * - 받아온 데이터에 색상 구분을 적용하여 FullCalendar에 전달
+                         */
+                        events: function(fetchInfo, successCallback, failureCallback) {
+                            fetch('/scitHub/api/calendar/events?showPublic=true&showPrivate=true')
+                                .then(response => {
+                                    if (!response.ok) {
+                                        throw new Error('서버 응답에 실패했습니다.');
+                                    }
+                                    return response.json();
+                                })
+                                .then(data => {
+                                    // 서버에서 받은 데이터를 FullCalendar 형식에 맞게 가공
+                                    const formattedEvents = data.map(event => ({
+                                        id: event.eventId,
+                                        title: event.title,
+                                        start: event.start,
+                                        end: event.end,
+                                        allDay: event.allDay,
+                                        // 색상 구분 로직 적용
+                                        color: event.visibility === 'PUBLIC' ? '#ff9f89' : '#3788d8',
+                                        extendedProps: {
+                                            content: event.content,
+                                            visibility: event.visibility,
+                                            userId: event.userId
+                                        }
+                                    }));
+                                    successCallback(formattedEvents); // 가공된 데이터를 FullCalendar에 전달
+                                })
+                                .catch(error => {
+                                    console.error('오늘의 일정을 불러오는 데 실패했습니다:', error);
+                                    failureCallback(error); // 실패 시 FullCalendar에 에러 전달
+                                });
+                        },
+
+                        // 이벤트 블록 내부의 HTML을 직접 생성
+                        eventContent: function(arg) {
+                            const title = arg.event.title;
+                            const startTime = arg.event.start.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', hour12: false });
+                            const endTime = arg.event.end ? arg.event.end.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: false }) : '';
+
+                            return {
+                                html: `
+                                    <div class="custom-event-title">${title}</div>
+                                    <div class="custom-event-time">${startTime} - ${endTime}</div>
+                                `
+                            };
+                        },
+
+                        // 뷰가 렌더링된 후, 위젯 헤더에 오늘 날짜 표시
+                        viewDidMount: function(info) {
+                            const currentDate = calendar.getDate();
+                            titleEl.textContent = currentDate.toLocaleDateString('ja-JP', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric',
+                                weekday: 'long'
+                            });
+                        }
+                    });
+
+                    calendar.render();
+                });
+
+            </script>
         </th:block>
     </body>
 </html>
