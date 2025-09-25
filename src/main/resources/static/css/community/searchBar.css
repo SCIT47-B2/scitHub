@@ -23,7 +23,7 @@
     border-radius: 8px;
     padding: 10px 12px;
     font-size: 14px;
-    height: 40px;
+    /* height: 40px; */
     box-sizing: border-box;
 }
 
@@ -51,4 +51,8 @@
 
 .search-bar button#search-btn:hover {
     background-color: #3b50b0;
+}
+
+.search-bar .search-select {
+    
 }

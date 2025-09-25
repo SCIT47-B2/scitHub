@@ -16,9 +16,14 @@
             <div class="write-header">
                 <h2>新規投稿</h2>
                 <div class="header-buttons">
+                    <button class="actionBtn" type="button" id="cancelBtn">
+                        投稿を辞める<i class="fa-solid fa-x"></i>
+                    </button>
                     <button class="actionBtn" type="button" id="submitPostBtn">
                         投稿する<i class="fa-solid fa-pencil"></i>
                     </button>
+                    <!-- board의 이름을 가져오는 숨겨진 input -->
+                    <input type="hidden" id="boardName" th:value="${boardName}">
                 </div>
             </div>
             <div class="decoration">
@@ -31,7 +36,9 @@
                                     <option value="">掲示板を選択してください</option>
                                     <!-- 게시판 목록 항목과 연동되게 바꿈 -->
                                     <th:block  th:each="board : ${boardMap}">
-                                        <option th:value="${board.key}" th:text="${board.value}"></option>
+                                        <option th:value="${board.key}"
+                                                th:text="${board.value}"
+                                                th:selected="${board.key} == ${boardName}"></option>
                                     </th:block>
                                 </select>
                             </div>
@@ -63,7 +70,7 @@
 		    <script src="https://cdn.ckeditor.com/ckeditor5/46.0.3/translations/ko.umd.js" crossorigin></script>
             <script th:src="@{/js/ckeditor5/ckeditor5.js}"></script>
             <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
-            <script th:src="@{/js/community/makeTag.js}"></script>
+            <script th:src="@{/js/community/controlTag.js}"></script>
             <script th:src="@{/js/community/validate.js}"></script>
             <script th:src="@{/js/community/writePost.js}"></script>
         </th:block>

@@ -63,8 +63,7 @@ public class CommunityController {
     public List<MenuItem> menuItems() {
         return List.of(
             new MenuItem("掲示板", "/community/home"),
-            new MenuItem("講義評", "/community/courseList"),
-            new MenuItem("Q&A", "/community/qna")
+            new MenuItem("講義評", "/community/courseList")
         );
     }
 
@@ -80,6 +79,7 @@ public class CommunityController {
         boardMap.put("hobby", "趣味&旅行&グルメ情報");
         boardMap.put("certificate", "資格情報");
         boardMap.put("graduated", "卒業生掲示板");
+        boardMap.put("qna", "Q&A");
 
         log.debug("게시글 맵 정보 : {}", boardMap);
         return boardMap;
@@ -136,13 +136,13 @@ public class CommunityController {
         @RequestParam("boardId") Integer boardId,
         @RequestParam(name = "searchType", required = false) String searchType,
         @RequestParam(name = "keyword", required = false) String keyword,
-        @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
-    ) {
+        @PageableDefault(size = 10, sort = {"createdAt", "postId"}, direction = Sort.Direction.DESC) Pageable pageable) {
 
         // 수신 데이터 로그
         log.debug("출력할 게시판의 id : {}", boardId);
         log.debug("검색 범위 : {}", searchType);
         log.debug("검색 키워드 : {}", keyword);
+        log.debug("pageable 정보 : {}", pageable);
 
         // postDTO 페이지 생성
         Page<PostDTO> postPage;
@@ -155,9 +155,11 @@ public class CommunityController {
                 postPage = cs.findPostsByBoard(boardId, pageable);
             }
             log.debug("페이지 정보 : {}", postPage);
+            /*
             for (PostDTO postDTO : postPage) {
                 log.debug("각 게시글 정보 : {}", postDTO);
             }
+            */
             return ResponseEntity.ok(postPage);
         } catch (Exception e) {
             log.debug("게시글 검색 중 오류 발생 : {}", e);
@@ -176,10 +178,9 @@ public class CommunityController {
      */
     @GetMapping("writePost")
     public String writePostPage(
-        @RequestParam("boardId") Integer boardId,
-        Model model
-    ) {
-        model.addAttribute("boardId", boardId);
+        @RequestParam("name") String name,
+        Model model) {
+        model.addAttribute("boardName", name);
         return "community/writeForm";
     }
 
@@ -307,10 +308,10 @@ public class CommunityController {
         @AuthenticationPrincipal UserDetails user
     ) {
         try {
-            cs.deletePost(postId, user.getUsername());
-            return "redirect:home";
+            String boardName = cs.deletePost(postId, user.getUsername());
+            return "redirect:board?name=" + boardName;
         } catch (Exception e) {
-            return "redirect:home";
+            return "redirect:readPost?postId=" + postId;
         }
     }
 

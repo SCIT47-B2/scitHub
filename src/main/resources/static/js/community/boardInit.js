@@ -4,7 +4,7 @@ $(document).ready(function() {
 });
 
 function gotoWritePost() {
-    const boardId = $('#boardId').val();
+    const boardName = $('#boardName').val();
 
-    location.href = `writePost?boardId=${boardId}`
+    location.href = `writePost?name=${boardName}`
 }

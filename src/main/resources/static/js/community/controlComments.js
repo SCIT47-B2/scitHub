@@ -25,6 +25,11 @@ function loadComments() {
                 const commentHtml = createCommentHTML(comment);
                 commentListContainer.append(commentHtml);
             });
+
+            // 댓글 개수 출력
+            const commentCount = commentList.length;
+            console.log(commentCount);
+            $('.commentCountDisplay').text(commentCount)
         },
         error: function() {
             alert('コメントの読み込みに失敗しました。');
@@ -55,7 +60,7 @@ function createCommentHTML(comment) {
             <img src="${avatarUrl}" alt="프로필 사진" class="profile-pic-small">
             <div class="comment-content">
                 <div class="comment-header">
-                    <span class="comment-author">${comment.username}</span>
+                    <span class="comment-author">${comment.userNameKor}</span>
                     <span class="comment-date">${formattedDate}</span>
                 </div>
                 <p class="comment-text">${comment.content.replace(/\n/g, '<br>')}</p>
@@ -132,6 +137,10 @@ $('.comment-list').on('click', '.delete-btn', function() {
                 $(`.comment[data-comment-id=${commentId}]`).remove();
                 // 또는 전체 목록 새로고침
                 // loadComments();
+                // 댓글 개수 변경
+                const commentCount = $('.comment-list').children().length;
+                console.log(commentCount);
+                $('.commentCountDisplay').text(commentCount);
             },
             error: function() {
                 alert('コメントの削除に失敗しました。');
@@ -207,7 +216,7 @@ $('.comment-list').on('click', '.save-edit-btn', function() {
             commentTextP.html(newContent.replace(/\n/g, '<br>')).show();
             commentDiv.find('.comment-edit-form').remove();
             commentDiv.removeClass('comment-edit-mode');
-            alert('コメントが修正されました。');
+            // alert('コメントが修正されました。');
         },
         error: function() {
             alert('コメントの修正に失敗しました。');
