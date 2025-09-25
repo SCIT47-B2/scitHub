@@ -88,8 +88,8 @@ public class AdminController {
     ) {
         log.debug("운영실 공지사항 페이지 요청: page={}, searchType={}, searchWord={}, boardName={}", page, searchType, searchWord, boardName);
         int boardId = bs.getBoardIdFromName(boardName);
-        int upperBoardId = boardName.equals("announcement") ? bs.getBoardIdFromName("announcementIt") : bs.getBoardIdFromName("announcement");
-        int lowerBoardId = boardName.equals("announcementJp") ? bs.getBoardIdFromName("announcementIt") : bs.getBoardIdFromName("announcementJp");
+        int upperBoardId = boardName.equals("announcement") ? bs.getBoardIdFromName("announcementIT") : bs.getBoardIdFromName("announcement");
+        int lowerBoardId = boardName.equals("announcementJP") ? bs.getBoardIdFromName("announcementIT") : bs.getBoardIdFromName("announcementJP");
 
         log.debug("게시판 ID: {}", boardId);
         if (boardId == -1) {

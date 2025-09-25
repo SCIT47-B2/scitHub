@@ -387,8 +387,20 @@
                     <a class="sectionHead" th:href="@{/admin}">運営室</a>
                     <div class="sectionBody">
                     <ul class="noticeList">
-                        <li><a th:href="@{/admin/announcement}">09/02(화) 20:00~21:00 네트워크 점검</a></li>
-                        <li><a th:href="@{/admin/announcement}">09/05(금) 과제 제출 마감</a></li>
+                        <li th:if="${#lists.isEmpty(latestAnnouncements)}">
+                            新しいお知らせはありません。
+                        </li>
+                        <li th:each="notice : ${latestAnnouncements}">
+                            <a th:href="@{/admin/announcement/read(postId=${notice.postId})}">
+                                <div class="notice-item">
+                                    <div class="notice-header">
+                                        <span><i class="fa-solid fa-bullhorn"></i> [[${notice.board}]]</span>
+                                        <span class="date">[[${#temporals.format(notice.createdAt, 'MM月 dd日 HH:mm')}]]</span>
+                                    </div>
+                                    <p class="title">[[${notice.title}]]</p>
+                                </div>
+                            </a>
+                        </li>
                     </ul>
                     </div>
                 </section>
