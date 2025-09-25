@@ -15,7 +15,7 @@ $(document).ready(function() {
             const previousUrl = new URL(referrer);
 
             // 이전 페이지가 글쓰기 페이지('/writePost')인 경우
-            if (previousUrl.pathname.includes('/writePost')) {
+            if (previousUrl.pathname.includes('/writePost') || previousUrl.pathname.includes('/updatePost')) {
                 // 해당 게시판의 기본 목록 페이지로 이동
                 location.href = `board?name=${boardName}`;
             }
