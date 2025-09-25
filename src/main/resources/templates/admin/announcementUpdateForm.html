@@ -80,7 +80,7 @@
                         // 실패 시 게시판 홈으로 이동
                         error: function(e) {
                             alert('お知らせの修正に失敗しました。: ' + e.responseText);
-                            location.href = listUrl;
+                            location.href = '/admin/announcement';
                         }
                     });
                 }
