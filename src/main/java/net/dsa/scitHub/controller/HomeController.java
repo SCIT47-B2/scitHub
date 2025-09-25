@@ -7,9 +7,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class HomeController {
+
+    // templates/classroom/home.html로 이동하게 함
     @GetMapping({"", "/"})
     public String home() {
-        return "home";
+        return "redirect:classroom/home";
     }
 
     @GetMapping("/skeleton")
