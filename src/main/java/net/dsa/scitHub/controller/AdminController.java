@@ -219,7 +219,7 @@ public class AdminController {
             // 수정 권한이 있는 유저인지 체크
             log.debug("게시글 작성자 : {}", postDTO.getUsername());
             log.debug("현재 로그인 유저 : {}", currentUser.getUserName());
-			if (!currentUser.getUserName().equals(postDTO.getUsername()) || !currentUser.getRole().equals("ROLE_ADMIN")) {
+			if (!currentUser.getUserName().equals(postDTO.getUsername()) && !currentUser.getRole().equals("ROLE_ADMIN")) {
 				throw new RuntimeException("修正の権限がありません。");
 			}
 			model.addAttribute("postDTO", postDTO);
