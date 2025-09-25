@@ -405,6 +405,21 @@
                     </div>
                 </section>
 
+                <section class="stackCard" aria-label="게시판 카테고리">
+                    <a class="sectionHead" th:href="@{/community/home}">掲示板カテゴリー</a>
+                    <!-- 게시판 카테고리 목록 -->
+                    <nav class="sectionBody">
+                        <div class="boardList">
+                            <th:block th:each="board : ${boardMap}">
+                                <a th:href="@{/community/board(name=${board.key})}"
+                                class="board-item"
+                                th:text="${board.value}">
+                                </a>
+                            </th:block>
+                        </div>
+                    </nav>
+                </section>
+
                 <!-- /** 새로운 질문
                     @desc   파란색 헤더(클릭 → question_submit.html) + 본문(입력창)
                     @param  없음
