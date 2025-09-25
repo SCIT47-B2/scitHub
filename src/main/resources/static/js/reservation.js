@@ -203,7 +203,7 @@ async function toggleRoomStatus(buttonElement) {
             // 서버가 응답으로 보낸 텍스트 에러 메시지를 읽어옵니다.
             const errorMessage = await response.text(); 
             // 읽어온 메시지를 alert 창에 보여줍니다.
-            alert(`状態の変更に失敗しました。: ${errorMessage}`); 
+            alert('状態の変更に失敗しました。');
         }
     } catch (error) {
         console.error('Error', error);

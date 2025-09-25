@@ -126,8 +126,22 @@ function populateForm(event) {
       ? new Date(new Date(event.endStr).getTime() - 86400000).toISOString().split('T')[0]
       : event.startStr;
   } else {
-    document.getElementById('eventStartDate').value = event.start ? event.start.toISOString().slice(0, 16) : '';
-    document.getElementById('eventEndDate').value = event.end ? event.end.toISOString().slice(0, 16) : '';
+    // 시간대 변환 없이 YYYY-MM-DDTHH:mm 형식으로 직접 만드는 헬퍼 함수
+    const toLocalISOString = (date) => {
+        if (!date) return ''; // 날짜가 없으면 빈 문자열 반환
+        
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        
+        return `${year}-${month}-${day}T${hours}:${minutes}`;
+    };
+
+    // 새로 만든 함수를 사용해서 입력창의 값을 설정
+    document.getElementById('eventStartDate').value = toLocalISOString(event.start);
+    document.getElementById('eventEndDate').value = toLocalISOString(event.end);
   }
 
   updateDateConstraints();
@@ -244,10 +258,18 @@ document.addEventListener('DOMContentLoaded', function onReady() {
     editable: true,
     headerToolbar: { left: '', center: '', right: '' },
     buttonText: { today: 'Today', month: 'M', week: 'W', day: 'D' },
+    eventDisplay: 'block',
+
 
     dayHeaderContent: function (arg) {
       const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
       return dayNames[arg.date.getDay()];
+    },
+    // 이벤트 안에 표시되는 시간 포맷 (월/주/일 뷰 모두 적용)
+    eventTimeFormat: {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
     },
 
     selectable: true,
@@ -502,7 +524,16 @@ document.addEventListener('DOMContentLoaded', function onReady() {
       })
       .catch((error) => {
         console.error('생성 실패:', error);
-        alert('エラー発生: ' + error.message);
+
+        
+      // 1. errorData 객체에서 실제 오류 메시지(value)들을 추출합니다.
+      const errorMessages = Object.values(error);
+
+      // 2. 만약 메시지가 있다면 첫 번째 메시지를, 없다면 기본 메시지를 사용합니다.
+      const displayMessage = errorMessages.length > 0 ? errorMessages[0] : '登録中にエラーが発生しました。';
+
+      // 3. 사용자에게 의미 있는 오류 메시지를 보여줍니다.
+      alert(displayMessage);
       });
   });
 });
