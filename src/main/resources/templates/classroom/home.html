@@ -364,6 +364,35 @@
                 overflow: hidden;         /* (추가) 영역을 넘어가는 텍스트는 숨김 */
                 text-overflow: ellipsis;  /* (추가) 숨겨진 텍스트를 ... 으로 표시 */
             }
+
+
+            /* //////////////////////////////////////////////////////////////// */
+            /* 게시판 카테고리 영역 크기 */
+            .boardList {
+                width: 100%;
+                max-height: 300px;  /* 최대 높이 */
+                overflow: auto;     /* 가로, 세로 크기 초과 시 스크롤로 */
+            }
+
+            /* 각 카테고리 스타일 */
+            .board-item {
+                color: #4b5563; /* Muted text color */
+                padding: 10px 14px;
+                border-radius: 8px;
+                transition: all 0.2s;
+                cursor: pointer;
+                font-size: 15px;
+                font-weight: 500;
+                text-decoration: none;
+                display: block;
+                border: 1px solid transparent;
+            }
+
+            .board-item:hover {
+                background-color: #f3f4f6; /* Light gray hover */
+                color: #111827;
+                text-decoration: none;
+            }
         </style>
     </head>
     <body>
@@ -378,11 +407,26 @@
                 <section class="stackCard" aria-label="운영실">
                     <a class="sectionHead" th:href="@{/admin}">運営室</a>
                     <div class="sectionBody">
-                    <ul class="noticeList">
-                        <li><a th:href="@{/admin/announcement}">09/02(화) 20:00~21:00 네트워크 점검</a></li>
-                        <li><a th:href="@{/admin/announcement}">09/05(금) 과제 제출 마감</a></li>
-                    </ul>
+                        <ul class="noticeList">
+                            <li><a th:href="@{/admin/announcement}">09/02(화) 20:00~21:00 네트워크 점검</a></li>
+                            <li><a th:href="@{/admin/announcement}">09/05(금) 과제 제출 마감</a></li>
+                        </ul>
                     </div>
+                </section>
+
+                <section class="stackCard" aria-label="게시판 카테고리">
+                    <a class="sectionHead" th:href="@{/community/home}">掲示板カテゴリー</a>
+                    <!-- 게시판 카테고리 목록 -->
+                    <nav class="sectionBody">
+                        <div class="boardList">
+                            <th:block th:each="board : ${boardMap}">
+                                <a th:href="@{/community/board(name=${board.key})}"
+                                class="board-item"
+                                th:text="${board.value}">
+                                </a>
+                            </th:block>
+                        </div>
+                    </nav>
                 </section>
 
                 <!-- /** 새로운 질문
