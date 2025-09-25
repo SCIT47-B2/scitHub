@@ -146,7 +146,7 @@ public class CommunityController {
 
         // postDTO 페이지 생성
         Page<PostDTO> postPage;
-
+        
         try {
             // keyword가 존재하면 검색 로직 수행, 없으면 일반 목록 조회
             if (keyword != null && !keyword.trim().isEmpty()) {

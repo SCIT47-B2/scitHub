@@ -34,6 +34,7 @@
                     <a th:each="menu : ${menuItems}"
                         th:href="${ctx + menu.url}"
                         th:text="${menu.name}"
+                        th:class="${#strings.replace(menu.url, '/', '')}"
                         th:classappend="${#strings.startsWith(activeUri, ctx + menu.url)} ? 'active' : ''">
                     </a>
                 </div>
