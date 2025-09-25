@@ -196,7 +196,7 @@ public class AdminController {
 			return "admin/announcementRead";
 		} catch (Exception e) {
 			log.debug("[예외 발생] 글 정보 조회 실패..");
-			return "redirect:admin/announcement";
+			return "redirect:/admin/announcement";
 		}
 	}
 
