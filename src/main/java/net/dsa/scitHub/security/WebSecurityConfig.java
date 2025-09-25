@@ -23,13 +23,14 @@ public class WebSecurityConfig {
 
 	// 로그인 없이 접근 가능한 URL 목록
     private static final String[] PUBLIC_URLS = {
-    		"/"                     // 메인 페이지
-            , "/images/**"          // 이미지 경로
+            "/images/**"            // 이미지 경로
+            , "/icons/**"           // 아이콘 파일 경로
             , "/css/**"             // CSS 파일들
             , "/js/**"              // JavaScript 파일들
-            , "/**"                 // 테스트를 위해 모든 경로 허용 (실제 서비스 시에는 제거 필요)
+            // , "/**"                 // 테스트를 위해 모든 경로 허용 (실제 서비스 시에는 제거 필요)
             , "/user/landingPage"   // 로그인 페이지
             , "/user/login"         // 로그인 처리 URL
+            , "/user/idCheck"       // 회원가입 시 ID 중복 여부를 체크하는 팝업
     };
 
     // @Component 와 같이 객체를 등록할때 사용, 보통 @Configuration 클래스 내에서 사용
