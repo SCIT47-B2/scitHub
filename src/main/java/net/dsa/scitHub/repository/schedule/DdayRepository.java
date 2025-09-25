@@ -1,6 +1,7 @@
 package net.dsa.scitHub.repository.schedule;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -59,4 +60,20 @@ public interface DdayRepository extends JpaRepository<Dday, Integer> {
      * Asc : 오름차순 정렬하겠다.
     */
     List<Dday> findByUserOrderByDdayAsc(User user);
+
+    /**
+     * 특정 사용자의 모든 D-Day를 '고정 해제'(isPinned = false) 상태로 일괄 업데이트합니다.
+     * @Modifying: 이 쿼리가 DB 상태를 변경하는 INSERT, UPDATE, DELETE 쿼리임을 나타냅니다.
+     */
+    @Modifying
+    @Query("UPDATE Dday d SET d.isPinned = false WHERE d.user.id = :userId")
+    void unpinAllByUserId(@Param("userId") Integer userId); // User ID의 타입(Long/Integer)을 확인하세요
+
+    /**
+     * 주어진 ID 목록에 해당하는 특정 사용자의 D-Day들을 '고정'(isPinned = true) 상태로 일괄 업데이트합니다.
+     */
+    @Modifying
+    @Query("UPDATE Dday d SET d.isPinned = true WHERE d.id IN :ids AND d.user.id = :userId")
+    void pinByIdsAndUserId(@Param("ids") List<Integer> ids, @Param("userId") Integer userId);
+    
 }

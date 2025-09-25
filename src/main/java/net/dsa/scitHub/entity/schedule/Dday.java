@@ -7,6 +7,8 @@ import net.dsa.scitHub.entity.user.User;
 import java.time.LocalDate;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 @Entity
 @Table(name = "dday")
 @Getter
@@ -36,6 +38,12 @@ public class Dday {
     @Column(name = "title", nullable = false, length = 100)
     private String title;
     
+    /** 디데이 고정 여부 */
+    @Builder.Default
+    @Column(name = "is_pinned", nullable = false)
+    private boolean isPinned = false;
+
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -43,7 +51,7 @@ public class Dday {
         Dday dday1 = (Dday) o;
         return Objects.equals(ddayId, dday1.ddayId);
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(ddayId);

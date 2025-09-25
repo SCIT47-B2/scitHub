@@ -19,6 +19,7 @@ public class DdayDTO {
     private String username;
     private LocalDate dday;
     private String title;
+    private boolean isPinned;
 
     public static DdayDTO convertToDdayDTO(Dday dday) {
         return DdayDTO.builder()
@@ -26,6 +27,7 @@ public class DdayDTO {
                         .username(dday.getUser() != null ? dday.getUser().getUsername() : null)
                         .dday(dday.getDday())
                         .title(dday.getTitle())
+                        .isPinned(dday.isPinned())
                         .build();
     }
 }
