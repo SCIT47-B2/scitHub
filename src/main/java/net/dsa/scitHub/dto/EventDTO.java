@@ -4,6 +4,9 @@ import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,15 +24,21 @@ public class EventDTO {
     private Integer eventId;
     private Visibility visibility;
     private String userId;
+
+    @NotBlank(message ="予定のタイトルは必須項目です。")
+    @Size(max = 150, message = "タイトルの文字数は150字以内です。") // DB: varchar(150)
     private String title;
+    
     private String content;
 
     // FullCalendar가 원하는 형식으로 날짜를 포맷시킴
+    @NotNull(message = "開始時間は必須項目です。")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime start;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime end;
     
+    @NotNull(message = "終日かどうかの指定は必須です。")
     private Boolean allDay;
 
     /**

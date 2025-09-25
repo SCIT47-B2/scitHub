@@ -51,7 +51,7 @@ public class EventService {
         log.debug("@@eventDTO 확인 {}", eventDTO);
 
         User eventUser = ur.findByUsername(user.getId()).orElseThrow(
-            () -> new EntityNotFoundException("해당 아이디가 없습니다.")
+            () -> new EntityNotFoundException("該当するIDが見つかりませんでした。")
         );
 
         Event event = Event.builder()

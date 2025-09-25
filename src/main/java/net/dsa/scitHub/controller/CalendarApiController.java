@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import jakarta.validation.Valid;
+
 import org.springframework.web.bind.annotation.PathVariable;
 
 import lombok.RequiredArgsConstructor;
@@ -44,7 +47,7 @@ public class CalendarApiController {
     @PostMapping("/calendar/events")
     public ResponseEntity<?> createEvent(
             @AuthenticationPrincipal AuthenticatedUser user,
-            @RequestBody EventDTO eventDTO) {
+            @Valid @RequestBody EventDTO eventDTO) {
 
         log.debug("회원 정보:{}", user);
 

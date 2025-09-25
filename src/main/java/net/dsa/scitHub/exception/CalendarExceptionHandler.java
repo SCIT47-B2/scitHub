@@ -1,7 +1,11 @@
 package net.dsa.scitHub.exception;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -36,6 +40,25 @@ public class CalendarExceptionHandler {
         // ResponseEntity 객체 생성
         // 404 상태 코드와 함께 ErrorResponse를 담아 응답
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+
+    /**
+     * @Valid 유효성 검사 실패 시 발생하는 예외를 처리하는 메서드
+     */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        // 어떤 필드가 어떤 규칙을 위반했는지 담을 Map 생성
+        Map<String, String> errors = new HashMap<>();
+
+        // 예외 정보에서 모든 필드 오류를 꺼내 Map에 담기
+        ex.getBindingResult().getFieldErrors().forEach(error -> {
+            String fieldName = error.getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+
+        // 400 Bad Request 상태와 함께 오류 Map
+        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 
     /**

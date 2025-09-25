@@ -312,3 +312,27 @@ input[type="checkbox"]:checked + label::after {
   box-shadow: var(--shadow);
   height: fit-content;
 }
+
+/* 날짜/시간 입력 필드의 너비 문제 해결 */
+
+/* 1. 날짜 입력 필드를 감싸는 그룹의 정렬 방식을 변경 */
+.date-inputs-grid .form-group {
+    display: flex;
+    flex-direction: column; /* 라벨과 입력창을 세로로 쌓음 */
+    align-items: flex-start; /* 왼쪽 정렬 */
+}
+
+/* 2. 라벨이 더 이상 공간을 차지하지 않도록 수정 */
+.date-inputs-grid .form-group label {
+    margin-bottom: 8px; /* 라벨과 입력창 사이 간격 */
+    margin-right: 0;    /* 오른쪽 자동 여백 제거 */
+}
+
+/* 3. 날짜/시간 입력창의 너비를 100%로 설정 */
+.date-inputs-grid .form-group input[type="datetime-local"],
+.date-inputs-grid .form-group input[type="date"] {
+    width: 100%; /* 너비를 꽉 채움 */
+    box-sizing: border-box; /* 패딩을 너비 계산에 포함 */
+    padding-left: 8px;
+    padding-right: 8px;
+}
