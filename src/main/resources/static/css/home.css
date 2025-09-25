@@ -252,7 +252,7 @@
 /* Different block types */
 .block.labelBar {
     background: transparent;
-    border: none;
+    /*border: none;*/
     color: var(--text-secondary);
     font-weight: 700;
     font-size: 12px;
