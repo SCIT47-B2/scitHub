@@ -271,4 +271,20 @@ public class PostService {
     private boolean isAuthority(String role, Integer userId, Authorizable target) {
         return "ROLE_ADMIN".equals(role) || target.getUser().getUserId().equals(userId);
     }
+
+    public List<PostDTO> getLatestAnnouncements(int count) {
+        // 1. 모든 공지사항 게시판 이름을 리스트로 정의
+        List<String> announcementBoardNames = List.of("announcement", "announcementIT", "announcementJP");
+
+        // 2. PageRequest를 사용해 상위 N개만 가져오도록 설정
+        Pageable pageable = PageRequest.of(0, count);
+
+        // 3. Repository를 호출하여 엔티티 목록을 가져옴
+        List<Post> posts = pr.findByBoard_NameInOrderByCreatedAtDesc(announcementBoardNames, pageable);
+
+        // 4. 엔티티 목록을 DTO 목록으로 변환하여 반환
+        return posts.stream()
+                .map(PostDTO::convertToPostDTO)
+                .toList();
+    }
 }

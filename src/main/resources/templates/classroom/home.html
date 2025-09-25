@@ -160,8 +160,11 @@
                 background: #ffffff !important;
             }
 
-            #mini-calendar .fc-timegrid-col-events {
-                margin: 0 4px;
+            #mini-calendar .fc-timegrid-col-events { 
+                /* 이벤트가 그려지는 영역의 왼쪽 여백을 50px로 설정하여 시간 라벨 공간을 확보합니다. */
+                margin-left: 50px !important; 
+                /* 우측에도 약간의 여백을 줍니다. */
+                margin-right: 4px !important;
             }
 
             /* =========================
@@ -343,9 +346,14 @@
             .dday-list li { display: flex; align-items: center; padding: 12px 8px; border-bottom: 1px solid #f1f3f5; }
             .dday-list li:last-child { border-bottom: none; }
             .dday-list input[type="checkbox"] { margin-right: 15px; width: 20px; height: 20px; }
-            .dday-list .dday-date { font-size: 0.8em; color: #868e96; }
-            .dday-empty-state { text-align: center; padding: 40px 20px; }
-            .dday-empty-state p { margin-bottom: 70px; font-size: 1.1em; }
+            .dday-list .dday-date { font-size: 0.8em; color: #868e96; } 
+            .dday-empty-state {
+                display: flex;
+                flex-direction: column; /* 자식 요소들을 세로로 정렬 */
+                min-height: 150px; /* 최소 높이 지정 */
+            }
+            .dday-empty-state .dday-modal-body { flex-grow: 1; display: flex; align-items: center; justify-content: center; padding: 20px; font-size: 1.1em; }
+            .dday-empty-state .dday-modal-footer { text-align: right; padding: 20px; border-top: 1px solid #e9ecef; }
             .dday-modal-footer { margin-top: 20px; padding-top: 20px; border-top: 1px solid #e9ecef; text-align: right; }
             .btn { padding: 10px 20px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
             .btn-primary { background: #4258BE; color: white; }
@@ -407,10 +415,22 @@
                 <section class="stackCard" aria-label="운영실">
                     <a class="sectionHead" th:href="@{/admin}">運営室</a>
                     <div class="sectionBody">
-                        <ul class="noticeList">
-                            <li><a th:href="@{/admin/announcement}">09/02(화) 20:00~21:00 네트워크 점검</a></li>
-                            <li><a th:href="@{/admin/announcement}">09/05(금) 과제 제출 마감</a></li>
-                        </ul>
+                    <ul class="noticeList">
+                        <li th:if="${#lists.isEmpty(latestAnnouncements)}">
+                            新しいお知らせはありません。
+                        </li>
+                        <li th:each="notice : ${latestAnnouncements}">
+                            <a th:href="@{/admin/announcement/read(postId=${notice.postId})}">
+                                <div class="notice-item">
+                                    <div class="notice-header">
+                                        <span><i class="fa-solid fa-bullhorn"></i> [[${notice.board}]]</span>
+                                        <span class="date">[[${#temporals.format(notice.createdAt, 'MM月 dd日 HH:mm')}]]</span>
+                                    </div>
+                                    <p class="title">[[${notice.title}]]</p>
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
                     </div>
                 </section>
 
@@ -558,9 +578,11 @@
                     </div>
                     <div id="ddayModalBody" class="dday-modal-body">
                         <ul id="ddayList" class="dday-list"></ul>
-                        <div id="ddayEmptyState" class="dday-empty-state" style="display: none;">
-                            <p>登録されたD-Dayがありません。</p>
-                            <a th:href="@{/calendar/dDay}" class="btn btn-primary">D-Dayを作成する</a>
+                        <div id="ddayEmptyState" class="dday-empty-state" style="display: none;"> 
+                            <div class="dday-modal-body">登録されたD-Dayがありません。</div>
+                            <div class="dday-modal-footer">
+                                <a th:href="@{/calendar/dDay}" class="btn btn-primary">D-Dayを作成する</a>
+                            </div>
                         </div>
                     </div>
                     <div id="ddayModalFooter" class="dday-modal-footer">
@@ -639,7 +661,7 @@
                     } else if (allDdays.length > 0) {
                         widget.innerHTML = `<div class="dday-item-empty">クリックしてホームに表示するD-Dayを選択します。</div>`;
                     } else {
-                        widget.innerHTML = `<div class="dday-item-empty">最初のD-Dayを登録してください。</div>`;
+                        widget.innerHTML = `<div class="dday-item-empty">D-Dayを登録してください。</div>`;
                     }
                 }
 
@@ -781,6 +803,10 @@
                             const title = arg.event.title;
                             const start = arg.event.start;
                             const end = arg.event.end;
+                                                    
+                            // 이벤트 기간(분) 계산
+                            const durationMinutes = end ? (end.getTime() - start.getTime()) / 60000 : 60;
+                            const isShortEvent = durationMinutes <= 60;
 
                             // 1. 시작 시간은 항상 있으므로 안전하게 변환합니다.
                             const startTime = start.toLocaleTimeString('ja-JP', {
@@ -800,13 +826,16 @@
                             const isPublic = arg.event.extendedProps.visibility === 'PUBLIC';
                             const bgColor = isPublic ? '#ff8c42' : '#7c93c3';
 
+                            // 짧은 이벤트일 경우 시간 텍스트를 숨김
+                            const timeHtml = isShortEvent ? '' : `<div style="font-size: 0.7rem; opacity: 0.9;">${startTime} - ${endTime}</div>`;
+                            
                             // HTML 생성
                             return {
                                 html: `
                                     <div style="
                                         background: ${bgColor};
-                                        color: white;
-                                        padding: 8px;
+                                        color: white; 
+                                        padding: 8px 12px; 
                                         border-radius: 8px;
                                         height: 100%;
                                         display: flex;
@@ -817,15 +846,11 @@
                                         <div style="
                                             font-weight: 600;
                                             font-size: 0.85rem;
-                                            margin-bottom: 4px;
                                             overflow: hidden;
                                             text-overflow: ellipsis;
                                             white-space: nowrap;
                                         ">${title}</div>
-                                        <div style="
-                                            font-size: 0.7rem;
-                                            opacity: 0.9;
-                                        ">${startTime} - ${endTime}</div>
+                                        ${timeHtml}
                                     </div>
                                 `
                             };

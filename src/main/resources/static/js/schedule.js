@@ -95,7 +95,7 @@ function enableEditMode() {
   setFormEditable(true);
   document.querySelector('#modalButtons').innerHTML = `
     <button type="button" class="btn btn-secondary" onclick="disableEditMode()">キャンセル</button>
-    <button type="submit" class="btn btn-primary" id="submitBtn">貯蔵</button>
+    <button type="submit" class="btn btn-primary" id="submitBtn">保存</button>
   `;
 }
 
@@ -470,7 +470,7 @@ document.addEventListener('DOMContentLoaded', function onReady() {
           return response.json();
         })
         .then(() => {
-          alert('スケジュールは正常に修正されました.');
+          alert('スケジュールが修正されました.');
           calendar.refetchEvents();
           closeModal();
         })
