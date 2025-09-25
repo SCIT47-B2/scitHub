@@ -11,7 +11,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dsa.scitHub.dto.ClassroomDTO;
 import net.dsa.scitHub.dto.MenuItem;
-import net.dsa.scitHub.entity.classroom.Classroom;
+import net.dsa.scitHub.dto.PostDTO;
+import net.dsa.scitHub.service.PostService;
 import net.dsa.scitHub.service.ReservationService;
 
 @Controller
@@ -20,6 +21,7 @@ import net.dsa.scitHub.service.ReservationService;
 public class ClassroomController {
 
     private final ReservationService rs;
+    private final PostService ps;
 
     // 클래스룸 페이지 요청
     @GetMapping({ "/classroom", "/classroom/home" })
@@ -31,9 +33,11 @@ public class ClassroomController {
         );
 
         Map<Integer, ClassroomDTO> classroomMap = rs.getAllClassrooms();
+        List<PostDTO> latestAnnouncements = ps.getLatestAnnouncements(3);
 
         model.addAttribute("menuItems", menuItems);
         model.addAttribute("classroomMap", classroomMap);
+        model.addAttribute("latestAnnouncements", latestAnnouncements);
 
         return "classroom/home";
     }

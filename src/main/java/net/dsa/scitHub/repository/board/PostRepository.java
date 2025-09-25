@@ -113,4 +113,12 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     )
     Optional<Post> findPostWithDetailsById(@Param("postId") Integer postId);
 
+    /**
+     * 여러 게시판 이름에 해당하는 게시글들을 최신순으로 조회
+     * @param boardNames 게시판 이름 리스트
+     * @param pageable 페이징 정보
+     * @return 게시글 리스트
+     */
+    List<Post> findByBoard_NameInOrderByCreatedAtDesc(List<String> boardNames, Pageable pageable);
+
 }
