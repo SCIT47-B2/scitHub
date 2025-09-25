@@ -1,0 +1,1 @@
+$('.communityhome').addClass('active');
