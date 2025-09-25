@@ -37,7 +37,7 @@
                     <!-- 2. 중심 공지 테이블 영역 -->
                     <div class="announcement-section">
                         <div class="section-header">
-                            <h2 th:text="${boardName == 'announcement' ? 'お知らせ' : boardName == 'announcementIt' ? 'お知らせ - IT' : 'お知らせ - 日本語'}"></h2>
+                            <h2 th:text="${boardName == 'announcement' ? 'お知らせ' : boardName == 'announcementIT' ? 'お知らせ - IT' : 'お知らせ - 日本語'}"></h2>
                             <div class="write-button-container" th:if="${currentUser != null and currentUser.role == 'ROLE_ADMIN'}">
                                 <a th:href="@{/admin/announcement/write(boardName=${boardName})}" class="btn-primary">
                                     <i class="fa-solid fa-pencil"></i>
@@ -62,7 +62,7 @@
                                 <tr th:each="post, status : ${postPage}" th:unless="${postPage.isEmpty()}">
                                     <td th:text="${post.postId}"></td>
                                     <td>
-                                        <a th:text="${post.title}" th:href="@{/admin/announcementRead(postId=${post.postId})}"></a>
+                                        <a th:text="${post.title}" th:href="@{/admin/announcement/read(postId=${post.postId})}"></a>
                                     </td>
                                     <td th:text="${post.userNameKor}" class="center"></td>
                                     <td th:text="${#temporals.format(post.createdAt, 'yy-MM-dd HH:mm')}"></td>
@@ -106,7 +106,7 @@
                 <!-- 오른쪽 사이드 콘텐츠 (타 공지) -->
                 <aside class="side-content">
                     <!-- 4. 위쪽 공지 패널 -->
-                    <div class="notice-panel" th:with="UpperBoardName=${boardName == 'announcement' ? 'announcementIt' : 'announcement'}">
+                    <div class="notice-panel" th:with="UpperBoardName=${boardName == 'announcement' ? 'announcementIT' : 'announcement'}">
                         <a th:href="|javascript:changeBoard('${UpperBoardName}')|" class="panel-header">
                             <h3 th:text="${boardName == 'announcement' ? 'お知らせ - IT' : 'お知らせ'}"></h3>
                             <span>&gt;</span>
@@ -124,7 +124,7 @@
                     </div>
 
                     <!-- 5. 아래쪽 공지 패널 -->
-                    <div class="notice-panel" th:with="lowerBoardName=${boardName == 'announcementJp' ? 'announcementIt' : 'announcementJp'}">
+                    <div class="notice-panel" th:with="lowerBoardName=${boardName == 'announcementJp' ? 'announcementIT' : 'announcementJp'}">
                         <a th:href="|javascript:changeBoard('${lowerBoardName}')|" class="panel-header">
                             <h3 th:text="${boardName == 'announcementJp' ? 'お知らせ - IT' : 'お知らせ - 日本語'}"></h3>
                             <span>&gt;</span>

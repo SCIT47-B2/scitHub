@@ -16,7 +16,9 @@
     font-weight: 700;
 }
 
-.writeBtn {
+/* write-header 안의 모든 버튼에 대한 공통 스타일 */
+.btn-header-action {
+    /* 기존 .writeBtn의 스타일을 그대로 가져옵니다. */
     padding: 10px 20px;
     font-size: 15px;
     font-weight: 600;
@@ -26,11 +28,21 @@
     color: white;
     cursor: pointer;
     transition: background-color 0.2s;
+
+    /* 아이콘과 텍스트 정렬을 위해 추가 */
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
 }
-.writeBtn:hover {
-    background-color: #3b50b0; /* var(--primary)보다 약간 어두운 색 */
+.btn-header-action:hover {
+    background-color: #3b50b0;
 }
 
+/* 수정 페이지의 여러 버튼을 감싸는 컨테이너 */
+.header-buttons {
+    display: flex;
+    gap: 10px; /* 버튼 사이의 간격 */
+}
 
 /* --- 메인 폼 카드 --- */
 .form-container {

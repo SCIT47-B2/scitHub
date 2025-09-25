@@ -27,6 +27,7 @@ import net.dsa.scitHub.dto.PostDetailDTO;
 import net.dsa.scitHub.dto.UserManageDTO;
 import net.dsa.scitHub.entity.board.Post;
 import net.dsa.scitHub.service.BoardService;
+import net.dsa.scitHub.service.CommunityService;
 import net.dsa.scitHub.service.PostService;
 import net.dsa.scitHub.service.UserService;
 
@@ -39,6 +40,7 @@ public class AdminController {
     private final PostService ps;
     private final BoardService bs;
     private final UserService us;
+    private final CommunityService cs;
 
 	@Value("${file.uploadPath}")
 	String uploadPath;			// 첨부파일 저장 경로
@@ -171,17 +173,121 @@ public class AdminController {
         }
     }
 
-    @GetMapping("announcementRead")
-    public String announcementRead(
-        @RequestParam("postId") int postId,
+    /**
+     * 공지사항 글 상세보기 페이지
+     * @param postId 조회할 글 ID
+     * @param user 현재 로그인한 사용자 정보
+     * @param model 뷰에 데이터를 전달할 객체
+     * @return "admin/announcementRead" 뷰 템플릿
+     */
+	@GetMapping("announcement/read")
+	public String announcementRead(
+        @RequestParam(name = "postId", defaultValue = "0") int postId,
+        @ModelAttribute("currentUser") MypageDTO currentUser,
         Model model
     ) {
-        log.debug("운영실 공지사항 상세보기 요청: postId={}", postId);
+        log.debug("공지사항 글 상세보기 요청: postId={}", postId);
 
-        PostDetailDTO postDetail = ps.findPostDetailById(postId);
-        model.addAttribute("postDetail", postDetail);
+		try {
+			PostDTO postDTO = cs.getPost(postId, true, currentUser.getUserName());
+			model.addAttribute("post", postDTO);
 
-        return "admin/announcementRead";
+			log.debug("조회한 글 정보: {}", postDTO);
+			return "admin/announcementRead";
+		} catch (Exception e) {
+			log.debug("[예외 발생] 글 정보 조회 실패..");
+			return "redirect:/admin/announcement";
+		}
+	}
+
+    /**
+     * 공지사항 글 수정 페이지
+     * @param postId 수정할 글 ID
+     * @param currentUser 현재 로그인한 사용자 정보
+     * @param model 뷰에 데이터를 전달할 객체
+     * @return "admin/announcementUpdateForm" 뷰 템플릿
+     */
+	@GetMapping("announcement/update")
+	public String announcementUpdate(
+        @RequestParam("postId") int postId,
+        @ModelAttribute("currentUser") MypageDTO currentUser,
+        Model model
+    ) {
+		try {
+			PostDTO postDTO = cs.getPost(postId, false, currentUser.getUserName());
+            log.debug("수정할 글 정보: {}", postDTO);
+            // 수정 권한이 있는 유저인지 체크
+            log.debug("게시글 작성자 : {}", postDTO.getUsername());
+            log.debug("현재 로그인 유저 : {}", currentUser.getUserName());
+			if (!currentUser.getUserName().equals(postDTO.getUsername()) && !currentUser.getRole().equals("ROLE_ADMIN")) {
+				throw new RuntimeException("修正の権限がありません。");
+			}
+			model.addAttribute("postDTO", postDTO);
+
+			return "admin/announcementUpdateForm";
+		} catch (Exception e) {
+			log.debug("[예외 발생] {}", e.getMessage());
+			return "redirect:/admin/announcement";
+		}
+	}
+
+    /**
+     * 공지사항 글 수정 처리 (AJAX)
+     * @param postDTO 수정할 게시글 정보
+     * @param currentUser 현재 로그인한 사용자 정보
+     * @return ResponseEntity with updated post ID or error message
+     */
+    @ResponseBody
+	@PostMapping("announcement/update")
+	public ResponseEntity<?> announcementUpdate(
+        PostDTO postDTO,
+        @ModelAttribute("currentUser") MypageDTO currentUser
+    ) {
+		try {
+            PostDTO updatedPost = ps.updatePost(postDTO, currentUser.getUserId(), currentUser.getRole());
+            log.debug("게시글 수정 성공: {}", updatedPost);
+
+            return ResponseEntity.ok(updatedPost.getPostId());
+        } catch (EntityNotFoundException e) {
+            log.error("[예외 발생] 게시글 수정 실패: {}", e.getMessage());
+
+            return ResponseEntity.status(404).body("게시글을 찾을 수 없습니다.");
+        } catch (SecurityException e) {
+            log.error("[예외 발생] 게시글 수정 권한 없음: {}", e.getMessage());
+
+            return ResponseEntity.status(403).body("게시글 수정 권한이 없습니다.");
+        } catch (Exception e) {
+            log.error("[예외 발생] 게시글 수정 중 오류: {}", e.getMessage());
+
+            return ResponseEntity.status(500).body("게시글 수정 중 오류가 발생했습니다.");
+        }
+	}
+
+    /**
+     * 공지사항 글 삭제
+     * @param postId 삭제할 글 ID
+     * @param currentUser 현재 로그인한 사용자 정보
+     * @return 리다이렉트 URL
+     */
+    @GetMapping("announcement/delete")
+    public String deleteAnnouncement(
+        @RequestParam("postId") Integer postId,
+        @ModelAttribute("currentUser") MypageDTO currentUser
+    ) {
+        try {
+            ps.deletePost(postId, currentUser.getUserId(), currentUser.getRole());
+            log.debug("게시글 삭제 성공!");
+
+            return "redirect:/admin/announcement";
+        } catch (EntityNotFoundException e) {
+            log.error("[예외 발생] 게시글 삭제 실패: {}", e.getMessage());
+
+            return "redirect:/admin/announcement?error=true";
+        } catch (SecurityException e) {
+            log.error("[예외 발생] 게시글 삭제 권한 없음: {}", e.getMessage());
+
+            return "redirect:/admin/announcement?accessDenied=true";
+        }
     }
 
     /**

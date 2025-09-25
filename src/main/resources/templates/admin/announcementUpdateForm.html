@@ -3,7 +3,7 @@
     xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
     layout:decorate="~{layouts/defaultLayout}">
     <head>
-        <title>Announcement Write</title>
+        <title>Announcement Update</title>
         <th:block layout:fragment="css">
             <link rel="stylesheet" th:href="@{/css/ckeditor5/editorStyleAnnouncement.css}">
             <link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/46.0.3/ckeditor5.css" crossorigin>
@@ -13,12 +13,22 @@
     <body>
         <section class="mainGrid" layout:fragment="content">
             <div class="write-header">
-                <h2 th:text="${boardName == 'announcement' ? '新しいお知らせを作成' : boardName == 'announcementIt' ? '新しいITお知らせを作成' : '新しい日本語のお知らせを作成'}"></h2>
-                <button class="btn-header-action" type="button" id="submitPostBtn">登録する ✏️</button>
+                <h2>お知らせを修正</h2>
+                <div class="header-buttons">
+                    <button class="btn-header-action" type="button" id="cancelBtn"
+                        th:onclick="|location.href='@{/admin/announcement/read(postId=${postDTO.postId})}'|">
+                        修正を辞める<i class="fa-solid fa-undo"></i>
+                    </button>
+                    <button class="btn-header-action" type="button" id="updatePostBtn">
+                        修正する<i class="fa-solid fa-pencil"></i>
+                    </button>
+                </div>
             </div>
             <div class="form-container">
                 <form id="postForm" th:object="${postDTO}">
+                    <input type="hidden" name="postId" id="postId" th:value="*{postId}">
                     <input type="hidden" name="boardId" id="boardId" th:value="*{boardId}">
+
                     <input type="text" name="title" id="title" placeholder="タイトルを入力してください" th:value="*{title}">
                     <div class="main-container">
                         <div class="editor-container editor-container_classic-editor" id="editor-container">
@@ -34,16 +44,22 @@
             <script th:src="@{/js/ckeditor5/ckeditor5.js}"></script>
             <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
             <script th:inline="javascript">
-                const postUrl = /*[[@{/admin/announcement/write}]]*/ '/default-post-url';
+                const updateUrl = /*[[@{/admin/announcement/update}]]*/ '/default-update-url';
                 const readUrlBase = /*[[@{/admin/announcement/read}]]*/ '/default-read-url';
-                const listUrl = /*[[@{/admin/announcement(boardName=${boardName})}]]*/ '/default-list-url';
 
-                $('#submitPostBtn').click(function() {
-                    writePost();
+                // 수정 폼 로드 시 기존 내용으로 에디터 초기화
+                const initialContent = /*[[${postDTO.content}]]*/ '';
+
+                document.addEventListener('DOMContentLoaded', () => {
+                    if (window.editor) {
+                        window.editor.setData(initialContent);
+                    }
                 });
 
+                $('#updatePostBtn').click(updatePost);
+
                 // 게시글 비동기 제출
-                function writePost() {
+                function updatePost() {
 
                     // 유효성 검사
                     const formData = validateFormAndGetFormData();
@@ -52,19 +68,18 @@
 
                     // 비동기 요청으로 게시글 데이터 전달
                     $.ajax({
-                        url: postUrl,
+                        url: updateUrl,
                         method: 'POST',
                         data: formData,
                         processData: false,
                         contentType: false,
-                        // 작성 성공 시 해당 게시글 읽기
                         success: function(postId) {
                             location.href = readUrlBase + '?postId=' + postId;
                         },
                         // 실패 시 게시판 홈으로 이동
                         error: function(e) {
-                            alert('お知らせの登録に失敗しました。お知らせ一覧に移動します。' + e.statusText);
-                            location.href = listUrl;
+                            alert('お知らせの修正に失敗しました。: ' + e.responseText);
+                            location.href = '/admin/announcement';
                         }
                     });
                 }
@@ -72,13 +87,13 @@
                  // 게시판 폼에 입력한 데이터를 서버 사이드에 비동기 제출
                 function validateFormAndGetFormData() {
                     //유효성 검사
-                    // ✨ DTO에 바인딩된 hidden input에서 boardId를 가져옴
+                    const postId = $('#postId').val();
                     const boardId = $('#boardId').val();
                     const title = $('#title').val();
                     const content = editor.getData();
 
                     // 각 부분에 내용이 없을 시 알림 문구
-                    if (!boardId) {
+                    if (!postId || !boardId) {
                         alert('掲示板IDが見つかりません。');
                         return null;
                     }
@@ -93,6 +108,7 @@
 
                     // 게시글 관련 데이터들을 form 제출과 같은 형식으로 가공
                     const formData = new FormData();
+                    formData.append('postId', postId);
                     formData.append('boardId', boardId);
                     formData.append('title', title);
                     formData.append('content', content);
