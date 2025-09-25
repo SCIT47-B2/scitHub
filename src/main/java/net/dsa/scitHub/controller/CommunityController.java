@@ -94,7 +94,8 @@ public class CommunityController {
     @GetMapping({"", "/", "home"})
     public String communityPage(
         Model model,
-        @AuthenticationPrincipal UserDetails user) {
+        @AuthenticationPrincipal UserDetails user
+    ) {
         // return "community/home"; // templates/community/home.html
         return "redirect:board?name=free";  // 일단 자유게시판 페이지로 이동시키기
     }
@@ -107,7 +108,8 @@ public class CommunityController {
     @GetMapping("board")
     public String gotoBoard(
         @RequestParam("name") String name,
-        Model model) {
+        Model model
+    ) {
         try {
             BoardDTO boardDTO = cs.getBoard(name);
             model.addAttribute("boardName", boardDTO.getName());
@@ -134,7 +136,8 @@ public class CommunityController {
         @RequestParam("boardId") Integer boardId,
         @RequestParam(name = "searchType", required = false) String searchType,
         @RequestParam(name = "keyword", required = false) String keyword,
-        @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
 
         // 수신 데이터 로그
         log.debug("출력할 게시판의 id : {}", boardId);
@@ -174,7 +177,8 @@ public class CommunityController {
     @GetMapping("writePost")
     public String writePostPage(
         @RequestParam("boardId") Integer boardId,
-        Model model) {
+        Model model
+    ) {
         model.addAttribute("boardId", boardId);
         return "community/writeForm";
     }
@@ -185,8 +189,9 @@ public class CommunityController {
      */
     @PostMapping("write")
     public ResponseEntity<?> writePost(
-            PostDTO postDTO,
-            @AuthenticationPrincipal UserDetails user) {
+        PostDTO postDTO,
+        @AuthenticationPrincipal UserDetails user
+    ) {
         try {
             log.debug("postDTO : {}", postDTO);
             if(!postDTO.getTagList().isEmpty()) {
@@ -210,9 +215,10 @@ public class CommunityController {
      */
 	@GetMapping("readPost")
 	public String read(
-		    @RequestParam(name = "postId", defaultValue = "0") int postId,
-            @AuthenticationPrincipal UserDetails user,
-		    Model model) {
+        @RequestParam(name = "postId", defaultValue = "0") int postId,
+        @AuthenticationPrincipal UserDetails user,
+        Model model
+    ) {
 		try {
 			PostDTO postDTO = cs.getPost(postId, true, user.getUsername());
 			model.addAttribute("post", postDTO);
@@ -240,9 +246,10 @@ public class CommunityController {
 	 */
 	@GetMapping("updatePost")
 	public String update(
-			@RequestParam("postId") int postId,
-            @AuthenticationPrincipal UserDetails user,
-            Model model) {
+        @RequestParam("postId") int postId,
+        @AuthenticationPrincipal UserDetails user,
+        Model model
+    ) {
 		try {
 			PostDTO postDTO = cs.getPost(postId, false, user.getUsername());
             // 수정 권한이 있는 유저인지 체크
@@ -275,9 +282,9 @@ public class CommunityController {
 	 */
 	@PatchMapping("updatePost")
 	public ResponseEntity<?> updatePost(
-            @RequestParam("postId") Integer postId,
-			PostDTO postDTO,
-			@AuthenticationPrincipal UserDetails user) {
+        PostDTO postDTO,
+        @AuthenticationPrincipal UserDetails user
+    ) {
 		try {
             cs.updatePost(postDTO, user.getUsername());
             log.debug("불러온 정보 : {}", postDTO);
@@ -297,7 +304,8 @@ public class CommunityController {
     @GetMapping("deletePost")
     public String deletePost(
         @RequestParam("postId") Integer postId,
-        @AuthenticationPrincipal UserDetails user) {
+        @AuthenticationPrincipal UserDetails user
+    ) {
         try {
             cs.deletePost(postId, user.getUsername());
             return "redirect:home";
@@ -313,8 +321,9 @@ public class CommunityController {
      */
     @PostMapping("likePost")
     public ResponseEntity<?> likePost(
-            @RequestParam("postId") int postId,
-            @AuthenticationPrincipal UserDetails user) {
+        @RequestParam("postId") int postId,
+        @AuthenticationPrincipal UserDetails user
+    ) {
         try {
             cs.toggleLikePost(postId, user.getUsername());
             log.debug("좋아요 토글 처리 성공");
@@ -332,8 +341,9 @@ public class CommunityController {
      */
     @PostMapping("bookmarkPost")
     public ResponseEntity<?> bookmarkPost(
-            @RequestParam("postId") int postId,
-            @AuthenticationPrincipal UserDetails user) {
+        @RequestParam("postId") int postId,
+        @AuthenticationPrincipal UserDetails user
+    ) {
         try {
             // 북마크 토글 처리를 한 다음 결과값으로 북마크됐는지 여부를 가져옴
             boolean isBookmarked = cs.toggleBookmarkPost(postId, user.getUsername());
@@ -352,8 +362,9 @@ public class CommunityController {
      */
     @GetMapping("commentList")
     public ResponseEntity<List<CommentDTO>> commentList(
-            @RequestParam("postId") int postId,
-            @AuthenticationPrincipal UserDetails user) {
+        @RequestParam("postId") int postId,
+        @AuthenticationPrincipal UserDetails user
+    ) {
         log.debug("요청된 게시글 번호 : {}", postId);
         try {
             List<CommentDTO> commentList = cs.getCommentList(postId, user.getUsername());
@@ -374,8 +385,9 @@ public class CommunityController {
      */
     @PostMapping("writeComment")
     public ResponseEntity<?> writeComment(
-            CommentDTO commentDTO,
-            @AuthenticationPrincipal UserDetails user) {
+        CommentDTO commentDTO,
+        @AuthenticationPrincipal UserDetails user
+    ) {
         log.debug("댓글 작성 데이터 : {}", commentDTO);
         try {
             cs.makeNewComment(commentDTO, user.getUsername());
@@ -391,8 +403,9 @@ public class CommunityController {
      */
     @DeleteMapping("deleteComment/{commentId}")
     public ResponseEntity<?> deleteComment(
-            @PathVariable("commentId") Integer commentId,
-            @AuthenticationPrincipal UserDetails user) {
+        @PathVariable("commentId") Integer commentId,
+        @AuthenticationPrincipal UserDetails user
+    ) {
         log.debug("삭제할 댓글", commentId);
         try {
             cs.deleteComment(commentId, user.getUsername());
@@ -410,8 +423,9 @@ public class CommunityController {
      */
     @PatchMapping("updateComment")
     public ResponseEntity<?> updateComment(
-            @RequestBody CommentDTO commentDTO,
-            @AuthenticationPrincipal UserDetails user) {
+        @RequestBody CommentDTO commentDTO,
+        @AuthenticationPrincipal UserDetails user
+    ) {
         log.debug("수정할 댓글과 내용 : {}", commentDTO);
         try {
             cs.updateComment(commentDTO, user.getUsername());
@@ -435,8 +449,8 @@ public class CommunityController {
      */
     @GetMapping("courseList")
     public String courseList(
-            Model model,
-            @RequestParam(name="name", required=false) String name
+        Model model,
+        @RequestParam(name="name", required=false) String name
     ) {
 
         // 이름으로 검색하거나 전체 강의 정보 가져오기
@@ -455,9 +469,9 @@ public class CommunityController {
      */
     @GetMapping("courseReview")
     public String courseReview(
-            @RequestParam(name="id", required=true) Integer courseId,
-            Model model,
-            @AuthenticationPrincipal UserDetails userDetails
+        @RequestParam(name="id", required=true) Integer courseId,
+        Model model,
+        @AuthenticationPrincipal UserDetails userDetails
     ) {
         // 현재 로그인한 사용자의 ID를 가져옴. 비로그인 상태일 수 있으므로 null 체크가 필요
         Integer currentUserId = (userDetails != null) ? ur.findByUsername(userDetails.getUsername()).get().getUserId() : null;
@@ -474,8 +488,10 @@ public class CommunityController {
 
     // 리뷰 삭제를 위한 DELETE 메서드
     @DeleteMapping("courseReview/{reviewId}")
-    public ResponseEntity<?> deleteReview(@PathVariable("reviewId") Integer reviewId,
-                                          @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<?> deleteReview(
+        @PathVariable("reviewId") Integer reviewId,
+        @AuthenticationPrincipal UserDetails userDetails
+    ) {
         if (userDetails == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("ログインが必要です。");
         }
@@ -498,10 +514,12 @@ public class CommunityController {
      * @return
      */
     @PostMapping("/courseReview/{courseId}")
-    public ResponseEntity<String> createReview(@PathVariable("courseId") Integer courseId,
-                                               // @ModelAttribute를 통해 form에서 전송된 데이터(rating, commentText)가 CourseReviewDTO에 자동으로 바인딩
-                                               @ModelAttribute CourseReviewDTO reviewDTO,
-                                               @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<String> createReview(
+        @PathVariable("courseId") Integer courseId,
+        // @ModelAttribute를 통해 form에서 전송된 데이터(rating, commentText)가 CourseReviewDTO에 자동으로 바인딩
+        @ModelAttribute CourseReviewDTO reviewDTO,
+        @AuthenticationPrincipal UserDetails userDetails
+    ) {
         if (userDetails == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("ログインが必要です.");
         }

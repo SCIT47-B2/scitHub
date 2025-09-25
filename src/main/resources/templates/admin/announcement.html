@@ -62,7 +62,7 @@
                                 <tr th:each="post, status : ${postPage}" th:unless="${postPage.isEmpty()}">
                                     <td th:text="${post.postId}"></td>
                                     <td>
-                                        <a th:text="${post.title}" th:href="@{/admin/announcementRead(postId=${post.postId})}"></a>
+                                        <a th:text="${post.title}" th:href="@{/admin/announcement/read(postId=${post.postId})}"></a>
                                     </td>
                                     <td th:text="${post.userNameKor}" class="center"></td>
                                     <td th:text="${#temporals.format(post.createdAt, 'yy-MM-dd HH:mm')}"></td>

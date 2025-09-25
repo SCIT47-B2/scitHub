@@ -1,18 +1,87 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org"
-    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-    layout:decorate="~{layouts/defaultLayout}">
-    <head>
-        <title>Announcement Read</title>
-        <th:block layout:fragment="css">
-        </th:block>
-    </head>
-    <body>
-        <section class="mainGrid" aria-label="메인 영역" layout:fragment="content">
-            <!-- 이곳에 작성하면 메인 영역에 내용이 추가됩니다. -->
-            <img th:src="@{/images/bluePeople.png}" alt="파란색 사람들">
-        </section>
-        <th:block layout:fragment="script">
-        </th:block>
-    </body>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layouts/defaultLayout}" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <title>게시글 읽기</title>
+    <th:block layout:fragment="css">
+        <link rel="stylesheet" th:href='@{/css/community/pageFormat.css}'>
+        <link rel="stylesheet" th:href="@{/css/community/readPost.css}">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    </th:block>
+    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+</head>
+
+<body>
+    <section class="mainField" aria-label="메인 영역" layout:fragment="content">
+        <div class="contentGrid">
+            <div class="page-container">
+                <!-- 메인 레이아웃 (화살표 + 게시글 컨텐츠) -->
+                <div class="main-layout">
+                    <!-- 좌측 네비게이션 (뒤로가기 화살표) -->
+                    <div class="nav-aside">
+                        <a href="javascript:history.back();" class="back-arrow">
+                            <i class="fa-solid fa-arrow-left"></i>
+                        </a>
+                    </div>
+
+                    <!-- 게시글 전체를 감싸는 흰색 컨테이너 -->
+                    <div class="post-wrapper">
+                        <!-- 게시글 상단: 작성자 정보 및 버튼 -->
+                        <div class="post-header">
+                            <div class="author-info">
+                                <img th:if="${!#strings.isEmpty(post.avatarUrl)}"
+                                th:src="@{/images/avatar/{f}(f=${post.avatarUrl})}" alt="プロフィールイメージ" class="profile-pic">
+                                <img th:unless="${!#strings.isEmpty(post.avatarUrl)}"
+                                    th:src="@{/images/chiikawaPuzzle.png}" alt="仮のプロフィールイメージ" class="profile-pic">
+                                <div class="author-details">
+                                    <span th:text="${post.username}" class="author-name"></span>
+                                    <span class="post-date" th:text="${#temporals.format(post.createdAt, 'yyyy年 MM月 dd日 HH:mm:ss')}"></span>
+                                </div>
+                            </div>
+                            <!-- 게시글 삭제/수정 버튼(해당 유저가 작성한 게시글일 시) -->
+                            <div class="post-actions">
+                                <th:block th:if="${post.username == #authentication.name}">
+                                    <button type="button" class="action-btn" id="deletePostBtn"><i class="fa-solid fa-trash"></i>削除する</button>
+                                    <button type="button" class="action-btn" id="updatePostBtn"><i class="fa-solid fa-pen-to-square"></i>修正する</button>
+                                </th:block>
+                                <!--
+                                <div class="bookmark">
+                                    <i class="fa-solid fa-bookmark"></i>
+                                </div>
+                                -->
+                            </div>
+                        </div>
+
+                        <!-- 게시글 본문 -->
+                        <div class="post-body">
+                            <h1 class="post-title" th:text="${post.title}"></h1>
+                            <!-- 게시글 식별자 (hidden) -->
+                            <input type="hidden" id="postId" th:value="${post.postId}">
+                            <div class="post-content">
+                                <div class="content-display" th:utext="${post.content}"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <th:block layout:fragment="script">
+        <script>
+            $('#deletePostBtn').click(function() {
+                const flag = confirm("本当にこのポストを削除してもよろしいですか?");
+                if(flag) {
+                    const postId = $('#postId').val();
+                    location.href = `delete?postId=${postId}`;
+                }
+            });
+            $('#updatePostBtn').click(function() {
+                const postId = $('#postId').val();
+                location.href = `update?postId=${postId}`;
+            });
+        </script>
+    </th:block>
+</body>
+
 </html>
