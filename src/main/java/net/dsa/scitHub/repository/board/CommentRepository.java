@@ -21,6 +21,9 @@ public interface CommentRepository extends JpaRepository<Comment, Integer> {
     /** 게시글별 댓글 조회(등록한 순서대로) */
     List<Comment> findByPost_PostIdOrderByCreatedAtDesc(Integer postId);
 
+    /** 게시글별 댓글 조회(오래된 순서로) */
+    List<Comment> findByPost_PostIdOrderByCreatedAtAsc(Integer postId);
+
     /** 사용자별 댓글 조회 (페이징) */
     Page<Comment> findByUser_UserId(Integer userId, Pageable pageable);
 

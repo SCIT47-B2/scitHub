@@ -548,7 +548,7 @@ public class CommunityService {
         // 게시글 실존 여부 확인
         if(pr.existsById(postId)) {
             // 해당 게시글에 연결된 댓글을 등록 날짜순으로 검색
-            List<Comment> comments = cr.findByPost_PostIdOrderByCreatedAtDesc(postId);
+            List<Comment> comments = cr.findByPost_PostIdOrderByCreatedAtAsc(postId);
             List<CommentDTO> commentList = new ArrayList<>();
             for (Comment comment : comments) {
                 CommentDTO commentDTO = CommentDTO.builder()
