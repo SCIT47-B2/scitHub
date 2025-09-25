@@ -227,7 +227,7 @@ public class AdminController {
 			return "admin/announcementUpdateForm";
 		} catch (Exception e) {
 			log.debug("[예외 발생] {}", e.getMessage());
-			return "redirect:";
+			return "redirect:/admin/announcement";
 		}
 	}
 
