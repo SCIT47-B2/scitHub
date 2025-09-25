@@ -22,7 +22,6 @@
                             <span class="tabLabel">カレンダー</span>
                         </a>
                         <a class="tab"
-                            sec:authorize="hasRole('admin')"
                             th:href="${ctx + '/admin/announcement'}"
                             th:classappend="${#strings.startsWith(activeUri, ctx + '/admin')} ? 'active' : ''"
                             th:attr="aria-current=${#strings.startsWith(activeUri, ctx + '/admin')} ? 'page' : null">
