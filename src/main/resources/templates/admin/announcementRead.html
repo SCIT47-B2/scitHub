@@ -1,87 +1,122 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
     layout:decorate="~{layouts/defaultLayout}" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+    <head>
+        <title>게시글 읽기</title>
+        <th:block layout:fragment="css">
+            <link rel="stylesheet" th:href='@{/css/community/pageFormat.css}'>
+            <link rel="stylesheet" th:href="@{/css/community/readPost.css}">
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+        </th:block>
+        <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+    </head>
 
-<head>
-    <title>게시글 읽기</title>
-    <th:block layout:fragment="css">
-        <link rel="stylesheet" th:href='@{/css/community/pageFormat.css}'>
-        <link rel="stylesheet" th:href="@{/css/community/readPost.css}">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    </th:block>
-    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
-</head>
-
-<body>
-    <section class="mainField" aria-label="메인 영역" layout:fragment="content">
-        <div class="contentGrid">
-            <div class="page-container">
-                <!-- 메인 레이아웃 (화살표 + 게시글 컨텐츠) -->
-                <div class="main-layout">
-                    <!-- 좌측 네비게이션 (뒤로가기 화살표) -->
-                    <div class="nav-aside">
-                        <a href="javascript:history.back();" class="back-arrow">
-                            <i class="fa-solid fa-arrow-left"></i>
-                        </a>
-                    </div>
-
-                    <!-- 게시글 전체를 감싸는 흰색 컨테이너 -->
-                    <div class="post-wrapper">
-                        <!-- 게시글 상단: 작성자 정보 및 버튼 -->
-                        <div class="post-header">
-                            <div class="author-info">
-                                <img th:if="${!#strings.isEmpty(post.avatarUrl)}"
-                                th:src="@{/images/avatar/{f}(f=${post.avatarUrl})}" alt="プロフィールイメージ" class="profile-pic">
-                                <img th:unless="${!#strings.isEmpty(post.avatarUrl)}"
-                                    th:src="@{/images/chiikawaPuzzle.png}" alt="仮のプロフィールイメージ" class="profile-pic">
-                                <div class="author-details">
-                                    <span th:text="${post.username}" class="author-name"></span>
-                                    <span class="post-date" th:text="${#temporals.format(post.createdAt, 'yyyy年 MM月 dd日 HH:mm:ss')}"></span>
-                                </div>
-                            </div>
-                            <!-- 게시글 삭제/수정 버튼(해당 유저가 작성한 게시글일 시) -->
-                            <div class="post-actions">
-                                <th:block th:if="${post.username == #authentication.name}">
-                                    <button type="button" class="action-btn" id="deletePostBtn"><i class="fa-solid fa-trash"></i>削除する</button>
-                                    <button type="button" class="action-btn" id="updatePostBtn"><i class="fa-solid fa-pen-to-square"></i>修正する</button>
-                                </th:block>
-                                <!--
-                                <div class="bookmark">
-                                    <i class="fa-solid fa-bookmark"></i>
-                                </div>
-                                -->
-                            </div>
+    <body>
+        <section class="mainField" aria-label="메인 영역" layout:fragment="content">
+            <div class="contentGrid">
+                <div class="page-container">
+                    <!-- 메인 레이아웃 (화살표 + 게시글 컨텐츠) -->
+                    <div class="main-layout">
+                        <!-- 좌측 네비게이션 (뒤로가기 화살표) -->
+                        <div class="nav-aside">
+                            <a class="back-arrow" th:data-list-url="@{/admin/announcement(boardName=${post.board})}">
+                                <i class="fa-solid fa-arrow-left"></i>
+                            </a>
                         </div>
 
-                        <!-- 게시글 본문 -->
-                        <div class="post-body">
-                            <h1 class="post-title" th:text="${post.title}"></h1>
-                            <!-- 게시글 식별자 (hidden) -->
-                            <input type="hidden" id="postId" th:value="${post.postId}">
-                            <div class="post-content">
-                                <div class="content-display" th:utext="${post.content}"></div>
+                        <!-- 게시글 전체를 감싸는 흰색 컨테이너 -->
+                        <div class="post-wrapper">
+                            <!-- 게시글 상단: 작성자 정보 및 버튼 -->
+                            <div class="post-header">
+                                <div class="author-info">
+                                    <img th:if="${!#strings.isEmpty(post.avatarUrl)}"
+                                    th:src="@{/images/avatar/{f}(f=${post.avatarUrl})}" alt="プロフィールイメージ" class="profile-pic">
+                                    <img th:unless="${!#strings.isEmpty(post.avatarUrl)}"
+                                        th:src="@{/images/chiikawaPuzzle.png}" alt="仮のプロフィールイメージ" class="profile-pic">
+                                    <div class="author-details">
+                                        <span th:text="${post.username}" class="author-name"></span>
+                                        <span class="post-date" th:text="${#temporals.format(post.createdAt, 'yyyy年 MM月 dd日 HH:mm:ss')}"></span>
+                                    </div>
+                                </div>
+                                <!-- 게시글 삭제/수정 버튼(해당 유저가 작성한 게시글일 시) -->
+                                <div class="post-actions">
+                                    <th:block th:if="${post.username == #authentication.name}">
+                                        <button type="button" class="action-btn" id="deletePostBtn"><i class="fa-solid fa-trash"></i>削除する</button>
+                                        <button type="button" class="action-btn" id="updatePostBtn"><i class="fa-solid fa-pen-to-square"></i>修正する</button>
+                                    </th:block>
+                                    <!--
+                                    <div class="bookmark">
+                                        <i class="fa-solid fa-bookmark"></i>
+                                    </div>
+                                    -->
+                                </div>
+                            </div>
+
+                            <!-- 게시글 본문 -->
+                            <div class="post-body">
+                                <h1 class="post-title" th:text="${post.title}"></h1>
+                                <!-- 게시글 식별자 (hidden) -->
+                                <input type="hidden" id="postId" th:value="${post.postId}">
+                                <div class="post-content">
+                                    <div class="content-display" th:utext="${post.content}"></div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
-    <th:block layout:fragment="script">
-        <script>
-            $('#deletePostBtn').click(function() {
-                const flag = confirm("本当にこのポストを削除してもよろしいですか?");
-                if(flag) {
-                    const postId = $('#postId').val();
-                    location.href = `delete?postId=${postId}`;
-                }
-            });
-            $('#updatePostBtn').click(function() {
-                const postId = $('#postId').val();
-                location.href = `update?postId=${postId}`;
-            });
-        </script>
-    </th:block>
-</body>
+        </section>
+        <th:block layout:fragment="script">
+            <script>
+                $(document).ready(function() {
+                    /**
+                    * 뒤로가기 버튼 이벤트 처리
+                    * - 이전 페이지가 글쓰기, 수정 페이지인 경우 해당 게시판의 목록 페이지로 이동
+                    * - 이전 페이지가 글쓰기, 수정 페이지가 아닌 경우 일반적인 뒤로가기 동작 수행
+                    * - Referrer 정보가 없는 경우(북마크나 URL 직접 입력으로 접속한 경우) 해당 게시판의 목록 페이지로 이동
+                    */
+                    $('.back-arrow').click(function(e) {
+                        e.preventDefault(); // <a> 태그의 기본 링크 이동 동작 방지
 
+                        const listUrl = $(this).data('list-url');
+                        const referrer = document.referrer;
+
+                        // 1. 이전 페이지 URL(referrer) 정보가 있는지 확인
+                        if (referrer) {
+                            const previousUrl = new URL(referrer);
+
+                            // 이전 페이지가 글쓰기 페이지('/announcement/write') 또는 수정 페이지('/announcement/update')인 경우
+                            if (previousUrl.pathname.includes('/write') || previousUrl.pathname.includes('/update')) {
+                                // 해당 공지 게시판의 기본 목록 페이지로 이동
+                                location.href = listUrl;
+                            }
+                            // 4. 그 외 다른 페이지에서 넘어온 경우
+                            else {
+                                // 일반적인 뒤로가기 동작 수행
+                                history.back();
+                            }
+                        }
+                        // 5. Referrer 정보가 없는 경우 (북마크나 URL 직접 입력으로 접속한 경우)
+                        else {
+                            // 기본 동작으로 게시판 목록으로 이동
+                            location.href = listUrl;
+                        }
+                    });
+                });
+
+                // 삭제 및 수정 버튼 이벤트 처리
+                $('#deletePostBtn').click(function() {
+                    const flag = confirm("本当にこのポストを削除してもよろしいですか?");
+                    if(flag) {
+                        const postId = $('#postId').val();
+                        location.href = `delete?postId=${postId}`;
+                    }
+                });
+                $('#updatePostBtn').click(function() {
+                    const postId = $('#postId').val();
+                    location.href = `update?postId=${postId}`;
+                });
+            </script>
+        </th:block>
+    </body>
 </html>
