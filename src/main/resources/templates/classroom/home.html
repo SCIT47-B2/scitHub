@@ -16,245 +16,243 @@
                 gap: 0; /* 위젯 사이의 기본 간격은 0으로 하고 각 위젯의 margin으로 조절 */
             }
 
-        /* ============================================
-        모던 캘린더 위젯 스타일 (FullCalendar 커스터마이징)
-        ============================================ */
+            /* ============================================
+            모던 캘린더 위젯 스타일 (FullCalendar 커스터마이징)
+            ============================================ */
 
-        /* =========================
-        1. 위젯 컨테이너
-        ========================= */
-        .home-schedule-widget {
-            background: #ffffff;
-            border-radius: 16px;
-            padding: 0;
-            margin: 20px 0;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-            overflow: hidden;
-            border: none;
-        }
-
-        /* =========================
-        2. 헤더 영역
-        ========================= */
-        .widget-header {
-            background: #ffffff;
-            padding: 20px 24px;
-            border-bottom: 1px solid #f1f3f5;
-        }
-
-        .widget-header h3 {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin: 0;
-            color: #212529;
-        }
-
-        /* =========================
-        3. 캘린더 본체
-        ========================= */
-        #mini-calendar {
-            background: #ffffff;
-            padding: 20px;
-            border: none;
-            max-height: 400px;  /* 최대 높이 설정 */
-            overflow-y: auto;   /* 세로 스크롤 활성화 */
-            overflow-x: hidden; /* 가로 스크롤 숨김 */
-        }
-
-        /* =========================
-        4. 모든 테두리 제거
-        ========================= */
-        #mini-calendar .fc-scrollgrid,
-        #mini-calendar .fc-scrollgrid-section,
-        #mini-calendar .fc-scrollgrid-section > td,
-        #mini-calendar .fc-scrollgrid-section-body > td,
-        #mini-calendar .fc-scrollgrid-sync-table,
-        #mini-calendar .fc-timegrid-body,
-        #mini-calendar .fc-timegrid-slots,
-        #mini-calendar .fc-timegrid-slots table,
-        #mini-calendar .fc-timegrid-slots td,
-        #mini-calendar .fc-timegrid-axis,
-        #mini-calendar .fc-timegrid-axis-frame,
-        #mini-calendar .fc-timegrid-axis-chunk,
-        #mini-calendar .fc-timegrid-slot-label-frame,
-        #mini-calendar .fc-timegrid-cols,
-        #mini-calendar .fc-timegrid-cols table,
-        #mini-calendar .fc-timegrid-col,
-        #mini-calendar .fc-scroller,
-        #mini-calendar .fc-scroller-liquid,
-        #mini-calendar .fc-scroller-liquid-absolute,
-        #mini-calendar .fc-col-header {
-            border: none !important;
-            outline: none !important;
-        }
-
-        /* =========================
-        5. 시간 구분선 설정
-        ========================= */
-        /* 각 시간 슬롯이 확실히 구분되도록 - 이것만 사용 */
-        #mini-calendar .fc-timegrid-slots tr {
-            border-bottom: 1px solid #dee2e6 !important;
-        }
-
-        /* 다른 모든 border 제거 */
-        #mini-calendar .fc-timegrid-slot {
-            height: 40px !important;
-            border: none !important;
-        }
-
-        #mini-calendar .fc-timegrid-slot-label-frame {
-            border: none !important;  /* 이 부분 제거! */
-        }
-
-        #mini-calendar .fc-timegrid-slot-lane {
-            border: none !important;
-        }
-
-        /* 마지막 시간 슬롯의 선 제거 */
-        #mini-calendar .fc-timegrid-slots tr:last-child {
-            border-bottom: none !important;
-        }
-
-        /* 30분 단위 슬롯 숨기기 */
-        #mini-calendar .fc-timegrid-slot-minor {
-            display: none;
-        }
-
-        /* 선이 전체 너비로 연결되도록 설정 */
-        #mini-calendar .fc-timegrid-slots table {
-            width: 100%;
-        }
-
-        /* =========================
-        6. 시간 라벨 스타일
-        ========================= */
-        #mini-calendar .fc-timegrid-slot-label {
-            font-size: 0.75rem;
-            font-weight: 400;
-            color: #6c757d;
-            vertical-align: top;
-            padding-top: 4px;
-            border-top: none !important;
-            border-left: none !important;
-            border-right: none !important;
-        }
-
-        #mini-calendar .fc-timegrid-slot-label-cushion {
-            padding: 8px 4px;
-        }
-
-        /* 시간축과 이벤트 영역 사이 세로선 제거 */
-        #mini-calendar .fc-timegrid-axis,
-        #mini-calendar .fc-timegrid-divider {
-            border: none !important;
-            display: none;
-        }
-
-        /* =========================
-        7. 배경색 설정
-        ========================= */
-        #mini-calendar .fc-day,
-        #mini-calendar .fc-timegrid-col,
-        #mini-calendar .fc-timegrid-col-bg,
-        #mini-calendar .fc-day-today {
-            background: #ffffff !important;
-        }
-
-        #mini-calendar .fc-timegrid-col-events {
-            margin: 0 4px;
-        }
-
-        /* =========================
-        8. 이벤트 스타일
-        ========================= */
-        #mini-calendar .fc-event {
-            border: none !important;
-            background: transparent !important;
-            padding: 2px !important;
-            margin: 1px !important;
-        }
-
-        #mini-calendar .fc-event:hover {
-            transform: translateY(-1px);
-            transition: transform 0.2s ease;
-        }
-
-        /* FullCalendar 기본 스타일 제거 */
-        #mini-calendar .fc-event-main {
-            background: transparent !important;
-            border: none !important;
-        }
-
-        #mini-calendar .fc-timegrid-event {
-            margin: 1px;
-            z-index: auto !important;
-        }
-
-        /* =========================
-        9. 추가 기능 스타일
-        ========================= */
-        /* 현재 시간 표시선 */
-        #mini-calendar .fc-timegrid-now-indicator-line {
-            border: 2px solid #ef4444;
-            border-radius: 2px;
-        }
-
-        #mini-calendar .fc-timegrid-now-indicator-arrow {
-            border-color: #ef4444;
-        }
-
-        /* 빈 슬롯 hover 효과 */
-        #mini-calendar .fc-timegrid-slot-lane:hover {
-            background: rgba(102, 126, 234, 0.03);
-            transition: background 0.2s ease;
-        }
-
-        /* 스크롤바 */
-        #mini-calendar::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        #mini-calendar::-webkit-scrollbar-thumb {
-            background: #dee2e6;
-            border-radius: 10px;
-        }
-
-        #mini-calendar::-webkit-scrollbar-track {
-            background: #f1f5f9;
-            border-radius: 10px;
-        }
-
-        /* =========================
-        10. 애니메이션
-        ========================= */
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateX(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        /* =========================
-        11. 반응형 디자인
-        ========================= */
-        @media (max-width: 768px) {
+            /* =========================
+            1. 위젯 컨테이너
+            ========================= */
             .home-schedule-widget {
-                margin: 10px 0;
+                background: #ffffff;
                 border-radius: 16px;
+                padding: 0;
+                margin: 20px 0;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+                overflow: hidden;
+                border: none;
             }
-            
+
+            /* =========================
+            2. 헤더 영역
+            ========================= */
             .widget-header {
-                padding: 16px 20px;
+                background: #ffffff;
+                padding: 20px 24px;
+                border-bottom: 1px solid #f1f3f5;
             }
-            
+
+            .widget-header h3 {
+                font-size: 1.1rem;
+                font-weight: 600;
+                margin: 0;
+                color: #212529;
+            }
+
+            /* =========================
+            3. 캘린더 본체
+            ========================= */
             #mini-calendar {
-                padding: 16px;
+                background: #ffffff;
+                padding: 20px;
+                border: none;
+                max-height: 400px;  /* 최대 높이 설정 */
+                overflow-y: auto;   /* 세로 스크롤 활성화 */
+                overflow-x: hidden; /* 가로 스크롤 숨김 */
             }
-        }
+
+            /* =========================
+            4. 모든 테두리 제거
+            ========================= */
+            #mini-calendar .fc-scrollgrid,
+            #mini-calendar .fc-scrollgrid-section,
+            #mini-calendar .fc-scrollgrid-section > td,
+            #mini-calendar .fc-scrollgrid-section-body > td,
+            #mini-calendar .fc-scrollgrid-sync-table,
+            #mini-calendar .fc-timegrid-body,
+            #mini-calendar .fc-timegrid-slots,
+            #mini-calendar .fc-timegrid-slots table,
+            #mini-calendar .fc-timegrid-slots td,
+            #mini-calendar .fc-timegrid-axis,
+            #mini-calendar .fc-timegrid-axis-frame,
+            #mini-calendar .fc-timegrid-axis-chunk,
+            #mini-calendar .fc-timegrid-slot-label-frame,
+            #mini-calendar .fc-timegrid-cols,
+            #mini-calendar .fc-timegrid-cols table,
+            #mini-calendar .fc-timegrid-col,
+            #mini-calendar .fc-scroller,
+            #mini-calendar .fc-scroller-liquid,
+            #mini-calendar .fc-scroller-liquid-absolute,
+            #mini-calendar .fc-col-header {
+                border: none !important;
+                outline: none !important;
+            }
+
+            /* =========================
+            5. 시간 구분선 설정
+            ========================= */
+            /* 각 시간 슬롯이 확실히 구분되도록 - 이것만 사용 */
+            #mini-calendar .fc-timegrid-slots tr {
+                border-bottom: 1px solid #dee2e6 !important;
+            }
+
+            /* 다른 모든 border 제거 */
+            #mini-calendar .fc-timegrid-slot {
+                height: 40px !important;
+                border: none !important;
+            }
+
+            #mini-calendar .fc-timegrid-slot-label-frame {
+                border: none !important;  /* 이 부분 제거! */
+            }
+
+            #mini-calendar .fc-timegrid-slot-lane {
+                border: none !important;
+            }
+
+            /* 마지막 시간 슬롯의 선 제거 */
+            #mini-calendar .fc-timegrid-slots tr:last-child {
+                border-bottom: none !important;
+            }
+
+            /* 30분 단위 슬롯 숨기기 */
+            #mini-calendar .fc-timegrid-slot-minor {
+                display: none;
+            }
+
+            /* 선이 전체 너비로 연결되도록 설정 */
+            #mini-calendar .fc-timegrid-slots table {
+                width: 100%;
+            }
+
+            /* =========================
+            6. 시간 라벨 스타일
+            ========================= */
+            #mini-calendar .fc-timegrid-slot-label {
+                font-size: 0.75rem;
+                font-weight: 400;
+                color: #6c757d;
+                vertical-align: top;
+                padding-top: 4px;
+                border-top: none !important;
+                border-left: none !important;
+                border-right: none !important;
+            }
+
+            #mini-calendar .fc-timegrid-slot-label-cushion {
+                padding: 8px 4px;
+            }
+
+            /* 시간축과 이벤트 영역 사이 세로선 제거 */
+            #mini-calendar .fc-timegrid-axis,
+            #mini-calendar .fc-timegrid-divider {
+                border: none !important;
+                display: none;
+            }
+
+            /* =========================
+            7. 배경색 설정
+            ========================= */
+            #mini-calendar .fc-day,
+            #mini-calendar .fc-timegrid-col,
+            #mini-calendar .fc-timegrid-col-bg,
+            #mini-calendar .fc-day-today {
+                background: #ffffff !important;
+            }
+
+            #mini-calendar .fc-timegrid-col-events {
+                margin: 0 4px;
+            }
+
+            /* =========================
+            8. 이벤트 스타일
+            ========================= */
+            #mini-calendar .fc-event {
+                border: none !important;
+                background: transparent !important;
+                padding: 2px !important;
+                margin: 1px !important;
+            }
+
+            #mini-calendar .fc-event:hover {
+                transform: translateY(-1px);
+                transition: transform 0.2s ease;
+            }
+
+            /* FullCalendar 기본 스타일 제거 */
+            #mini-calendar .fc-event-main {
+                background: transparent !important;
+                border: none !important;
+            }
+
+            #mini-calendar .fc-timegrid-event {
+                margin: 1px;
+                z-index: auto !important;
+            }
+
+            /* =========================
+            9. 추가 기능 스타일
+            ========================= */
+            /* 현재 시간 표시선 */
+            #mini-calendar .fc-timegrid-now-indicator-line {
+                border: 2px solid #ef4444;
+                border-radius: 2px;
+            }
+
+            #mini-calendar .fc-timegrid-now-indicator-arrow {
+                border-color: #ef4444;
+            }
+
+            /* 빈 슬롯 hover 효과 */
+            #mini-calendar .fc-timegrid-slot-lane:hover {
+                background: rgba(102, 126, 234, 0.03);
+                transition: background 0.2s ease;
+            }
+
+            /* 스크롤바 */
+            #mini-calendar::-webkit-scrollbar {
+                width: 6px;
+            }
+
+            #mini-calendar::-webkit-scrollbar-thumb {
+                background: #dee2e6;
+                border-radius: 10px;
+            }
+
+            #mini-calendar::-webkit-scrollbar-track {
+                background: #f1f5f9;
+                border-radius: 10px;
+            }
+
+            /* =========================
+            10. 애니메이션
+            ========================= */
+            @keyframes slideIn {
+                from {
+                    opacity: 0;
+                    transform: translateX(-10px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+            }
+
+            /* =========================
+            11. 반응형 디자인
+            ========================= */
+            @media (max-width: 768px) {
+                .home-schedule-widget {
+                    margin: 10px 0;
+                    border-radius: 16px;
+                }
+                .widget-header {
+                    padding: 16px 20px;
+                }
+                #mini-calendar {
+                    padding: 16px;
+                }
+            }
 
 
             /* --- D-Day 위젯  --- */
@@ -267,7 +265,7 @@
                 display: flex;
                 flex-direction: column;
                 gap: 10px; /* 카드 사이의 간격 */
-                
+
                 /* 스크롤 기능 */
                 max-height: 150px; /* 위젯의 최대 높이 (카드 2개 정도) */
                 overflow-y: auto;  /* 내용이 max-height를 넘으면 자동으로 세로 스크롤 생성 */
@@ -378,11 +376,11 @@
                     @param  없음
                     @return 없음(UI) */ -->
                 <section class="stackCard" aria-label="운영실">
-                    <a class="sectionHead" href="operations.html">運営室</a>
+                    <a class="sectionHead" th:href="@{/admin}">運営室</a>
                     <div class="sectionBody">
                     <ul class="noticeList">
-                        <li><a href="notice1.html">09/02(화) 20:00~21:00 네트워크 점검</a></li>
-                        <li><a href="notice2.html">09/05(금) 과제 제출 마감</a></li>
+                        <li><a th:href="@{/admin/announcement}">09/02(화) 20:00~21:00 네트워크 점검</a></li>
+                        <li><a th:href="@{/admin/announcement}">09/05(금) 과제 제출 마감</a></li>
                     </ul>
                     </div>
                 </section>
@@ -612,7 +610,7 @@
                         emptyEl.style.display = 'block';
                         return;
                     }
-                    
+
                     listEl.style.display = 'block';
                     footerEl.style.display = 'block';
                     emptyEl.style.display = 'none';
@@ -650,7 +648,7 @@
                         if (!response.ok) throw new Error('Failed to save');
                         alert('保存しました。');
                         document.getElementById('ddaySelectModal').style.display = 'none';
-                        
+
                         const updatedDdays = allDdays.map(d => ({ ...d, pinned: checkedIds.includes(String(d.ddayId)) }));
                         renderDdayWidget(updatedDdays);
                         renderDdayModal(updatedDdays);
@@ -690,7 +688,7 @@
                     } else {
                         ddayString = `D+${Math.abs(diffDays)}`;
                     }
-                    
+
                     return { ddayString, targetDate };
                 }
 
@@ -739,7 +737,7 @@
                             const title = arg.event.title;
                             const start = arg.event.start;
                             const end = arg.event.end;
-                                                    
+
                             // 1. 시작 시간은 항상 있으므로 안전하게 변환합니다.
                             const startTime = start.toLocaleTimeString('ja-JP', {
                                 hour: '2-digit',
@@ -753,13 +751,13 @@
                                 minute: '2-digit',
                                 hour12: false
                             }) : '';
-                            
+
                             // 색상 결정 (PUBLIC은 주황, PRIVATE는 파랑)
                             const isPublic = arg.event.extendedProps.visibility === 'PUBLIC';
                             const bgColor = isPublic ? '#ff8c42' : '#7c93c3';
-                            
+
                             // HTML 생성
-                            return { 
+                            return {
                                 html: `
                                     <div style="
                                         background: ${bgColor};
@@ -785,7 +783,7 @@
                                             opacity: 0.9;
                                         ">${startTime} - ${endTime}</div>
                                     </div>
-                                ` 
+                                `
                             };
                         },
                         viewDidMount: function(info) {

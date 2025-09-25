@@ -41,8 +41,8 @@ public class WebSecurityConfig {
             // 요청에 대한 권한 설정
             .authorizeHttpRequests(author -> author
                 .requestMatchers(PUBLIC_URLS).permitAll()   // 모두 접근 허용
-                // /admin/ 경로로 들어오는 모든 요청은 ADMIN 권한을 가진 사용자만 접근 가능
-                .requestMatchers("/admin/**").hasRole("ADMIN")
+                // /admin/manageUser 경로로 들어오는 요청은 ADMIN 권한을 가진 사용자만 접근 가능
+                .requestMatchers("/admin/manageUser").hasRole("ADMIN")
                 .anyRequest().authenticated()               // 그 외의 모든 요청은 인증 필요
             )
             // 폼 로그인 설정
