@@ -229,6 +229,14 @@ document.addEventListener('DOMContentLoaded', function onReady() {
 
   addDateValidationListeners();
 
+  const isAllDayCheckbox = document.getElementById('isAllDay');
+  if (isAllDayCheckbox) {
+    isAllDayCheckbox.addEventListener('change', function() {
+      console.log('종일 체크박스 변경됨:', this.checked);
+      toggleDateInputs();
+    });
+  }
+  
   const calendarEl = document.getElementById('calendar');
   const calendar = new FullCalendar.Calendar(calendarEl, {
     initialView: 'dayGridMonth',
@@ -402,6 +410,15 @@ document.addEventListener('DOMContentLoaded', function onReady() {
   // 폼 제출(등록/수정 공용)
   document.querySelector('#eventForm').addEventListener('submit', function (e) {
     e.preventDefault();
+    
+
+    // 제목 입력했는지 유효성 검사
+    const titleInput = document.getElementById('eventTitle');
+    if (titleInput.value.trim() === '') {
+      alert('タイトルを入力してください。');
+      titleInput.focus();
+      return;
+    }
 
     const formData = new FormData(this);
     const isAllDay = document.getElementById('isAllDay').checked;

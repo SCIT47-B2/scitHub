@@ -252,7 +252,7 @@
 /* Different block types */
 .block.labelBar {
     background: transparent;
-    border: none;
+    /*border: none;*/
     color: var(--text-secondary);
     font-weight: 700;
     font-size: 12px;
@@ -337,4 +337,9 @@
 .close-button:hover {
     transform: scale(1.1);
     color: var(--text-primary);
+}
+
+.active-room {
+    background-color: #cfe0ff !important; /* 예시) 연한 파란색 배경 */
+    font-weight: 600;                      /* 글씨를 굵게 하여 가독성을 높입니다 */
 }

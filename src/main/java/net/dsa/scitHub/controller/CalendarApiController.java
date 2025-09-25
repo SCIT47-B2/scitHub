@@ -197,4 +197,17 @@ public class CalendarApiController {
         // 200 OK와 DTO반환.
         return ResponseEntity.ok(updatedDTO);
     }
+
+    /**
+     * 홈 화면 위젯용 : 사용자가 선택한 D-Day를 고정하는 함수
+     * @param pinnedIds javaScript에서 보낸 '고정할 D-Day ID 목록'
+     */
+    @PostMapping("/dday/pin")
+    public ResponseEntity<Void> pinDdaysForWidget(
+                    @AuthenticationPrincipal AuthenticatedUser userDetails,
+                    @RequestBody List<Integer> pinnedIds) {
+        
+        ds.updatePinnedDdays(userDetails.getId(), pinnedIds);
+        return ResponseEntity.ok().build();
+    }
 }
