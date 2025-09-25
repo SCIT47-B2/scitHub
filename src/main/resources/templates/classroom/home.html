@@ -9,65 +9,367 @@
             <link rel="stylesheet" th:href="@{/css/reservation.css}">
         </th:block>
         <style>
-            /* 홈 화면 위젯 컨테이너 */
+            /* 우측 위젯 컬럼 스타일 (dday, 일정)*/
+            .rightCol {
+                display: flex;
+                flex-direction: column;
+                gap: 0; /* 위젯 사이의 기본 간격은 0으로 하고 각 위젯의 margin으로 조절 */
+            }
+
+        /* ============================================
+        모던 캘린더 위젯 스타일 (FullCalendar 커스터마이징)
+        ============================================ */
+
+        /* =========================
+        1. 위젯 컨테이너
+        ========================= */
+        .home-schedule-widget {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 0;
+            margin: 20px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+            border: none;
+        }
+
+        /* =========================
+        2. 헤더 영역
+        ========================= */
+        .widget-header {
+            background: #ffffff;
+            padding: 20px 24px;
+            border-bottom: 1px solid #f1f3f5;
+        }
+
+        .widget-header h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 0;
+            color: #212529;
+        }
+
+        /* =========================
+        3. 캘린더 본체
+        ========================= */
+        #mini-calendar {
+            background: #ffffff;
+            padding: 20px;
+            border: none;
+            max-height: 400px;  /* 최대 높이 설정 */
+            overflow-y: auto;   /* 세로 스크롤 활성화 */
+            overflow-x: hidden; /* 가로 스크롤 숨김 */
+        }
+
+        /* =========================
+        4. 모든 테두리 제거
+        ========================= */
+        #mini-calendar .fc-scrollgrid,
+        #mini-calendar .fc-scrollgrid-section,
+        #mini-calendar .fc-scrollgrid-section > td,
+        #mini-calendar .fc-scrollgrid-section-body > td,
+        #mini-calendar .fc-scrollgrid-sync-table,
+        #mini-calendar .fc-timegrid-body,
+        #mini-calendar .fc-timegrid-slots,
+        #mini-calendar .fc-timegrid-slots table,
+        #mini-calendar .fc-timegrid-slots td,
+        #mini-calendar .fc-timegrid-axis,
+        #mini-calendar .fc-timegrid-axis-frame,
+        #mini-calendar .fc-timegrid-axis-chunk,
+        #mini-calendar .fc-timegrid-slot-label-frame,
+        #mini-calendar .fc-timegrid-cols,
+        #mini-calendar .fc-timegrid-cols table,
+        #mini-calendar .fc-timegrid-col,
+        #mini-calendar .fc-scroller,
+        #mini-calendar .fc-scroller-liquid,
+        #mini-calendar .fc-scroller-liquid-absolute,
+        #mini-calendar .fc-col-header {
+            border: none !important;
+            outline: none !important;
+        }
+
+        /* =========================
+        5. 시간 구분선 설정
+        ========================= */
+        /* 각 시간 슬롯이 확실히 구분되도록 - 이것만 사용 */
+        #mini-calendar .fc-timegrid-slots tr {
+            border-bottom: 1px solid #dee2e6 !important;
+        }
+
+        /* 다른 모든 border 제거 */
+        #mini-calendar .fc-timegrid-slot {
+            height: 40px !important;
+            border: none !important;
+        }
+
+        #mini-calendar .fc-timegrid-slot-label-frame {
+            border: none !important;  /* 이 부분 제거! */
+        }
+
+        #mini-calendar .fc-timegrid-slot-lane {
+            border: none !important;
+        }
+
+        /* 마지막 시간 슬롯의 선 제거 */
+        #mini-calendar .fc-timegrid-slots tr:last-child {
+            border-bottom: none !important;
+        }
+
+        /* 30분 단위 슬롯 숨기기 */
+        #mini-calendar .fc-timegrid-slot-minor {
+            display: none;
+        }
+
+        /* 선이 전체 너비로 연결되도록 설정 */
+        #mini-calendar .fc-timegrid-slots table {
+            width: 100%;
+        }
+
+        /* =========================
+        6. 시간 라벨 스타일
+        ========================= */
+        #mini-calendar .fc-timegrid-slot-label {
+            font-size: 0.75rem;
+            font-weight: 400;
+            color: #6c757d;
+            vertical-align: top;
+            padding-top: 4px;
+            border-top: none !important;
+            border-left: none !important;
+            border-right: none !important;
+        }
+
+        #mini-calendar .fc-timegrid-slot-label-cushion {
+            padding: 8px 4px;
+        }
+
+        /* 시간축과 이벤트 영역 사이 세로선 제거 */
+        #mini-calendar .fc-timegrid-axis,
+        #mini-calendar .fc-timegrid-divider {
+            border: none !important;
+            display: none;
+        }
+
+        /* =========================
+        7. 배경색 설정
+        ========================= */
+        #mini-calendar .fc-day,
+        #mini-calendar .fc-timegrid-col,
+        #mini-calendar .fc-timegrid-col-bg,
+        #mini-calendar .fc-day-today {
+            background: #ffffff !important;
+        }
+
+        #mini-calendar .fc-timegrid-col-events {
+            margin: 0 4px;
+        }
+
+        /* =========================
+        8. 이벤트 스타일
+        ========================= */
+        #mini-calendar .fc-event {
+            border: none !important;
+            background: transparent !important;
+            padding: 2px !important;
+            margin: 1px !important;
+        }
+
+        #mini-calendar .fc-event:hover {
+            transform: translateY(-1px);
+            transition: transform 0.2s ease;
+        }
+
+        /* FullCalendar 기본 스타일 제거 */
+        #mini-calendar .fc-event-main {
+            background: transparent !important;
+            border: none !important;
+        }
+
+        #mini-calendar .fc-timegrid-event {
+            margin: 1px;
+            z-index: auto !important;
+        }
+
+        /* =========================
+        9. 추가 기능 스타일
+        ========================= */
+        /* 현재 시간 표시선 */
+        #mini-calendar .fc-timegrid-now-indicator-line {
+            border: 2px solid #ef4444;
+            border-radius: 2px;
+        }
+
+        #mini-calendar .fc-timegrid-now-indicator-arrow {
+            border-color: #ef4444;
+        }
+
+        /* 빈 슬롯 hover 효과 */
+        #mini-calendar .fc-timegrid-slot-lane:hover {
+            background: rgba(102, 126, 234, 0.03);
+            transition: background 0.2s ease;
+        }
+
+        /* 스크롤바 */
+        #mini-calendar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #mini-calendar::-webkit-scrollbar-thumb {
+            background: #dee2e6;
+            border-radius: 10px;
+        }
+
+        #mini-calendar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 10px;
+        }
+
+        /* =========================
+        10. 애니메이션
+        ========================= */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* =========================
+        11. 반응형 디자인
+        ========================= */
+        @media (max-width: 768px) {
             .home-schedule-widget {
-                max-width: 400px;
-                margin: 20px auto;
-                padding: 20px;
-                background-color: #fff;
-                border-radius: 20px;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+                margin: 10px 0;
+                border-radius: 16px;
             }
-
-            .widget-header h3 {
-                font-size: 1.5em;
-                margin-bottom: 15px;
+            
+            .widget-header {
+                padding: 16px 20px;
             }
-
-            /* FullCalendar 기본 UI 숨기기 및 수정 */
-            #mini-calendar .fc-theme-standard {
-                border: none; /* 전체 테두리 제거 */
+            
+            #mini-calendar {
+                padding: 16px;
             }
+        }
 
-            #mini-calendar .fc-timegrid-slot-label {
-                border: none; /* 시간 축 라인 제거 */
-            }
 
-            #mini-calendar .fc-timegrid-col.fc-day-today {
-                background-color: transparent; /* 오늘 날짜 배경색 제거 */
-            }
-
-            /* 커스텀 이벤트 블록 스타일 */
-            #mini-calendar .fc-timegrid-event {
-                border-radius: 15px !important; /* 모서리 둥글게 */
-                border: none;
-                padding: 8px;
+            /* --- D-Day 위젯  --- */
+            .dday-widget {
+                margin: 0;
+                background-color: transparent;
                 box-shadow: none;
+                padding: 0;
+                cursor: pointer;
+                display: flex;
+                flex-direction: column;
+                gap: 10px; /* 카드 사이의 간격 */
+                
+                /* 스크롤 기능 */
+                max-height: 150px; /* 위젯의 최대 높이 (카드 2개 정도) */
+                overflow-y: auto;  /* 내용이 max-height를 넘으면 자동으로 세로 스크롤 생성 */
             }
 
-            .custom-event-title {
-                font-weight: bold;
+            /* 새로운 D-Day 카드 아이템 스타일 */
+            .dday-item {
+                display: flex;
+                align-items: center;
+                padding: 15px 20px;
+                border-radius: 16px;
+                background-color: #e3eafc; /* 연한 파란색 배경 */
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+                transition: transform 0.2s;
+            }
+            .dday-item:hover {
+                transform: translateY(-2px);
+            }
+
+            /* D-Day 카운터 (D-54) 스타일 */
+            .dday-counter {
+                font-size: 1.2em;
+                font-weight: 700;
+                color: #495057;
+                margin-right: 15px;
+                min-width: 4em;      /* 최소 너비를 글자 크기의 4배로 지정 (값 조절 가능) */
+                display: inline-block; /* span 태그에 너비 속성을 적용하기 위해 필요 */
+            }
+
+            /* D-Day 제목 스타일 */
+            .dday-title {
                 font-size: 1em;
+                font-weight: 500;
+                color: #495057;
             }
 
-            .custom-event-time {
-                font-size: 0.8em;
-                opacity: 0.9;
+            /* D-Day 없을 때 안내 문구 스타일 */
+            .dday-item-empty {
+                width: 100%;
+                text-align: center;
+                color: #868e96;
+                font-size: 0.9em;
+                padding: 20px;
+                background-color: #f8f9fa;
+                border-radius: 16px;
+                box-sizing: border-box;
             }
 
-            /* 겹치는 이벤트 사이에 흰색 테두리를 추가하여 시각적으로 분리 */
-            #mini-calendar .fc-timegrid-event {
-                border: 2px solid white !important;
+            /* D-Day 카운터 (D-54) 스타일 */
+            .dday-counter {
+                font-size: 1.2em;
+                font-weight: 700;
+                color: #495057;
+                margin-right: 15px;
             }
 
-            /* 종일 이벤트 슬롯의 스타일링 (선택사항) */
-            #mini-calendar .fc-daygrid-day-frame {
-                padding: 5px;
+            /* D-Day 제목 스타일 */
+            .dday-title {
+                font-size: 1em;
+                font-weight: 500;
+                color: #495057;
+            }
+            /* --- D-Day 모달 --- */
+            .dday-modal-overlay {
+                position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.6);
+                backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 10000;
+            }
+            .dday-modal-content {
+                background: white; border-radius: 20px; padding: 24px; width: 90%; max-width: 450px;
+            }
+            .dday-modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #e9ecef; padding-bottom: 16px; }
+            .dday-modal-header h3 { margin: 0; font-size: 1.2em; }
+            .close-button { background: none; border: none; font-size: 1.8em; cursor: pointer; overflow-x: hidden;}
+            .dday-list { list-style: none; padding: 0; margin: 0; max-height: 300px; overflow-x: hidden; overflow-y: auto; }
+            .dday-list li { display: flex; align-items: center; padding: 12px 8px; border-bottom: 1px solid #f1f3f5; }
+            .dday-list li:last-child { border-bottom: none; }
+            .dday-list input[type="checkbox"] { margin-right: 15px; width: 20px; height: 20px; }
+            .dday-list .dday-date { font-size: 0.8em; color: #868e96; }
+            .dday-empty-state { text-align: center; padding: 40px 20px; }
+            .dday-empty-state p { margin-bottom: 70px; font-size: 1.1em; }
+            .dday-modal-footer { margin-top: 20px; padding-top: 20px; border-top: 1px solid #e9ecef; text-align: right; }
+            .btn { padding: 10px 20px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
+            .btn-primary { background: #4258BE; color: white; }
+
+            /* D-Day 정보 영역 (제목 + 날짜) */
+            .dday-list .dday-info {
+                flex-grow: 1;       /* 기존 속성 유지 */
+                overflow: hidden;     /* (추가) 자식 요소(제목)가 영역을 넘치면 숨김 처리 */
+                margin-right: 10px; /* (추가) 제목과 우측 카운터 사이의 간격을 줌 */
+                min-width: 0; /* <<<<<<< ✨ 이 한 줄이 핵심입니다! */
+            }
+
+            /* D-Day 제목 스타일 */
+            .dday-list .dday-title {
+                white-space: nowrap;      /* (추가) 제목이 길어도 줄바꿈하지 않음 */
+                overflow: hidden;         /* (추가) 영역을 넘어가는 텍스트는 숨김 */
+                text-overflow: ellipsis;  /* (추가) 숨겨진 텍스트를 ... 으로 표시 */
             }
         </style>
     </head>
     <body>
-        <section class="mainGrid" aria-label="메인 영역" layout:fragment="content">
+        <div class="mainGrid" aria-label="메인 영역" layout:fragment="content">
 
             <!-- 좌: 운영실 + 새로운 질문 (2단 블록) -->
             <div class="leftCol">
@@ -125,21 +427,21 @@
                         <div class="corridor" style="grid-column:13 / span 1; grid-row:3 / span 8;"></div>
 
                         <!-- 좌측 세로열 -->
-                        <a class="block small room" href="#" data-room-id="5" th:data-room-name="${classroomMap.get(5).getClassroomName()}" style="grid-column:1 / span 2; grid-row:3 / span 1; text-decoration:none;" >ルーム5</a>
-                        <a class="block small room" href="#" data-room-id="4" th:data-room-name="${classroomMap.get(4).getClassroomName()}" style="grid-column:1 / span 2; grid-row:4 / span 1; text-decoration:none;">ルーム4</a>
-                        <a class="block small room" href="#" data-room-id="3" th:data-room-name="${classroomMap.get(3).getClassroomName()}" style="grid-column:1 / span 2; grid-row:5 / span 1; text-decoration:none;">ルーム3</a>
-                        <a class="block small room" href="#" data-room-id="2" th:data-room-name="${classroomMap.get(2).getClassroomName()}" style="grid-column:1 / span 2; grid-row:6 / span 1; text-decoration:none;">ルーム2</a>
-                        <a class="block small room" href="#" data-room-id="1" th:data-room-name="${classroomMap.get(1).getClassroomName()}" style="grid-column:1 / span 2; grid-row:7 / span 1; text-decoration:none;">ルーム1</a>
+                        <a class="block small room" href="#" data-room-id="5" th:data-room-name="${classroomMap.get(5).getClassroomName()}" th:classappend="${classroomMap.get(5).isActive} ? 'active-room'" style="grid-column:1 / span 2; grid-row:3 / span 1; text-decoration:none;" >ルーム5</a>
+                        <a class="block small room" href="#" data-room-id="4" th:data-room-name="${classroomMap.get(4).getClassroomName()}" th:classappend="${classroomMap.get(4).isActive} ? 'active-room'" style="grid-column:1 / span 2; grid-row:4 / span 1; text-decoration:none;">ルーム4</a>
+                        <a class="block small room" href="#" data-room-id="3" th:data-room-name="${classroomMap.get(3).getClassroomName()}" th:classappend="${classroomMap.get(3).isActive} ? 'active-room'" style="grid-column:1 / span 2; grid-row:5 / span 1; text-decoration:none;">ルーム3</a>
+                        <a class="block small room" href="#" data-room-id="2" th:data-room-name="${classroomMap.get(2).getClassroomName()}" th:classappend="${classroomMap.get(2).isActive} ? 'active-room'" style="grid-column:1 / span 2; grid-row:6 / span 1; text-decoration:none;">ルーム2</a>
+                        <a class="block small room" href="#" data-room-id="1" th:data-room-name="${classroomMap.get(1).getClassroomName()}" th:classappend="${classroomMap.get(1).isActive} ? 'active-room'" style="grid-column:1 / span 2; grid-row:7 / span 1; text-decoration:none;">ルーム1</a>
                         <div class="block small gray"  style="grid-column:1 / span 2; grid-row:8 / span 1;">倉庫</div>
                         <div class="block small label" style="grid-column:1 / span 2; grid-row:9 / span 1;">面接室2</div>
                         <div class="block small label" style="grid-column:1 / span 2; grid-row:10 / span 1;">面接室1</div>
 
                         <!-- 좌측 2열 -->
-                        <a class="block small room" href="#" data-room-id="10" th:data-room-name="${classroomMap.get(10).getClassroomName()}" style="grid-column:3 / span 2; grid-row:3 / span 1; text-decoration:none;">ルーム10</a>
-                        <a class="block small room" href="#" data-room-id="9" th:data-room-name="${classroomMap.get(9).getClassroomName()}" style="grid-column:3 / span 2; grid-row:4 / span 1; text-decoration:none;">ルーム9</a>
-                        <a class="block small room" href="#" data-room-id="8" th:data-room-name="${classroomMap.get(8).getClassroomName()}" style="grid-column:3 / span 2; grid-row:5 / span 1; text-decoration:none;">ルーム8</a>
-                        <a class="block small room" href="#" data-room-id="7" th:data-room-name="${classroomMap.get(7).getClassroomName()}" style="grid-column:3 / span 2; grid-row:6 / span 1; text-decoration:none;">ルーム7</a>
-                        <a class="block small room" href="#" data-room-id="6" th:data-room-name="${classroomMap.get(6).getClassroomName()}" style="grid-column:3 / span 2; grid-row:7 / span 1; text-decoration:none;">ルーム6</a>
+                        <a class="block small room" href="#" data-room-id="10" th:data-room-name="${classroomMap.get(10).getClassroomName()}" th:classappend="${classroomMap.get(10).isActive} ? 'active-room'" style="grid-column:3 / span 2; grid-row:3 / span 1; text-decoration:none;">ルーム10</a>
+                        <a class="block small room" href="#" data-room-id="9" th:data-room-name="${classroomMap.get(9).getClassroomName()}" th:classappend="${classroomMap.get(9).isActive} ? 'active-room'" style="grid-column:3 / span 2; grid-row:4 / span 1; text-decoration:none;">ルーム9</a>
+                        <a class="block small room" href="#" data-room-id="8" th:data-room-name="${classroomMap.get(8).getClassroomName()}" th:classappend="${classroomMap.get(8).isActive} ? 'active-room'" style="grid-column:3 / span 2; grid-row:5 / span 1; text-decoration:none;">ルーム8</a>
+                        <a class="block small room" href="#" data-room-id="7" th:data-room-name="${classroomMap.get(7).getClassroomName()}" th:classappend="${classroomMap.get(7).isActive} ? 'active-room'" style="grid-column:3 / span 2; grid-row:6 / span 1; text-decoration:none;">ルーム7</a>
+                        <a class="block small room" href="#" data-room-id="6" th:data-room-name="${classroomMap.get(6).getClassroomName()}" th:classappend="${classroomMap.get(6).isActive} ? 'active-room'" style="grid-column:3 / span 2; grid-row:7 / span 1; text-decoration:none;">ルーム6</a>
                         <div class="block gray" style="grid-column:3 / span 2; grid-row:8 / span 3; font-size:12px;">事務室</div>
 
                         <!-- 가운데 왼 열 -->
@@ -173,13 +475,18 @@
                     </ul>
                 </section>
             </div> -->
-            <div class="home-schedule-widget">
-                <div class="widget-header">
-                    <h3 id="widget-date-title"></h3>
+            <div class="rightCol">
+                <!-- 디데이 위젯 -->
+                <div id="ddayWidget" class="dday-widget" style="display: none;">
+                    </div>
+                <!-- 일정 위젯 -->
+                <div class="home-schedule-widget">
+                    <div class="widget-header">
+                        <h3 id="widget-date-title"></h3>
+                    </div>
+                    <div id="mini-calendar"></div>
                 </div>
-                <div id="mini-calendar"></div>
             </div>
-
             <!-- 3강의실 좌석배치도 -->
             <div id="seatModal" class="modal-overlay">
                 <div class="modal-content">
@@ -200,6 +507,25 @@
                     </div>
                 </div>
             </div>
+            <!-- dday 모달 -->
+            <div id="ddaySelectModal" class="dday-modal-overlay" style="display: none;">
+                <div class="dday-modal-content">
+                    <div class="dday-modal-header">
+                        <h3>ホーム画面に表示するD-Dayを選択</h3>
+                        <button id="closeDdayModal" class="close-button">&times;</button>
+                    </div>
+                    <div id="ddayModalBody" class="dday-modal-body">
+                        <ul id="ddayList" class="dday-list"></ul>
+                        <div id="ddayEmptyState" class="dday-empty-state" style="display: none;">
+                            <p>登録されたD-Dayがありません。</p>
+                            <a th:href="@{/calendar/dDay}" class="btn btn-primary">D-Dayを作成する</a>
+                        </div>
+                    </div>
+                    <div id="ddayModalFooter" class="dday-modal-footer">
+                        <button id="savePinnedDdays" class="btn btn-primary">選択内容を保存</button>
+                    </div>
+                </div>
+            </div>
         </div>
         </section>
         <th:block layout:fragment="script">
@@ -208,102 +534,267 @@
             <script th:src="@{/js/reservation.js}"></script>
 
             <script>
+                        // ================== 👇 이 한 줄을 추가! ==================
+                        console.log("--- home.html 스크립트 블록 시작! ---");
+                        // =======================================================
                 document.addEventListener('DOMContentLoaded', function() {
-                    const calendarEl = document.getElementById('mini-calendar');
-                    const titleEl = document.getElementById('widget-date-title');
-
-                    // 캘린더 엘리먼트가 페이지에 존재하는지 확인
-                    if (!calendarEl || !titleEl) {
-                        console.error("캘린더 위젯을 위한 HTML 엘리먼트(#mini-calendar, #widget-date-title)를 찾을 수 없습니다.");
-                        return;
-                    }
-
-                    const calendar = new FullCalendar.Calendar(calendarEl, {
-                         locale: 'ja', // FullCalendar의 기본 언어를 일본어로 설정
-                        // 뷰 설정
-                        initialView: 'timeGridDay', // 하루의 시간 그리드 뷰
-                        initialDate: new Date(),    // 오늘 날짜로 시작
-
-                        // UI 커스텀
-                        headerToolbar: false,     // 기본 헤더(제목, 이전/다음 버튼) 숨기기
-                        allDaySlot: true,        // '종일' 슬롯 나타내기
-                        height: 'auto',           // 내용에 따라 높이 자동 조절
-                        
-                        // 시간 축 설정
-                        slotMinTime: '08:00:00',  // 캘린더 시작 시간
-                        slotMaxTime: '18:00:00',  // 캘린더 종료 시간
-                        slotLabelFormat: {        // 시간 축 라벨 형식
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            hour12: false
-                        },
-
-                        /**
-                         * 이벤트 데이터 로드
-                         * - 개인/전체 일정 파라미터를 모두 true로 설정하여 API 호출
-                         * - 받아온 데이터에 색상 구분을 적용하여 FullCalendar에 전달
-                         */
-                        events: function(fetchInfo, successCallback, failureCallback) {
-                            fetch('/scitHub/api/calendar/events?showPublic=true&showPrivate=true')
-                                .then(response => {
-                                    if (!response.ok) {
-                                        throw new Error('서버 응답에 실패했습니다.');
-                                    }
-                                    return response.json();
-                                })
-                                .then(data => {
-                                    // 서버에서 받은 데이터를 FullCalendar 형식에 맞게 가공
-                                    const formattedEvents = data.map(event => ({
-                                        id: event.eventId,
-                                        title: event.title,
-                                        start: event.start,
-                                        end: event.end,
-                                        allDay: event.allDay,
-                                        // 색상 구분 로직 적용
-                                        color: event.visibility === 'PUBLIC' ? '#ff9f89' : '#3788d8',
-                                        extendedProps: {
-                                            content: event.content,
-                                            visibility: event.visibility,
-                                            userId: event.userId
-                                        }
-                                    }));
-                                    successCallback(formattedEvents); // 가공된 데이터를 FullCalendar에 전달
-                                })
-                                .catch(error => {
-                                    console.error('오늘의 일정을 불러오는 데 실패했습니다:', error);
-                                    failureCallback(error); // 실패 시 FullCalendar에 에러 전달
-                                });
-                        },
-
-                        // 이벤트 블록 내부의 HTML을 직접 생성
-                        eventContent: function(arg) {
-                            const title = arg.event.title;
-                            const startTime = arg.event.start.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', hour12: false });
-                            const endTime = arg.event.end ? arg.event.end.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: false }) : '';
-
-                            return {
-                                html: `
-                                    <div class="custom-event-title">${title}</div>
-                                    <div class="custom-event-time">${startTime} - ${endTime}</div>
-                                `
-                            };
-                        },
-
-                        // 뷰가 렌더링된 후, 위젯 헤더에 오늘 날짜 표시
-                        viewDidMount: function(info) {
-                            const currentDate = calendar.getDate();
-                            titleEl.textContent = currentDate.toLocaleDateString('ja-JP', {
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric',
-                                weekday: 'long'
-                            });
-                        }
-                    });
-
-                    calendar.render();
+                    initializeDdayWidget();
+                    initializeCalendarWidget();
                 });
 
+                // ==========================================================
+                // D-Day 위젯 관련 함수들
+                // ==========================================================
+                async function initializeDdayWidget() {
+                    const widget = document.getElementById('ddayWidget');
+                    const modal = document.getElementById('ddaySelectModal');
+                    const closeModalBtn = document.getElementById('closeDdayModal');
+                    const saveBtn = document.getElementById('savePinnedDdays');
+
+                    const allDdays = await fetchAllDdays();
+                    if (allDdays) {
+                        renderDdayWidget(allDdays);
+                        renderDdayModal(allDdays);
+                    }
+
+                    widget.addEventListener('click', () => modal.style.display = 'flex');
+                    closeModalBtn.addEventListener('click', () => modal.style.display = 'none');
+                    modal.addEventListener('click', (e) => {
+                        if (e.target === modal) modal.style.display = 'none';
+                    });
+                    saveBtn.addEventListener('click', () => savePinnedDdays(allDdays));
+                }
+
+                async function fetchAllDdays() {
+                    try {
+                        const response = await fetch('/scitHub/api/ddays');
+
+                        if (!response.ok) throw new Error('D-Day data fetch failed');
+                        return await response.json();
+                    } catch (error) {
+                        console.error(error);
+                        return []; // 실패 시 빈 배열 반환
+                    }
+                }
+
+                function renderDdayWidget(ddayEvents) {
+                    const widget = document.getElementById('ddayWidget');
+                    const allDdays = ddayEvents || [];
+                    const pinnedDdays = allDdays.filter(d => d.pinned);   // .slice(0, 2) 이걸로 표시되는 D-Day 갯수 조절
+
+                    widget.style.display = 'flex';
+
+                    if (pinnedDdays.length > 0) {
+                        widget.innerHTML = pinnedDdays.map(dday => {
+                            const { ddayString } = calculateDday(dday.dday);
+
+                            // 카운터와 제목을 각각의 span 태그로 감싸줍니다.
+                            return `<div class="dday-item">
+                                        <span class="dday-counter">${ddayString}</span>
+                                        <span class="dday-title">${dday.title}</span>
+                                    </div>`;
+                        }).join('');
+                    } else if (allDdays.length > 0) {
+                        widget.innerHTML = `<div class="dday-item-empty">クリックしてホームに表示するD-Dayを選択します。</div>`;
+                    } else {
+                        widget.innerHTML = `<div class="dday-item-empty">最初のD-Dayを登録してください。</div>`;
+                    }
+                }
+
+                function renderDdayModal(ddayEvents) {
+                    const listEl = document.getElementById('ddayList');
+                    const emptyEl = document.getElementById('ddayEmptyState');
+                    const footerEl = document.getElementById('ddayModalFooter');
+
+                    if (!ddayEvents || ddayEvents.length === 0) {
+                        listEl.style.display = 'none';
+                        footerEl.style.display = 'none';
+                        emptyEl.style.display = 'block';
+                        return;
+                    }
+                    
+                    listEl.style.display = 'block';
+                    footerEl.style.display = 'block';
+                    emptyEl.style.display = 'none';
+
+                    listEl.innerHTML = ddayEvents.map(dday => {
+                        const { ddayString, targetDate } = calculateDday(dday.dday);
+                        const formattedDate = targetDate.toLocaleDateString('ja-JP');
+                        return `<li>
+                                    <input type="checkbox" data-id="${dday.ddayId}" ${dday.pinned ? 'checked' : ''}>
+                                    <div class="dday-info"><div class="dday-title">${dday.title}</div><div class="dday-date">${formattedDate}</div></div>
+                                    <div class="dday-counter">${ddayString}</div>
+                                </li>`;
+                    }).join('');
+
+                    // 개수 두개 제한 하는 역할
+                    // listEl.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                    //     checkbox.addEventListener('change', () => {
+                    //         if (listEl.querySelectorAll('input[type="checkbox"]:checked').length > 2) {
+                    //             alert('D-Dayは最大2つまで選択できます。');
+                    //             checkbox.checked = false;
+                    //         }
+                    //     });
+                    // });
+                }
+
+                // 선택한 D-Day를 저장하는 함수
+                async function savePinnedDdays(allDdays) {
+                    const checkedIds = Array.from(document.querySelectorAll('#ddayList input:checked')).map(box => box.dataset.id);
+                    try {
+                        const response = await fetch('/scitHub/api/dday/pin', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(checkedIds)
+                        });
+                        if (!response.ok) throw new Error('Failed to save');
+                        alert('保存しました。');
+                        document.getElementById('ddaySelectModal').style.display = 'none';
+                        
+                        const updatedDdays = allDdays.map(d => ({ ...d, pinned: checkedIds.includes(String(d.ddayId)) }));
+                        renderDdayWidget(updatedDdays);
+                        renderDdayModal(updatedDdays);
+                    } catch (error) {
+                        console.error(error);
+                        alert('エラーが発生しました。');
+                    }
+                }
+
+                // 이 함수 하나만 교체하면 두 곳의 문제가 모두 해결됩니다.
+                function calculateDday(targetDateStr) {
+                    // 1. null이나 undefined 값이 들어와도 안전하게 처리
+                    if (!targetDateStr || typeof targetDateStr !== 'string') { 
+                        return { ddayString: 'D-?', targetDate: new Date() };
+                    }
+
+                    // 2. 시간대 문제 없이 날짜 계산
+                    const parts = targetDateStr.split('-');
+                    if (parts.length !== 3) {
+                        return { ddayString: '날짜 오류', targetDate: new Date() };
+                    }
+                    const [year, month, day] = parts.map(Number);
+                    const targetDate = new Date(year, month - 1, day);
+
+                    // 3. 오늘 날짜와 비교
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+
+                    const diffTime = targetDate.getTime() - today.getTime();
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                    let ddayString;
+                    if (diffDays === 0) {
+                        ddayString = 'D-Day';
+                    } else if (diffDays > 0) {
+                        ddayString = `D-${diffDays}`;
+                    } else {
+                        ddayString = `D+${Math.abs(diffDays)}`;
+                    }
+                    
+                    return { ddayString, targetDate };
+                }
+
+                // ==========================================================
+                // 캘린더 위젯 관련 함수
+                // ==========================================================
+                function initializeCalendarWidget() {
+                    const calendarEl = document.getElementById('mini-calendar');
+                    const titleEl = document.getElementById('widget-date-title');
+                    if (!calendarEl || !titleEl) return;
+
+                    const calendar = new FullCalendar.Calendar(calendarEl, {
+                        locale: 'ja',
+                        initialView: 'timeGridDay',
+                        initialDate: new Date(),
+                        slotEventOverlap: false,  // 이벤트가 겹치지 않게
+                        eventDisplay: 'block',    // 블록 형태로 표시
+                        dayMaxEvents: false,      // 이벤트 개수 제한 없음
+                        headerToolbar: false,
+                        slotDuration: '01:00:00', // 30분에서 1시간 단위로 변경
+                        slotLabelInterval: '01:00:00', // 1시간마다 라벨 표시
+                        allDaySlot: false,
+                        dayHeaders: false,
+                        height: 'auto',
+                        contentHeight: 'auto',
+                        slotMinTime: '08:00:00',
+                        slotMaxTime: '23:00:00',
+                        slotLabelFormat: { hour: '2-digit', minute: '2-digit', hour12: false },
+                        allDayText: '終日', // 'all-day' 텍스트를 '終日'로 변경
+                        events: function(fetchInfo, successCallback, failureCallback) {
+                            fetch('/scitHub/api/calendar/events?showPublic=true&showPrivate=true')
+                                .then(res => res.ok ? res.json() : Promise.reject('Server error'))
+                                .then(data => {
+                                    const formattedEvents = data.map(event => ({
+                                        ...event,
+                                        color: event.visibility === 'PUBLIC' ? '#ff9f89' : '#3788d8',
+                                    }));
+                                    successCallback(formattedEvents);
+                                })
+                                .catch(err => {
+                                    console.error('Failed to load calendar events:', err);
+                                    failureCallback(err);
+                                });
+                        },
+                        eventContent: function(arg) {
+                            const title = arg.event.title;
+                            const start = arg.event.start;
+                            const end = arg.event.end;
+                                                    
+                            // 1. 시작 시간은 항상 있으므로 안전하게 변환합니다.
+                            const startTime = start.toLocaleTimeString('ja-JP', {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                hour12: false
+                            });
+
+                            // 2. 종료 시간이 있을 때만 변환하고, 없으면 빈 문자열을 사용합니다.
+                            const endTime = end ? end.toLocaleTimeString('ja-JP', {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                hour12: false
+                            }) : '';
+                            
+                            // 색상 결정 (PUBLIC은 주황, PRIVATE는 파랑)
+                            const isPublic = arg.event.extendedProps.visibility === 'PUBLIC';
+                            const bgColor = isPublic ? '#ff8c42' : '#7c93c3';
+                            
+                            // HTML 생성
+                            return { 
+                                html: `
+                                    <div style="
+                                        background: ${bgColor};
+                                        color: white;
+                                        padding: 8px;
+                                        border-radius: 8px;
+                                        height: 100%;
+                                        display: flex;
+                                        flex-direction: column;
+                                        justify-content: center;
+                                        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                                    ">
+                                        <div style="
+                                            font-weight: 600;
+                                            font-size: 0.85rem;
+                                            margin-bottom: 4px;
+                                            overflow: hidden;
+                                            text-overflow: ellipsis;
+                                            white-space: nowrap;
+                                        ">${title}</div>
+                                        <div style="
+                                            font-size: 0.7rem;
+                                            opacity: 0.9;
+                                        ">${startTime} - ${endTime}</div>
+                                    </div>
+                                ` 
+                            };
+                        },
+                        viewDidMount: function(info) {
+                            const currentDate = calendar.getDate();
+                            titleEl.textContent = currentDate.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' });
+                        }
+                    });
+                    calendar.render();
+                }
             </script>
         </th:block>
     </body>

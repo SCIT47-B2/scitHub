@@ -52,7 +52,7 @@ public class DdayService {
         DdayDTO newDdayDTO = DdayDTO.convertToDdayDTO(newDdayEntity);
 
         // 새로 저장된 dday의 정보를 담고 있는 DTO 반환
-        return newDdayDTO; 
+        return newDdayDTO;
 
     }
 
@@ -72,7 +72,18 @@ public class DdayService {
 
         // 하나씩 꺼내서 DdayDTO로 변환시키고 리스트에 add
         for(Dday dday : ddays) {
+
+        // 🔍 디버깅용 로그 추가
+                    log.debug("Dday Entity - ID: {}, Title: {}, isPinned: {}", 
+                  dday.getDdayId(), dday.getTitle(), dday.isPinned());
+
+
             DdayDTO ddayDTO = DdayDTO.convertToDdayDTO(dday);
+
+
+                    // 🔍 변환 후 로그
+        log.debug("Dday DTO - ID: {}, Title: {}, isPinned: {}", 
+                  ddayDTO.getDdayId(), ddayDTO.getTitle(), ddayDTO.isPinned());
             
             ddayDTOs.add(ddayDTO);
         }
@@ -122,6 +133,27 @@ public class DdayService {
 
         // JPA가 자동저장해준 Entity를 사용하여 DTO로 변환하여 return
         return DdayDTO.convertToDdayDTO(ddayEntity);
+    }
+
+    /**
+     * D-Day 고정 상태를 업데이트 하는 메서드
+     * @param username 컨트롤러에서 받은 String 타입의 사용자 고유 ID
+     * @param pinnedIds 고정할 D-Day ID 목록
+     */
+    public void updatePinnedDdays(String username, List<Integer> pinnedIds) {
+        // String 타입의 username으로 User 엔티티를 조회
+        User user = ur.findByUsername(username).orElseThrow(() -> new EntityNotFoundException("User not found with username: " + username));
+
+        // 조회한 User의 UserId를 가져옴
+        Integer userId = user.getUserId();
+
+        // 모든 D-Day를 고쟁해제 상태로
+        dr.unpinAllByUserId(userId);
+
+        // 새로 선택된 D-Day만 고정 상태로 변경
+        if (pinnedIds != null && !pinnedIds.isEmpty()) {
+            dr.pinByIdsAndUserId(pinnedIds, userId);
+        }
     }
 
 }
