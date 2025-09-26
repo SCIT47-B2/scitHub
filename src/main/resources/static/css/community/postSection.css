@@ -109,6 +109,24 @@
 
 /* 3. 게시글 테이블 */
 
+/* 제목-정렬 박스 → 가로 정렬 */
+.titleAndSort{
+    display:flex;          /* 한 줄로 */
+    align-items:center;    /* 세로 중앙 */
+    gap:12px;              /* 제목-select 간 여백 */
+}
+
+/* 정렬 select 공통 스타일 (검색 select와 동일) */
+.search-select{
+    border:1px solid #e5e7eb;
+    border-radius:8px;
+    padding:10px 12px;
+    font-size:14px;
+    height:40px;
+    box-sizing:border-box;
+    flex-shrink:0;
+}
+
 /* [추가] 테이블을 감싸는 컨테이너 스타일 */
 .table-responsive {
     width: 100%;

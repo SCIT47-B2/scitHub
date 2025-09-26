@@ -5,21 +5,23 @@ $(document).ready(function () {
     const urlParams = new URLSearchParams(window.location.search);
     const searchType = urlParams.get('searchType');
     const keyword = urlParams.get('keyword');
-    
+
     // URL의 page 파라미터는 1-based. 없으면 1페이지.
     const pageFromUrl = parseInt(urlParams.get('page')) || 1;
     // 서버에 보낼 때는 0-based 인덱스로 변환
     const pageForServer = pageFromUrl - 1;
+
+    let sort = $('#sortType').val() ? $('#sortType').val() : 'createdAt,desc';
 
     if (searchType && keyword) {
         // 검색창에 값 복원
         $('#searchType').val(searchType);
         $('#search-keyword').val(keyword);
         // 저장된 조건으로 게시글 로드
-        loadPosts(initialBoardId, pageForServer, searchType, keyword);
+        loadPosts(initialBoardId, pageForServer, searchType, keyword, sort);
     } else {
         // 기본 게시글 목록 로드
-        loadPosts(initialBoardId, pageForServer);
+        loadPosts(initialBoardId, pageForServer, sort);
     }
 
     translateBoardNameToJp();
@@ -34,6 +36,10 @@ $(document).ready(function () {
             event.preventDefault();
             executeSearch(initialBoardId);
         }
+    });
+
+    $('#sortType').on('change', function() {
+        executeSort(initialBoardId);
     });
 });
 
@@ -52,6 +58,15 @@ function executeSearch(boardId) {
     
     // 검색 시 항상 서버에는 첫 페이지(0)를 요청하고, URL에는 1페이지로 표시
     loadPosts(boardId, 0, searchType, keyword);
+}
+
+function executeSort(boardId) {
+    const searchType = $('#searchType').val();
+    const keyword = $('#search-keyword').val();
+    const sort = $('#sortType').val();
+    
+    // 검색 시 항상 서버에는 첫 페이지(0)를 요청하고, URL에는 1페이지로 표시
+    loadPosts(boardId, 0, searchType, keyword, sort);
 }
 
 /**
@@ -79,16 +94,20 @@ function updateURL(userPage, searchType = null, keyword = null) {
  * @param {number} boardId - 게시판 ID
  * @param {number} pageIndex - 서버에 요청할 0-based 페이지 인덱스
  */
-function loadPosts(boardId, pageIndex = 0, searchType = null, keyword = null) {
+function loadPosts(boardId, pageIndex = 0, searchType = null, keyword = null, sort = null) {
     // URL을 업데이트할 때는 1-based 페이지 번호로 변환
     updateURL(pageIndex + 1, searchType, keyword);
+
+    const sortArray = sort ? [sort, 'postId,desc'] : ['createdAt,desc', 'postId,desc'];
 
     let requestData = {
         boardId: boardId,
         page: pageIndex, // 서버에는 0-based 인덱스 전송
         size: 10,
-        sort: ['createdAt,desc', 'postId,desc']
+        sort: sortArray
     };
+
+    console.log(requestData);
 
     if (searchType && keyword) {
         requestData.searchType = searchType;
@@ -99,10 +118,11 @@ function loadPosts(boardId, pageIndex = 0, searchType = null, keyword = null) {
         url: 'getBoard',
         type: 'GET',
         data: requestData,
+        traditional: true,
         dataType: 'json',
         success: function (pageData) {
             renderPosts(pageData.content);
-            renderPagination(pageData, boardId, searchType, keyword);
+            renderPagination(pageData, boardId, searchType, keyword, sort);
         },
         error: function (xhr, status, error) {
             console.error('データのロードに失敗しました:', error);
@@ -135,7 +155,7 @@ function renderPosts(posts) {
     $postListBody.empty();
 
     if (!posts || posts.length === 0) {
-        $postListBody.html('<tr class="no-posts-message"><td colspan="6">게시글이 없습니다.</td></tr>');
+        $postListBody.html('<tr class="no-posts-message"><td colspan="6">ポストがありません.</td></tr>');
         return;
     }
 
@@ -157,7 +177,7 @@ function renderPosts(posts) {
     });
 }
 
-function renderPagination(pageData, boardId, searchType, keyword) {
+function renderPagination(pageData, boardId, searchType, keyword, sort) {
     const $pagination = $('#pagination-container');
     $pagination.empty();
 
@@ -178,9 +198,9 @@ function renderPagination(pageData, boardId, searchType, keyword) {
     const endPage = Math.min(startPage + pagesPerBlock - 1, totalPages - 1);
 
     if (currentPage > 0) {
-        const firstLink = $('<a>').html('&laquo;').on('click', () => loadPosts(boardId, 0, searchType, keyword));
+        const firstLink = $('<a>').html('&laquo;').on('click', () => loadPosts(boardId, 0, searchType, keyword, sort));
         $pagination.append(firstLink);
-        const prevPageLink = $('<a>').html('&lsaquo;').on('click', () => loadPosts(boardId, currentPage - 1, searchType, keyword));
+        const prevPageLink = $('<a>').html('&lsaquo;').on('click', () => loadPosts(boardId, currentPage - 1, searchType, keyword, sort));
         $pagination.append(prevPageLink);
     }
 
@@ -188,14 +208,14 @@ function renderPagination(pageData, boardId, searchType, keyword) {
         const pageNum = i;
         const pageLink = (pageNum === currentPage) ?
             $('<b>').text(pageNum + 1).addClass('active') :
-            $('<a>').text(pageNum + 1).on('click', () => loadPosts(boardId, pageNum, searchType, keyword));
+            $('<a>').text(pageNum + 1).on('click', () => loadPosts(boardId, pageNum, searchType, keyword, sort));
         $pagination.append(pageLink);
     }
 
     if (currentPage < totalPages - 1) {
-        const nextPageLink = $('<a>').html('&rsaquo;').on('click', () => loadPosts(boardId, currentPage + 1, searchType, keyword));
+        const nextPageLink = $('<a>').html('&rsaquo;').on('click', () => loadPosts(boardId, currentPage + 1, searchType, keyword, sort));
         $pagination.append(nextPageLink);
-        const lastLink = $('<a>').html('&raquo;').on('click', () => loadPosts(boardId, totalPages - 1, searchType, keyword));
+        const lastLink = $('<a>').html('&raquo;').on('click', () => loadPosts(boardId, totalPages - 1, searchType, keyword, sort));
         $pagination.append(lastLink);
     }
 }

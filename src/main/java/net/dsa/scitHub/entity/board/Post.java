@@ -5,6 +5,7 @@ import lombok.*;
 import net.dsa.scitHub.entity.interfaces.Authorizable;
 import net.dsa.scitHub.entity.user.User;
 
+import org.hibernate.annotations.Formula;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -79,6 +80,14 @@ public class Post implements Authorizable{
     /** 게시글 좋아요 목록 */
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<PostLike> likes;
+
+    // --- @Formula를 사용한 '좋아요 수' 필드 추가 ---
+    @Formula("(SELECT count(1) FROM post_like pl WHERE pl.post_id = post_id)")
+    private int likeCount;
+
+    // --- @Formula를 사용한 '댓글 수' 필드 추가 ---
+    @Formula("(SELECT count(1) FROM comment c WHERE c.post_id = post_id)")
+    private int commentCount;
 
 
     @Override
