@@ -37,6 +37,7 @@
     text-decoration: none;
 }
 .navPill .tab.active{ background:var(--primary); color:#fff; }
+.navPill .tab:not(.active):hover{ background: lightgray; }
 .navPill .tab:focus-visible{ outline:2px solid var(--primary); outline-offset:2px; }
 
 /** 헤더 하단 간격: 네비게이션 바 아래로 여백을 주어 메인과 분리 */
