@@ -31,6 +31,7 @@ public class WebSecurityConfig {
             , "/user/landingPage"   // 로그인 페이지
             , "/user/login"         // 로그인 처리 URL
             , "/user/idCheck"       // 회원가입 시 ID 중복 여부를 체크하는 팝업
+            , "/user/signup"        // 회원가입 처리 URL
     };
 
     // @Component 와 같이 객체를 등록할때 사용, 보통 @Configuration 클래스 내에서 사용
