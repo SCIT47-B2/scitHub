@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import net.dsa.scitHub.entity.company.Company;
 import net.dsa.scitHub.entity.company.CompanyReview;
-import net.dsa.scitHub.entity.user.User;
 
 @Builder
 @Data
@@ -19,7 +18,7 @@ public class CompanyReviewDTO {
     Byte rating;
     String content;
 
-    User user;
+    String username; // 작성자 아이디
     private Integer userCohortNo; // 작성자 기수
     Boolean isAuthor; // 현재 로그인한 사용자가 작성자인지 여부
 
@@ -27,7 +26,7 @@ public class CompanyReviewDTO {
         return CompanyReviewDTO.builder()
             .companyReviewId(entity.getCompanyReviewId())
             .company(entity.getCompany())
-            .user(entity.getUser())
+            .username(entity.getUser().getUsername())
             .rating(entity.getRating())
             .content(entity.getContent())
             .userCohortNo(entity.getUser().getCohortNo())

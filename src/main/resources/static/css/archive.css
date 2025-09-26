@@ -493,3 +493,55 @@ tbody tr:hover {
     font-weight: bold;
     color: #333;
 }
+
+/* --- 리뷰 작성자 정보 & 메시지 보내기 팝업 스타일 (수정안) --- */
+.reviewer-container {
+    position: relative;
+    width: fit-content;
+}
+
+.reviewer-info-chip {
+    cursor: pointer;
+}
+
+.send-message-popup {
+    position: absolute;
+    /* ✨ 1. 세로 위치를 부모의 중앙으로 설정 */
+    top: 50%;
+    /* ✨ 2. 가로 위치를 부모의 오른쪽 끝으로 설정 */
+    left: 100%;
+    /* ✨ 3. 작성자 칩과의 간격을 줌 */
+    margin-left: 8px;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-soft);
+    border-radius: 8px;
+    padding: 8px 12px;
+
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+
+    /* ✨ 4. 애니메이션 효과 및 초기 상태 수정 */
+    opacity: 0;
+    visibility: hidden;
+    /* 세로 중앙 정렬 + 왼쪽에서 나타나는 효과 */
+    transform: translateY(-50%) translateX(-10px);
+    transition: all 0.2s ease-in-out;
+    z-index: 10;
+}
+
+/* ✨ JavaScript가 active 클래스를 추가하면 팝업이 나타남 */
+.send-message-popup.active {
+    opacity: 1;
+    visibility: visible;
+    /* ✨ 세로 중앙 정렬 + 제자리로 오는 효과 */
+    transform: translateY(-50%) translateX(0); 
+}

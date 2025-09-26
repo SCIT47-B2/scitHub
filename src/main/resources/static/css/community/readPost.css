@@ -57,9 +57,51 @@
     align-items: center;
     margin-bottom: 25px;
 }
-.author-info { display: flex; align-items: center; gap: 12px; }
+.author-container { position: relative; width: fit-content; }
+.author-info { display: flex; align-items: center; gap: 12px; cursor: pointer; }
 .author-details { display: flex; flex-direction: column; gap: 4px; }
 .author-name { font-weight: 600; font-size: 15px; color: #333; }
+.send-message-popup {
+    position: absolute;
+    /* ✨ 1. 세로 위치를 부모의 중앙으로 설정 */
+    top: 50%;
+    /* ✨ 2. 가로 위치를 부모의 오른쪽 끝으로 설정 */
+    left: 100%;
+    /* ✨ 3. 작성자 칩과의 간격을 줌 */
+    margin-left: 8px;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    background-color: #FFFFFF;
+    color: #111827;
+    border: 1px solid #E5E7EB;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    border-radius: 8px;
+    padding: 8px 12px;
+
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+
+    /* ✨ 4. 애니메이션 효과 및 초기 상태 수정 */
+    opacity: 0;
+    visibility: hidden;
+    /* 세로 중앙 정렬 + 왼쪽에서 나타나는 효과 */
+    transform: translateY(-50%) translateX(-10px);
+    transition: all 0.2s ease-in-out;
+    z-index: 10;
+}
+
+/* ✨ JavaScript가 active 클래스를 추가하면 팝업이 나타남 */
+.send-message-popup.active {
+    opacity: 1;
+    visibility: visible;
+    /* ✨ 세로 중앙 정렬 + 제자리로 오는 효과 */
+    transform: translateY(-50%) translateX(0); 
+}
 .post-date { font-size: 13px; color: #999; }
 .post-actions { display: flex; gap: 8px; }
 .action-btn {
