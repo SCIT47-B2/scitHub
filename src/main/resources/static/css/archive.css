@@ -423,6 +423,7 @@ tbody tr:hover {
     box-sizing: border-box; /* padding, border를 너비에 포함 */
     width: 100%; /* 부모 요소에 꽉 차게 설정 */
     height: 120px;
+    font-family: 'Noto Sans JP';
     padding: 10px;
     border: none;
     border-radius: 10px;

@@ -296,6 +296,7 @@ section.message-box .pagination a.active {
   box-sizing: border-box; /* 너비 계산에 padding과 border를 포함시켜 오버플로우 방지 */
   resize: none; /* 사용자가 크기를 조절할 수 없도록 고정 */
   display: block;
+  font-family: 'Noto Sans JP';
   border: 1px solid var(--borderColor);
   border-radius: 8px;
   background: var(--bgBody);
