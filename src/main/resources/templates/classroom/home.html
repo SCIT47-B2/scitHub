@@ -394,7 +394,13 @@
                             <a th:href="@{/admin/announcement/read(postId=${notice.postId})}">
                                 <div class="notice-item">
                                     <div class="notice-header">
-                                        <span><i class="fa-solid fa-bullhorn"></i> [[${notice.board}]]</span>
+                                        <span th:switch="${notice.board}">
+                                            <i class="fa-solid fa-bullhorn"></i>
+                                            <span th:case="'announcement'">お知らせ</span>
+                                            <span th:case="'announcementIT'">お知らせ - IT</span>
+                                            <span th:case="'announcementJP'">お知らせ - 日本語</span>
+                                            <span th:case="*">[[${notice.board}]]</span>
+                                        </span>
                                         <span class="date">[[${#temporals.format(notice.createdAt, 'MM月 dd日 HH:mm')}]]</span>
                                     </div>
                                     <p class="title">[[${notice.title}]]</p>
