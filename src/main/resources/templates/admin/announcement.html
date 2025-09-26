@@ -114,7 +114,7 @@
                         <ul class="notice-list">
                             <li th:if="${upperPosts.isEmpty()}">お知らせがありません。</li>
                             <li th:each="upperPost : ${upperPosts}">
-                                <a th:href="@{/admin/announcementRead(postId=${upperPost.postId})}">
+                                <a th:href="@{/admin/announcement/read(postId=${upperPost.postId})}">
                                     <span class="title" th:text="${upperPost.title}"></span>
                                     <span class="date" th:text="${#temporals.format(upperPost.createdAt, 'yyyy-MM-dd')}"></span>
                                 </a>
@@ -132,7 +132,7 @@
                         <ul class="notice-list">
                             <li th:if="${lowerPosts.isEmpty()}">お知らせがありません。</li>
                             <li th:each="lowerPost : ${lowerPosts}">
-                                <a th:href="@{/admin/announcementRead(postId=${lowerPost.postId})}">
+                                <a th:href="@{/admin/announcement/read(postId=${lowerPost.postId})}">
                                     <span class="title" th:text="${lowerPost.title}"></span>
                                     <span class="date" th:text="${#temporals.format(lowerPost.createdAt, 'yyyy-MM-dd')}"></span>
                                 </a>
