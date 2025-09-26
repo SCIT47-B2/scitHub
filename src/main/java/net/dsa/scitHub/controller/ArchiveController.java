@@ -53,15 +53,15 @@ public class ArchiveController {
      */
     @GetMapping({"/archive", "/archive/companyList"})
     public String archivePage(
-            Model model,
-            @RequestParam(name="industry", required=false) Industry industry,
-            @RequestParam(name="type", required=false) CompanyType type,
-            @RequestParam(name="location", required=false) String location,
-            @RequestParam(name="headcount", required=false) String headcount,
-            @RequestParam(name="rating", required=false) String averageRating,
-            @RequestParam(name="name", required=false) String name,
-            @RequestParam(name = "page", defaultValue = "0") int page
-        ) {
+        Model model,
+        @RequestParam(name="industry", required=false) Industry industry,
+        @RequestParam(name="type", required=false) CompanyType type,
+        @RequestParam(name="location", required=false) String location,
+        @RequestParam(name="headcount", required=false) String headcount,
+        @RequestParam(name="rating", required=false) String averageRating,
+        @RequestParam(name="name", required=false) String name,
+        @RequestParam(name = "page", defaultValue = "0") int page
+    ) {
         // 사이드바 메뉴 아이템 설정
         List<MenuItem> menuItems = List.of(
             new MenuItem("会社レビュー", "/archive/companyList")
@@ -110,10 +110,10 @@ public class ArchiveController {
      */
     @GetMapping("/archive/companyReview")
     public String companyReview(
-            @RequestParam(name="id", required=true) Integer companyId,
-            @AuthenticationPrincipal UserDetails userDetails,
-            Model model
-        ) {
+        @RequestParam(name="id", required=true) Integer companyId,
+        @AuthenticationPrincipal UserDetails userDetails,
+        Model model
+    ) {
         // 사이드바 메뉴 아이템 설정
         List<MenuItem> menuItems = List.of(
             new MenuItem("会社レビュー", "/archive/companyList")
@@ -146,9 +146,11 @@ public class ArchiveController {
      * @return            처리 결과에 대한 ResponseEntity
      */
     @PostMapping("/archive/companyReview/{companyId}")
-    public ResponseEntity<String> createReview(@PathVariable("companyId") Integer companyId,
-                                               @ModelAttribute CompanyReviewDTO reviewDTO,
-                                               @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<String> createReview(
+        @PathVariable("companyId") Integer companyId,
+        @ModelAttribute CompanyReviewDTO reviewDTO,
+        @AuthenticationPrincipal UserDetails userDetails
+    ) {
         // @AuthenticationPrincipal을 통해 현재 로그인한 사용자 정보를 가져옵니다.
         // Spring Security 설정이 필요합니다.
         if (userDetails == null) {

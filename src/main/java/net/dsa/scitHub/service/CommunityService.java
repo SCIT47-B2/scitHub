@@ -294,6 +294,7 @@ public class CommunityService {
                             .boardId(post.getBoard().getBoardId())
                             .board(post.getBoard().getName())
                             .username(post.getUser().getUsername())
+                            .userNameKor(post.getUser().getNameKor())
                             .avatarUrl(post.getUser().getAvatarUrl())
                             .title(post.getTitle())
                             .content(post.getContent())

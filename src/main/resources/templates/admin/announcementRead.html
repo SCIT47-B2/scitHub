@@ -34,7 +34,7 @@
                                     <img th:unless="${!#strings.isEmpty(post.avatarUrl)}"
                                         th:src="@{/images/chiikawaPuzzle.png}" alt="仮のプロフィールイメージ" class="profile-pic">
                                     <div class="author-details">
-                                        <span th:text="${post.username}" class="author-name"></span>
+                                        <span th:text="${post.userNameKor}" class="author-name"></span>
                                         <span class="post-date" th:text="${#temporals.format(post.createdAt, 'yyyy年 MM月 dd日 HH:mm:ss')}"></span>
                                     </div>
                                 </div>
