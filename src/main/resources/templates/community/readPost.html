@@ -95,7 +95,9 @@
 
                         <!-- 댓글 입력 -->
                         <div class="comment-input-section">
-                            <img th:src="@{/images/avatar/{f}(f=${currentUser.avatarUrl})}" alt="私のプロフィールイメージ" class="profile-pic-small">
+                            <img th:src="${#strings.isEmpty(currentUser.avatarUrl)} ? @{/images/chiikawaPuzzle.png} : @{/images/avatar/{f}(f=${currentUser.avatarUrl})}"
+                                alt="私のプロフィールイメージ"
+                                class="profile-pic-small">
                             <div class="comment-input-box">
                                 <input type="text" name="commentForm" id="commentBox" placeholder="コメント作成欄">
                                 <i id="inputCommentBtn" class="fa-solid fa-arrow-up"></i>

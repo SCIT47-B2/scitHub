@@ -53,7 +53,7 @@ function createCommentHTML(comment) {
         </div>
     ` : '';
 
-    const avatarUrl = comment.avatarUrl ? `/scitHub/images/avatar/${comment.avatarUrl}` : "/images/chiikawaPuzzle.png";
+    const avatarUrl = comment.avatarUrl ? `/scitHub/images/avatar/${comment.avatarUrl}` : "/scitHub/images/chiikawaPuzzle.png";
     // DTO의 필드명을 사용하여 HTML을 구성합니다.
     return `
         <div class="comment" data-comment-id="${comment.commentId}">
