@@ -59,6 +59,7 @@
 }
 .author-container { position: relative; width: fit-content; }
 .author-info { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+.author-info:hover { background-color: #f9f9f9; border-radius: 8px; }
 .author-details { display: flex; flex-direction: column; gap: 4px; }
 .author-name { font-weight: 600; font-size: 15px; color: #333; }
 .send-message-popup {

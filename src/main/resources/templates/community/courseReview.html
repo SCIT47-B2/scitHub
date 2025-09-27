@@ -12,9 +12,9 @@
         <section class="mainGrid" aria-label="메인 영역" layout:fragment="content">
             <div class="container">
                 <!-- 뒤로 가기 버튼 -->
-                 <a th:href="@{/community/courseList}" class="back-button">
-                    <i class="fa fa-arrow-left"></i>
-                 </a>
+                <a th:href="@{/community/courseList}" class="back-button">
+                <i class="fa fa-arrow-left"></i>
+                </a>
                 <!-- 강의 정보 -->
                 <div class="header" th:if="${course}">
                     <div class="info-box" style="align-items: flex-start;">
@@ -50,9 +50,15 @@
                                 <button class="btn-delete-review" th:data-review-id="${review.courseReviewId}"
                                         onclick="deleteReview(this.getAttribute('data-review-id'))"><i class="fa-solid fa-trash"></i></button>
                             </div>
-                            <!-- 작성자 표시 -->
-                            <div class="reviewer-info-chip">
-                                <span th:text="${review.userCohortNo} + '期 ' + (${review.userCohortNo} == 47 ? '受講生' : '卒業生')"></span>
+                            <div class="reviewer-container">
+                                <!-- 작성자 표시 -->
+                                <div class="reviewer-info-chip">
+                                    <span th:text="${review.userCohortNo} + '期 ' + (${review.userCohortNo} == 47 ? '受講生' : '卒業生')"></span>
+                                </div>
+                                <!-- 메시지 보내기 버튼 -->
+                                <a class="send-message-popup" th:href="@{/mypage/messages(to=${review.username})}">
+                                    <i class="fa-solid fa-envelope"></i> メッセージを送る
+                                </a>
                             </div>
                             <!-- 별점 -->
                             <div class="review-rating-stars">
@@ -194,6 +200,42 @@
                             console.error('Error:', error);
                             alert('エラーが発生しました.');
                         });
+                    });
+
+                    // ✨ --- 메시지 보내기 팝업 기능 ---
+                    const reviewListContainer = document.querySelector('.review-list-container');
+
+                    // 리뷰 목록 영역에 이벤트 리스너를 설정 (이벤트 위임)
+                    reviewListContainer.addEventListener('click', (e) => {
+                        const chip = e.target.closest('.reviewer-info-chip');
+
+                        // 만약 클릭한 것이 작성자 정보 칩이라면
+                        if (chip) {
+                            e.stopPropagation(); // ✨ 다른 곳 클릭 이벤트가 바로 실행되는 것을 막음
+
+                            const container = chip.closest('.reviewer-container');
+                            const popup = container.querySelector('.send-message-popup');
+
+                            // 이미 열려있는 다른 팝업이 있다면 닫기
+                            document.querySelectorAll('.send-message-popup.active').forEach(activePopup => {
+                                if (activePopup !== popup) {
+                                    activePopup.classList.remove('active');
+                                }
+                            });
+
+                            // 현재 클릭한 팝업의 상태를 토글 (열고/닫기)
+                            popup.classList.toggle('active');
+                        }
+                    });
+
+                    // 문서 전체를 클릭했을 때 모든 팝업을 닫음
+                    document.addEventListener('click', (e) => {
+                        // 만약 클릭한 곳이 팝업 버튼 자신이 아니라면
+                        if (!e.target.closest('.reviewer-container')) {
+                            document.querySelectorAll('.send-message-popup.active').forEach(popup => {
+                                popup.classList.remove('active');
+                            });
+                        }
                     });
                 });
 

@@ -505,6 +505,10 @@ tbody tr:hover {
     cursor: pointer;
 }
 
+.reviewer-info-chip:hover {
+    background-color: #f0f0f0;
+}
+
 .send-message-popup {
     position: absolute;
     /* ✨ 1. 세로 위치를 부모의 중앙으로 설정 */
@@ -518,10 +522,10 @@ tbody tr:hover {
     align-items: center;
     gap: 8px;
 
-    background-color: var(--bg-primary);
-    color: var(--text-primary);
-    border: 1px solid var(--border-color);
-    box-shadow: var(--shadow-soft);
+    background-color: #FFFFFF;
+    color: #111827;
+    border: 1px solid #E5E7EB;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
     border-radius: 8px;
     padding: 8px 12px;
 
@@ -544,5 +548,5 @@ tbody tr:hover {
     opacity: 1;
     visibility: visible;
     /* ✨ 세로 중앙 정렬 + 제자리로 오는 효과 */
-    transform: translateY(-50%) translateX(0); 
+    transform: translateY(-50%) translateX(0);
 }

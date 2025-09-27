@@ -10,11 +10,13 @@
       <link rel="stylesheet" th:href="@{/css/sidebar.css}">
       <link rel="stylesheet" th:href="@{/css/mypage.css}">
     </th:block>
-    
+
   </head>
   <body>
     <!-- 좌측: 사이드바 -->
     <div th:replace="~{fragments/sidebar :: sidebarFragment(${menuItems})}"></div>
+
+    <div th:replace="~{fragments/notifications :: notificationPanelFragment}"></div>
 
     <!-- 우측: 콘텐츠 -->
     <main class="profilePage" aria-label="메인 영역" layout:fragment="content">
@@ -36,8 +38,8 @@
             <!-- 이미지만 감싸는 내부 래퍼: 프레임 안에 정확히 클리핑 -->
             <div class="avatarClip">
               <img id="avatarImg"
-                   th:src="${#strings.isEmpty(user.avatarUrl)} ? @{/images/chiikawaPuzzle.png} : @{/images/avatar/{f}(f=${user.avatarUrl})}"
-                   alt="프로필 이미지">
+                  th:src="${#strings.isEmpty(user.avatarUrl)} ? @{/images/chiikawaPuzzle.png} : @{/images/avatar/{f}(f=${user.avatarUrl})}"
+                  alt="프로필 이미지">
             </div>
 
             <button class="editAvatarBtn" id="editAvatarBtn" title="プロフィール画像を変更" type="button">

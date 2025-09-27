@@ -18,6 +18,8 @@
         <!-- 사이드바 -->
         <div th:replace="~{fragments/sidebar :: sidebarFragment(${menuItems})}"></div>
 
+        <div th:replace="~{fragments/notifications :: notificationPanelFragment}"></div>
+
         <!-- 메인 영역 -->
         <section class="message-box" aria-label="메인 영역" layout:fragment="content" style="margin-left: 250px; padding: 1.5rem; max-width: 80%;">
             <div class="header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
