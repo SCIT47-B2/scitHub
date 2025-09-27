@@ -92,7 +92,7 @@
                                     <img th:src="@{${c.logoUrl}}" alt="logo"
                                         style="width:40px; height:auto; margin-right:8px;">
                                     <!-- 회사 이름을 클릭하면 해당 회사의 리뷰 페이지로 이동 -->
-                                    <a th:href="@{/archive/companyReview(id=${c.companyId})}" class="company-name-link">
+                                    <a th:href="@{/archive/companyList/readReview(id=${c.companyId})}" class="company-name-link">
                                         <span th:text="${c.name}"></span>
                                     </a>
                                 </div>
@@ -110,7 +110,7 @@
                 <div class="pagination" th:if="${companyPage.totalPages > 0}">
                     <!-- '이전' 버튼: 현재 페이지가 첫 페이지가 아닐 경우에만 표시 -->
                     <a th:if="${companyPage.hasPrevious()}"
-                       th:href="@{/archive/companyList(page=${companyPage.number-1}, name=${name}, industry=${industry}, type=${type}, location=${location}, headcount=${headcount}, rating=${rating})}">
+                        th:href="@{/archive/companyList(page=${companyPage.number-1}, name=${name}, industry=${industry}, type=${type}, location=${location}, headcount=${headcount}, rating=${rating})}">
                         <span>&lt;</span>
                     </a>
 
@@ -118,14 +118,14 @@
                     <th:block th:each="i : ${#numbers.sequence(0, companyPage.totalPages - 1)}">
                         <!-- 현재 페이지 번호를 기준으로 앞뒤 2개씩, 총 5개의 페이지 번호를 보여줌 -->
                         <a th:if="${i >= companyPage.number - 2 and i <= companyPage.number + 2}"
-                           th:href="@{/archive/companyList(page=${i}, name=${name}, industry=${industry}, type=${type}, location=${location}, headcount=${headcount}, rating=${rating})}">
+                            th:href="@{/archive/companyList(page=${i}, name=${name}, industry=${industry}, type=${type}, location=${location}, headcount=${headcount}, rating=${rating})}">
                             <!-- 현재 페이지 번호는 'active' 클래스를 적용하여 강조 -->
                             <span th:class="${i == companyPage.number} ? 'active'" th:text="${i + 1}"></span>
                         </a>
                     </th:block>
                     <!-- '다음' 버튼: 현재 페이지가 마지막 페이지가 아닐 경우에만 표시 -->
                     <a th:if="${companyPage.hasNext()}"
-                       th:href="@{/archive/companyList(page=${companyPage.number+1}, name=${name}, industry=${industry}, type=${type}, location=${location}, headcount=${headcount}, rating=${rating})}">
+                        th:href="@{/archive/companyList(page=${companyPage.number+1}, name=${name}, industry=${industry}, type=${type}, location=${location}, headcount=${headcount}, rating=${rating})}">
                         <span>&gt;</span>
                     </a>
                 </div>

@@ -3,17 +3,16 @@ function displayTags() {
     const tagsData = $('#tagsData').val();
 
     console.log(tagsData);
-    
+
     // 태그 데이터가 없거나 빈 문자열인 경우 처리
     if (!tagsData || tagsData.trim() === '' || tagsData === '[]') {
-        $('#tagsContainer').html('<span class="no-tags">このポストにはタグが付いていません。</span>');
         return;
     }
-    
+
     try {
         // 문자열을 배열로 파싱
         let tagsArray = parseTagsString(tagsData);
-        
+
         // 태그 HTML 생성
         let tagsHtml = '';
         tagsArray.forEach(function(tag) {
@@ -22,17 +21,15 @@ function displayTags() {
                 console.log(tag);
             }
         });
-        
-        // 태그가 없는 경우
-        if (tagsHtml === '') {
-            $('#tagsContainer').html('<span class="no-tags">このポストにはタグが付いていません。</span>');
-        } else {
+
+        // 태그가 존재하면 컨테이너에 추가
+        if (tagsHtml !== '') {
             $('#tagsContainer').html(tagsHtml);
         }
-        
+
         // 태그 클릭 이벤트 바인딩
         bindTagClickEvents();
-        
+
     } catch (error) {
         console.error('タグのパーシング中エラー発生:', error);
         $('#tagsContainer').html('<span class="no-tags">タグの読込みに失敗しました。</span>');
@@ -42,28 +39,28 @@ function displayTags() {
 // 태그 문자열을 배열로 파싱하는 함수
 function parseTagsString(tagsString) {
     // '[#태그1, #태그2, #태그3]' 형식을 파싱
-    
+
     // 1. 대괄호 제거
     let cleanString = tagsString.replace(/^\[|\]$/g, '');
-    
+
     // 2. 빈 문자열 체크
     if (cleanString.trim() === '') {
         return [];
     }
-    
+
     // 3. 쉼표로 분할
     let tagsArray = cleanString.split(',');
-    
+
     // 4. 각 태그 정리 (앞뒤 공백 제거)
     tagsArray = tagsArray.map(function(tag) {
         return tag.trim();
     });
-    
+
     // 5. 빈 태그 필터링
     tagsArray = tagsArray.filter(function(tag) {
         return tag !== '';
     });
-    
+
     return tagsArray;
 }
 

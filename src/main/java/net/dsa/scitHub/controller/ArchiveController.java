@@ -75,7 +75,7 @@ public class ArchiveController {
         if (headcount != null) {
             sort = Sort.by(headcount.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, "headcount");
         // 평균 평점(averageRating) 파라미터가 있으면 해당 기준으로 정렬
-        } else if (averageRating != null) {            
+        } else if (averageRating != null) {
             // Repository의 JPQL에서 정의한 별칭(avgRating)을 기준으로 정렬
             sort = Sort.by(averageRating.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, "avgRating");
         }
@@ -108,7 +108,7 @@ public class ArchiveController {
      * @param model
      * @return
      */
-    @GetMapping("/archive/companyReview")
+    @GetMapping("/archive/companyList/readReview")
     public String companyReview(
         @RequestParam(name="id", required=true) Integer companyId,
         @AuthenticationPrincipal UserDetails userDetails,
@@ -166,7 +166,7 @@ public class ArchiveController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {
             // 예외 발생 시 서버 로그에 기록하고 클라이언트에게 에러 메시지 전송
-            log.error("강의 리뷰 등록 실패", e); 
+            log.error("강의 리뷰 등록 실패", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("レビューの登録中にエラーが発生しました.");
         }
     }
@@ -178,8 +178,10 @@ public class ArchiveController {
      * @return            처리 결과에 대한 ResponseEntity
      */
     @DeleteMapping("/archive/companyReview/{reviewId}")
-    public ResponseEntity<?> deleteReview(@PathVariable("reviewId") Integer reviewId,
-                                           @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<?> deleteReview(
+        @PathVariable("reviewId") Integer reviewId,
+        @AuthenticationPrincipal UserDetails userDetails
+    ) {
         if (userDetails == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("ログインが必要です.");
         }
@@ -194,7 +196,7 @@ public class ArchiveController {
             log.warn("会社レビュー 삭제 권한 없음: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage()); // 권한 없는 경우 403 Forbidden
         } catch (Exception e) {
-            log.error("会社レビュー 삭제 실패", e); 
+            log.error("会社レビュー 삭제 실패", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("レビューの削除中にエラーが発生しました.");
         }
     }
