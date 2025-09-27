@@ -276,4 +276,22 @@ public class NotificationService {
             log.debug("알림 읽음 처리 완료 [notificationId={}]", notificationId);
         }
     }
+
+    /**
+     * 특정 사용자의 모든 알림을 '읽음' 상태로 표시
+     * @param userId 사용자 ID
+     */
+    @Transactional
+    public void markAllAsRead(Integer userId) {
+        User user = User.builder().userId(userId).build();  // 간단히 ID만 가진 User 객체 생성
+
+        // 1. 해당 사용자의 읽지 않은 모든 알림 조회
+        List<Notification> unreadNotifications = nr.findAllByUserAndIsReadFalse(user);
+
+        // 2. 각 알림의 isRead 필드를 true로 설정
+        for (Notification notification : unreadNotifications) {
+            notification.setIsRead(true);
+            log.debug("알림 읽음 처리 완료 [notificationId={}]", notification.getNotificationId());
+        }
+    }
 }

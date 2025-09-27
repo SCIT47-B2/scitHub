@@ -1,8 +1,10 @@
 package net.dsa.scitHub.controller;
 
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -47,5 +49,16 @@ public class NotificationController {
         }
 
         return emitter;
+    }
+
+    @PostMapping("/notifications/read/all")
+    public ResponseEntity<Void> markAllAsRead(@AuthenticationPrincipal(expression = "userId") Integer userId) {
+        if (userId == null) {
+            return ResponseEntity.status(401).build();
+        }
+
+        ns.markAllAsRead(userId);
+
+        return ResponseEntity.ok().build();
     }
 }
