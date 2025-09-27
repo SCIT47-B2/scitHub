@@ -336,3 +336,37 @@ input[type="checkbox"]:checked + label::after {
     padding-left: 8px;
     padding-right: 8px;
 }
+
+
+
+
+
+/* 모달 헤더 (제목과 색상 버튼 정렬) */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+/* 색상 팔레트 (두 줄로 표시) */
+#colorPalette {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  width: 150px;
+}
+
+/* 색상 동그라미 기본 스타일 */
+.color-swatch {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid transparent;
+}
+
+/* 선택된 색상 동그라미 스타일 */
+.color-swatch.selected {
+  border-color: #007bff;
+}

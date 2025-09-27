@@ -33,6 +33,7 @@
                 border: none;
             }
 
+
             /* =========================
             2. 헤더 영역
             ========================= */
@@ -47,6 +48,17 @@
                 font-weight: 600;
                 margin: 0;
                 color: #212529;
+            }
+
+            
+            #widget-date-title {
+                width: fit-content;
+                cursor: pointer;
+                transition: color 0.2s ease;
+            }
+
+            #widget-date-title:hover {
+                color: #4258BE;
             }
 
             /* =========================
@@ -257,6 +269,78 @@
                 }
             }
 
+            /* =========================
+            12. 종일(All-day) 일정 영역 추가
+            ========================= */
+
+            /* '終日' 텍스트 라벨 스타일 */
+
+            #mini-calendar .fc-daygrid-body {
+                position: relative;
+                min-height: 30px;
+                background: transparent;  /* 배경 투명으로 */
+                border: none !important;  /* 모든 테두리 제거 */
+                border-bottom: 1px solid #dee2e6 !important;
+                margin-bottom: 8px;
+                padding: 0px 0;
+            }
+
+            /* 종일 일정 이벤트 스타일 */
+            #mini-calendar .fc-daygrid-event {
+                border: none !important;
+                border-radius: 20px !important;
+                padding: 4px 8px !important;
+                margin: 0px 0 !important;
+                width: 100%;
+            }
+
+            /* 종일 일정 이벤트들을 오른쪽으로 밀기 */
+            #mini-calendar .fc-daygrid-event-harness {
+                margin-left: -10px !important;
+                margin-right: -10px !important;
+                margin-bottom: -5px !important;
+            }
+
+            #mini-calendar .fc-daygrid-day-events {
+                margin-left: 0 !important;
+            }
+            #mini-calendar .fc-all-day-text {
+                font-size: 0.75rem;      /* 시간 라벨과 동일한 글자 크기 */
+                font-weight: 600;        /* 시간 라벨보다 조금 더 강조 */
+                color: #495057;          /* 더 잘 보이는 진한 회색 */
+                position: absolute;      /* 위치를 직접 지정하기 위해 */
+                left: 8px;               /* 왼쪽 여백 주기 */
+                top: 50%;                /* 세로 중앙 정렬 */
+                transform: translateY(-50%); /* 세로 중앙 정렬을 위한 미세 조정 */
+            }
+
+            /* '終日' 텍스트의 위치 기준점을 설정 */
+            #mini-calendar .fc-daygrid {
+                position: relative;
+                padding-left: 50px; /* '終日' 텍스트가 들어갈 공간 확보 */
+                border: none !important;
+            }
+
+            /* 종일 이벤트가 표시되는 영역의 불필요한 좌측 여백 제거 */
+            #mini-calendar .fc-daygrid-day-frame {
+                padding-left: 0;
+                border: none !important;
+            }
+            #mini-calendar .fc-daygrid-day {
+                border: none !important;
+            }
+
+            /* 종일 일정이 없을 때 영역 숨기기 */
+            #mini-calendar .fc-daygrid-body:empty,
+            #mini-calendar .fc-daygrid-body:not(:has(.fc-daygrid-event)) {
+                display: none !important;
+            }
+
+            /* 컨테이너 상단 패딩 축소 */
+            #mini-calendar {
+                padding-top: 9px !important; /* 기존 값보다 작게 */
+            }
+
 
             /* --- D-Day 위젯  --- */
             .dday-widget {
@@ -270,7 +354,7 @@
                 gap: 10px; /* 카드 사이의 간격 */
 
                 /* 스크롤 기능 */
-                max-height: 150px; /* 위젯의 최대 높이 (카드 2개 정도) */
+                max-height: 200px; /* 위젯의 최대 높이 (카드 2개 정도) */
                 overflow-y: auto;  /* 내용이 max-height를 넘으면 자동으로 세로 스크롤 생성 */
             }
 
@@ -353,7 +437,7 @@
                 min-height: 150px; /* 최소 높이 지정 */
             }
             .dday-empty-state .dday-modal-body { flex-grow: 1; display: flex; align-items: center; justify-content: center; padding: 20px; font-size: 1.1em; }
-            .dday-empty-state .dday-modal-footer { text-align: right; padding: 20px; border-top: 1px solid #e9ecef; }
+            .dday-empty-state .dday-modal-footer { text-align: right; padding: 33px 20px 10px; border-top: 1px solid #e9ecef; }
             .dday-modal-footer { margin-top: 20px; padding-top: 20px; border-top: 1px solid #e9ecef; text-align: right; }
             .btn { padding: 10px 20px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
             .btn-primary { background: #4258BE; color: white; }
@@ -372,6 +456,9 @@
                 overflow: hidden;         /* (추가) 영역을 넘어가는 텍스트는 숨김 */
                 text-overflow: ellipsis;  /* (추가) 숨겨진 텍스트를 ... 으로 표시 */
             }
+
+
+
         </style>
     </head>
     <body>
@@ -521,7 +608,7 @@
                 <!-- 일정 위젯 -->
                 <div class="home-schedule-widget">
                     <div class="widget-header">
-                        <h3 id="widget-date-title"></h3>
+                        <h3 id="widget-date-title" style="cursor: pointer; transition: color 0.2s;"></h3>
                     </div>
                     <div id="mini-calendar"></div>
                 </div>
@@ -743,6 +830,11 @@
                     const titleEl = document.getElementById('widget-date-title');
                     if (!calendarEl || !titleEl) return;
 
+                    // 날짜 제목 클릭 시 캘린더 페이지로 이동
+                    titleEl.addEventListener('click', function() {
+                        window.location.href = '/scitHub/calendar/schedule';
+                    });
+                    
                     const calendar = new FullCalendar.Calendar(calendarEl, {
                         locale: 'ja',
                         initialView: 'timeGridDay',
@@ -753,7 +845,8 @@
                         headerToolbar: false,
                         slotDuration: '01:00:00', // 30분에서 1시간 단위로 변경
                         slotLabelInterval: '01:00:00', // 1시간마다 라벨 표시
-                        allDaySlot: false,
+                        allDaySlot: true,
+                        allDayText: '終日',
                         dayHeaders: false,
                         height: 'auto',
                         contentHeight: 'auto',
@@ -766,9 +859,24 @@
                                 .then(res => res.ok ? res.json() : Promise.reject('Server error'))
                                 .then(data => {
                                     const formattedEvents = data.map(event => ({
-                                        ...event,
-                                        color: event.visibility === 'PUBLIC' ? '#ff9f89' : '#3788d8',
+                                        // FullCalendar가 인식할 수 있는 표준 속성
+                                        id: event.eventId,
+                                        title: event.title,
+                                        start: event.start,
+                                        end: event.end,
+                                        allDay: event.allDay,
+                                        color: event.color,  // 이벤트 색상
+                                        backgroundColor: event.color,  // 배경색도 명시적으로 설정
+                                        
+                                        // 추가 데이터는 extendedProps에 저장
+                                        extendedProps: {
+                                            content: event.content,
+                                            visibility: event.visibility,
+                                            userId: event.userId,
+                                            color: event.color  // 나중에 사용할 수 있도록 color도 저장
+                                        }
                                     }));
+                                    console.log("✅ 2단계: FullCalendar에 전달될 최종 가공 데이터", formattedEvents);
                                     successCallback(formattedEvents);
                                 })
                                 .catch(err => {
@@ -777,34 +885,120 @@
                                 });
                         },
                         eventContent: function(arg) {
+
+                            // 종일 일정 처리 추가
+                            if (arg.event.allDay) {
+                                const title = arg.event.title;
+                                const startDate = new Date(arg.event.start);
+                                const endDate = arg.event.end ? new Date(arg.event.end) : null;
+                                
+                                let dateStr = '';
+                                
+                                if (endDate) {
+                                    const nextDay = new Date(startDate);
+                                    nextDay.setDate(nextDay.getDate() + 1);
+                                    
+                                    if (endDate.toDateString() === nextDay.toDateString()) {
+                                        dateStr = `${startDate.getMonth()+1}/${startDate.getDate()}`;
+                                    } else {
+                                        const endDateForDisplay = new Date(endDate);
+                                        endDateForDisplay.setDate(endDateForDisplay.getDate() - 1);
+                                        dateStr = `${startDate.getMonth()+1}/${startDate.getDate()}-${endDateForDisplay.getMonth()+1}/${endDateForDisplay.getDate()}`;
+                                    }
+                                } else {
+                                    dateStr = `${startDate.getMonth()+1}/${startDate.getDate()}`;
+                                }
+                                
+                                const bgColor = arg.event.backgroundColor || 
+                                                arg.event.extendedProps.color || 
+                                                '#3788d8';
+                                
+                                return {
+                                    html: `
+                                        <div style="
+                                            background: ${bgColor};
+                                            color: white;
+                                            padding: 4px 8px;
+                                            border-radius: 4px;
+                                            font-size: 0.75rem;
+                                            display: flex;
+                                            align-items: center;
+                                            justify-content: space-between;
+                                            width: 100%;
+                                        ">
+                                            <span style="
+                                                font-weight: 600;
+                                                overflow: hidden;
+                                                text-overflow: ellipsis;
+                                                white-space: nowrap;
+                                                margin-right: 8px;
+                                            ">${title}</span>
+                                            <span style="
+                                                opacity: 0.8;
+                                                font-size: 0.7rem;
+                                                flex-shrink: 0;
+                                            ">${dateStr}</span>
+                                        </div>
+                                    `
+                                };
+                            }
+
+
                             const title = arg.event.title;
                             const start = arg.event.start;
                             const end = arg.event.end;
-                                                    
-                            // 이벤트 기간(분) 계산
-                            const durationMinutes = end ? (end.getTime() - start.getTime()) / 60000 : 60;
-                            const isShortEvent = durationMinutes <= 60;
+                            const originalStart = new Date(arg.event.start); // 시작일
+                            const originalEnd = arg.event.end ? new Date(arg.event.end) : null; // 종료일
+                                              
+                            // 오늘 날짜
+                            const today = new Date();
+                            today.setHours(0, 0, 0, 0);
+                            const tomorrow = new Date(today);
+                            tomorrow.setDate(tomorrow.getDate() + 1);
 
-                            // 1. 시작 시간은 항상 있으므로 안전하게 변환합니다.
-                            const startTime = start.toLocaleTimeString('ja-JP', {
-                                hour: '2-digit',
-                                minute: '2-digit',
-                                hour12: false
-                            });
+                            // 여러 날에 걸친 일정인지 확인
+                            const isMultiDay = originalEnd && 
+                                (originalEnd.toDateString() !== originalStart.toDateString());
+                            
+                            let timeHtml = '';
+                            if (isMultiDay) {
+                                // 여러 날 일정은 전체 기간 표시
+                                const startDateStr = originalStart.toLocaleDateString('ja-JP', {
+                                    month: 'numeric',
+                                    day: 'numeric'
+                                });
+                                const endDateStr = originalEnd ? originalEnd.toLocaleDateString('ja-JP', {
+                                    month: 'numeric',
+                                    day: 'numeric'
+                                }) : '';
+                                
+                                timeHtml = `<div style="font-size: 0.7rem; opacity: 0.9;">${startDateStr} ~ ${endDateStr}</div>`;
+                            } else {
+                                // 하루 일정은 시간만 표시
+                                const durationMinutes = end ? (end.getTime() - start.getTime()) / 60000 : 60;
+                                const isShortEvent = durationMinutes <= 60;
+                                
+                                if (!isShortEvent) {
+                                    const startTime = start.toLocaleTimeString('ja-JP', {
+                                        hour: '2-digit',
+                                        minute: '2-digit',
+                                        hour12: false
+                                    });
+                                    const endTime = end ? end.toLocaleTimeString('ja-JP', {
+                                        hour: '2-digit',
+                                        minute: '2-digit',
+                                        hour12: false
+                                    }) : '';
+                                    
+                                    timeHtml = `<div style="font-size: 0.7rem; opacity: 0.9;">${startTime} - ${endTime}</div>`;
+                                }
+                            }
 
-                            // 2. 종료 시간이 있을 때만 변환하고, 없으면 빈 문자열을 사용합니다.
-                            const endTime = end ? end.toLocaleTimeString('ja-JP', {
-                                hour: '2-digit',
-                                minute: '2-digit',
-                                hour12: false
-                            }) : '';
-
-                            // 색상 결정 (PUBLIC은 주황, PRIVATE는 파랑)
-                            const isPublic = arg.event.extendedProps.visibility === 'PUBLIC';
-                            const bgColor = isPublic ? '#ff8c42' : '#7c93c3';
-
-                            // 짧은 이벤트일 경우 시간 텍스트를 숨김
-                            const timeHtml = isShortEvent ? '' : `<div style="font-size: 0.7rem; opacity: 0.9;">${startTime} - ${endTime}</div>`;
+                            // 색상 결정
+                            const bgColor = arg.event.backgroundColor || 
+                                            arg.event.extendedProps.color || 
+                                            '#3788d8';
+                            console.log(`@@@@@ : ${bgColor}`);
                             
                             // HTML 생성
                             return {

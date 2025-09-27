@@ -8,6 +8,8 @@
     <!-- 외부 CSS 불러오기 -->
     <th:block layout:fragment="css">
       <link rel="stylesheet" th:href="@{/css/schedule.css}">
+      <script src="https://unpkg.com/@popperjs/core@2"></script>
+      <script src="https://unpkg.com/tippy.js@6"></script>
     </th:block>
   </head>
   <body>
@@ -55,8 +57,26 @@
       <!-- 일정등록 Modal -->
       <div id="eventModal" class="modal">
         <div class="modal-content">
-          <h3 id="modalTitle">スケジュール登録</h3>
+          <div class="modal-header">
+            <h3 id="modalTitle">スケジュール登録</h3>
+            <div id="colorPickerTrigger" class="color-swatch" style="background-color:#3788d8;"></div>
+          </div>
           <form id="eventForm" class="eventForm">
+
+            <div style="display: none;">
+              <div id="colorPalette">
+                <div class="color-swatch selected" data-color="#3788d8" style="background-color:#3788d8;"></div>
+                <div class="color-swatch" data-color="#e57373" style="background-color:#e57373;"></div>
+                <div class="color-swatch" data-color="#ffb74d" style="background-color:#ffb74d;"></div>
+                <div class="color-swatch" data-color="#FFC107" style="background-color:#FFC107;"></div>
+                <div class="color-swatch" data-color="#81c784" style="background-color:#81c784;"></div>
+                <div class="color-swatch" data-color="#ba68c8" style="background-color:#ba68c8;"></div>
+                <div class="color-swatch" data-color="#4db6ac" style="background-color:#4db6ac;"></div>
+                <div class="color-swatch" data-color="#757575" style="background-color:#757575;"></div>
+              </div>
+            </div>
+
+            <input type="hidden" id="eventColor" name="eventColor" value="#3788d8">
             <input type="hidden" id="eventId" name="eventId">
 
             <div class="form-group">
