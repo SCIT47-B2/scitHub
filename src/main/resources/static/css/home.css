@@ -97,7 +97,7 @@
     background: var(--text-primary);  /* Darker black for strong contrast */
     color: var(--bg-primary);
     text-decoration: none;
-    border-radius: var(--border-radius-md);
+    border-radius: 15px;
     font-weight: 700;
     font-size: 16px;
     transition: background-color 0.2s;
@@ -278,7 +278,7 @@
 /* This class provides the light blue accent style */
 .room.reservable {
     background: #E0E7FF; /* Light blue accent */
-    color: #3730A3;      /* Darker blue text */
+    color: black;      /* Darker blue text */
     border-color: #C7D2FE;
 }
 /* Remove the direct 'blue' class styling, prefer 'reservable' for consistency */
@@ -339,8 +339,9 @@
     color: var(--text-primary);
 }
 
+
 .active-room {
-    background-color: #cfe0ff !important; /* 예시) 연한 파란색 배경 */
+    background-color: #E1E4EF !important; /* 예시) 연한 파란색 배경 */
     font-weight: 600;                      /* 글씨를 굵게 하여 가독성을 높입니다 */
 }
 
@@ -456,4 +457,30 @@
     background-color: #f3f4f6; /* Light gray hover */
     color: #111827;
     text-decoration: none;
+}
+
+
+/* ========================================================
+   Frosted Glass Effect for Background Image
+   ======================================================== */
+
+
+.card,
+.stackCard .sectionBody {
+    /* Replace the solid white background with a semi-transparent one.
+       rgba(255, 255, 255, 0.85) means white with 85% opacity.
+       You can adjust the last value (0.85) to make it more or less transparent.
+    */
+    background-color: rgba(255, 255, 255, 0.5);
+
+    /* (Optional but Recommended) Add a backdrop-filter for a blurry,
+       frosted glass effect. This is what makes it look really professional.
+    */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px); /* For Safari compatibility */
+}
+
+/* To ensure the main content grid itself doesn't have a color */
+.mainGrid {
+    background-color: transparent;
 }
