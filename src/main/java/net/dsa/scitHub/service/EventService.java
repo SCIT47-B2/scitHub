@@ -61,6 +61,7 @@ public class EventService {
                         .content(eventDTO.getContent())
                         .startAt(eventDTO.getStart())
                         .endAt(eventDTO.getEnd())
+                        .color(eventDTO.getColor())
                         .isAllDay(eventDTO.getAllDay())
                         .build();
         Event savedEvent = er.save(event);
@@ -161,6 +162,9 @@ public class EventService {
         eventEntity.setEndAt(eventDTO.getEnd());
         eventEntity.setIsAllDay(eventDTO.getAllDay());
 
+        if (eventDTO.getColor() != null) {
+            eventEntity.setColor(eventDTO.getColor());
+        }
         // controller에 넘겨주기 위해 DTO로 변환
         EventDTO updateEventDTO = EventDTO.convertToEventDTO(eventEntity);
 

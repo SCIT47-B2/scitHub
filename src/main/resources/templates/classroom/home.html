@@ -33,6 +33,7 @@
                 border: none;
             }
 
+
             /* =========================
             2. 헤더 영역
             ========================= */
@@ -47,6 +48,16 @@
                 font-weight: 600;
                 margin: 0;
                 color: #212529;
+            }
+
+            
+            #widget-date-title {
+                cursor: pointer;
+                transition: color 0.2s ease;
+            }
+
+            #widget-date-title:hover {
+                color: #4258BE;
             }
 
             /* =========================
@@ -521,7 +532,7 @@
                 <!-- 일정 위젯 -->
                 <div class="home-schedule-widget">
                     <div class="widget-header">
-                        <h3 id="widget-date-title"></h3>
+                        <h3 id="widget-date-title" style="cursor: pointer; transition: color 0.2s;"></h3>
                     </div>
                     <div id="mini-calendar"></div>
                 </div>
@@ -743,6 +754,11 @@
                     const titleEl = document.getElementById('widget-date-title');
                     if (!calendarEl || !titleEl) return;
 
+                    // 날짜 제목 클릭 시 캘린더 페이지로 이동
+                    titleEl.addEventListener('click', function() {
+                        window.location.href = '/scitHub/calendar/schedule';
+                    });
+                    
                     const calendar = new FullCalendar.Calendar(calendarEl, {
                         locale: 'ja',
                         initialView: 'timeGridDay',
@@ -766,9 +782,24 @@
                                 .then(res => res.ok ? res.json() : Promise.reject('Server error'))
                                 .then(data => {
                                     const formattedEvents = data.map(event => ({
-                                        ...event,
-                                        color: event.visibility === 'PUBLIC' ? '#ff9f89' : '#3788d8',
+                                        // FullCalendar가 인식할 수 있는 표준 속성
+                                        id: event.eventId,
+                                        title: event.title,
+                                        start: event.start,
+                                        end: event.end,
+                                        allDay: event.allDay,
+                                        color: event.color,  // 이벤트 색상
+                                        backgroundColor: event.color,  // 배경색도 명시적으로 설정
+                                        
+                                        // 추가 데이터는 extendedProps에 저장
+                                        extendedProps: {
+                                            content: event.content,
+                                            visibility: event.visibility,
+                                            userId: event.userId,
+                                            color: event.color  // 나중에 사용할 수 있도록 color도 저장
+                                        }
                                     }));
+                                    console.log("✅ 2단계: FullCalendar에 전달될 최종 가공 데이터", formattedEvents);
                                     successCallback(formattedEvents);
                                 })
                                 .catch(err => {
@@ -777,34 +808,62 @@
                                 });
                         },
                         eventContent: function(arg) {
+
                             const title = arg.event.title;
                             const start = arg.event.start;
                             const end = arg.event.end;
-                                                    
-                            // 이벤트 기간(분) 계산
-                            const durationMinutes = end ? (end.getTime() - start.getTime()) / 60000 : 60;
-                            const isShortEvent = durationMinutes <= 60;
+                            const originalStart = new Date(arg.event.start); // 시작일
+                            const originalEnd = arg.event.end ? new Date(arg.event.end) : null; // 종료일
+                                              
+                            // 오늘 날짜
+                            const today = new Date();
+                            today.setHours(0, 0, 0, 0);
+                            const tomorrow = new Date(today);
+                            tomorrow.setDate(tomorrow.getDate() + 1);
 
-                            // 1. 시작 시간은 항상 있으므로 안전하게 변환합니다.
-                            const startTime = start.toLocaleTimeString('ja-JP', {
-                                hour: '2-digit',
-                                minute: '2-digit',
-                                hour12: false
-                            });
+                            // 여러 날에 걸친 일정인지 확인
+                            const isMultiDay = originalEnd && 
+                                (originalEnd.toDateString() !== originalStart.toDateString());
+                            
+                            let timeHtml = '';
+                            if (isMultiDay) {
+                                // 여러 날 일정은 전체 기간 표시
+                                const startDateStr = originalStart.toLocaleDateString('ja-JP', {
+                                    month: 'numeric',
+                                    day: 'numeric'
+                                });
+                                const endDateStr = originalEnd ? originalEnd.toLocaleDateString('ja-JP', {
+                                    month: 'numeric',
+                                    day: 'numeric'
+                                }) : '';
+                                
+                                timeHtml = `<div style="font-size: 0.7rem; opacity: 0.9;">${startDateStr} ~ ${endDateStr}</div>`;
+                            } else {
+                                // 하루 일정은 시간만 표시
+                                const durationMinutes = end ? (end.getTime() - start.getTime()) / 60000 : 60;
+                                const isShortEvent = durationMinutes <= 60;
+                                
+                                if (!isShortEvent) {
+                                    const startTime = start.toLocaleTimeString('ja-JP', {
+                                        hour: '2-digit',
+                                        minute: '2-digit',
+                                        hour12: false
+                                    });
+                                    const endTime = end ? end.toLocaleTimeString('ja-JP', {
+                                        hour: '2-digit',
+                                        minute: '2-digit',
+                                        hour12: false
+                                    }) : '';
+                                    
+                                    timeHtml = `<div style="font-size: 0.7rem; opacity: 0.9;">${startTime} - ${endTime}</div>`;
+                                }
+                            }
 
-                            // 2. 종료 시간이 있을 때만 변환하고, 없으면 빈 문자열을 사용합니다.
-                            const endTime = end ? end.toLocaleTimeString('ja-JP', {
-                                hour: '2-digit',
-                                minute: '2-digit',
-                                hour12: false
-                            }) : '';
-
-                            // 색상 결정 (PUBLIC은 주황, PRIVATE는 파랑)
-                            const isPublic = arg.event.extendedProps.visibility === 'PUBLIC';
-                            const bgColor = isPublic ? '#ff8c42' : '#7c93c3';
-
-                            // 짧은 이벤트일 경우 시간 텍스트를 숨김
-                            const timeHtml = isShortEvent ? '' : `<div style="font-size: 0.7rem; opacity: 0.9;">${startTime} - ${endTime}</div>`;
+                            // 색상 결정
+                            const bgColor = arg.event.backgroundColor || 
+                                            arg.event.extendedProps.color || 
+                                            '#3788d8';
+                            console.log(`@@@@@ : ${bgColor}`);
                             
                             // HTML 생성
                             return {

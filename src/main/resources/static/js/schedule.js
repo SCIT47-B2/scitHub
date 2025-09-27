@@ -3,7 +3,6 @@
 //  * @param  window.currentUser {userId, username, role} - 서버에서 주입(Thymeleaf inline)
 //  * @return 없음
 //  */
-
 /** 시작·종료 input의 min/max 동기화 리스너 추가 */
 function addDateValidationListeners() {
   const startDateTimeInput = document.querySelector('#eventStartDate');
@@ -58,6 +57,16 @@ function setFormEditable(isEditable) {
   document.querySelector('#startDate').readOnly = !isEditable;
   document.querySelector('#endDate').readOnly = !isEditable;
   document.querySelector('#isAllDay').disabled = !isEditable;
+
+  // 색상 선택 버튼 제어
+  const colorTrigger = document.querySelector('#colorPickerTrigger');
+  if (isEditable) {
+    colorTrigger.style.pointerEvents = 'auto';
+    colorTrigger.style.cursor = 'pointer';
+  } else {
+    colorTrigger.style.pointerEvents = 'none';
+    colorTrigger.style.cursor = 'default';
+  }
 }
 
 /** 종일 여부에 따라 날짜/시간 입력 토글 */
@@ -117,6 +126,31 @@ function populateForm(event) {
   document.getElementById('eventTitle').value = event.title;
   document.getElementById('eventContent').value = event.extendedProps.content;
   document.getElementById('isAllDay').checked = event.allDay;
+
+  // 색상 처리 추가
+  const eventColor = event.extendedProps.color || '#3788d8';
+  const hiddenInput = document.getElementById('eventColor'); 
+  const trigger = document.getElementById('colorPickerTrigger');
+
+  document.getElementById('eventColor').value = eventColor;
+  document.getElementById('colorPickerTrigger').style.backgroundColor = eventColor;
+  
+  if (hiddenInput) hiddenInput.value = eventColor;
+  if (trigger) trigger.style.backgroundColor = eventColor;
+  
+  // colorPalette는 Tippy가 관리하므로 직접 조작하지 않음
+  // 또는 안전하게 체크 후 처리
+  const colorPalette = document.querySelector('#colorPalette');
+  if (colorPalette) {
+    const currentSelected = colorPalette.querySelector('.selected');
+    if (currentSelected) {
+      currentSelected.classList.remove('selected');
+    }
+    const newSelectedSwatch = colorPalette.querySelector(`.color-swatch[data-color="${eventColor}"]`);
+    if (newSelectedSwatch) {
+      newSelectedSwatch.classList.add('selected');
+    }
+  }
 
   toggleDateInputs();
 
@@ -181,6 +215,19 @@ function openModal(mode, info) {
       modalTitle.textContent = '日程登録';
       document.querySelector('#eventId').value = '';
 
+
+      // 색상 초기화 추가
+      document.getElementById('eventColor').value = '#3788d8';
+      document.getElementById('colorPickerTrigger').style.backgroundColor = '#3788d8';
+
+      const colorPalette = document.getElementById('colorPalette');
+      if (colorPalette) {  // ⭐ null 체크 필수!
+        const currentSelected = colorPalette.querySelector('.selected');
+        if (currentSelected) currentSelected.classList.remove('selected');
+        const firstSwatch = colorPalette.querySelector('.color-swatch[data-color="#3788d8"]');
+        if (firstSwatch) firstSwatch.classList.add('selected');
+      }
+
       if (!info || !info.dateStr) {
         document.getElementById('eventStartDate').value = '';
         document.getElementById('eventEndDate').value = '';
@@ -240,6 +287,38 @@ document.addEventListener('DOMContentLoaded', function onReady() {
   // 공용 참조
   const eventModal = document.querySelector('#eventModal');
   const modalButtons = document.querySelector('#modalButtons');
+  // === 색상 선택 기능 초기화 START ===
+  const trigger = document.querySelector('#colorPickerTrigger');
+  const colorPalette = document.querySelector('#colorPalette');
+  const hiddenColorInput = document.querySelector('#eventColor');
+
+  const tippyInstance = tippy(trigger, {
+    content: colorPalette,
+    allowHTML: true,
+    interactive: true,
+    trigger: 'click',
+    placement: 'bottom-end',
+    appendTo: () => document.body,
+  });
+
+  colorPalette.addEventListener('click', function(e) {
+    if (e.target.classList.contains('color-swatch')) {
+      const newColor = e.target.dataset.color;
+      
+      // 1. 숨겨진 input 값 변경
+      hiddenColorInput.value = newColor;
+      // 2. 모달 헤더의 동그라미 색 변경
+      trigger.style.backgroundColor = newColor;
+
+      // 3. 팔레트 내 선택 상태 변경
+      const currentSelected = colorPalette.querySelector('.selected');
+      if (currentSelected) currentSelected.classList.remove('selected');
+      e.target.classList.add('selected');
+
+      // 4. 팝업 닫기
+      tippyInstance.hide();
+    }
+  });
 
   addDateValidationListeners();
 
@@ -308,10 +387,11 @@ document.addEventListener('DOMContentLoaded', function onReady() {
               extendedProps: {
                 content: event.content,
                 visibility: event.visibility,
-                userId: event.userId
+                userId: event.userId,
+                color: event.color
               },
               editable: isEventEditable,
-              color: event.visibility === 'PUBLIC' ? '#ff9f89' : '#3788d8'
+              color: event.color || '#3788d8'
             });
           }
           successCallback(events);
@@ -432,8 +512,6 @@ document.addEventListener('DOMContentLoaded', function onReady() {
   // 폼 제출(등록/수정 공용)
   document.querySelector('#eventForm').addEventListener('submit', function (e) {
     e.preventDefault();
-    
-
     // 제목 입력했는지 유효성 검사
     const titleInput = document.getElementById('eventTitle');
     if (titleInput.value.trim() === '') {
@@ -443,6 +521,10 @@ document.addEventListener('DOMContentLoaded', function onReady() {
     }
 
     const formData = new FormData(this);
+
+      // ⭐ 디버깅: color 값이 제대로 있는지 확인
+  console.log('Color input value:', document.getElementById('eventColor').value);
+  console.log('FormData color:', formData.get('eventColor'));
     const isAllDay = document.getElementById('isAllDay').checked;
     let eventData;
 
@@ -455,7 +537,8 @@ document.addEventListener('DOMContentLoaded', function onReady() {
         start: startDate,
         end: endDate,
         content: formData.get('eventContent'),
-        allDay: formData.get('isAllDay') === 'on'
+        allDay: formData.get('isAllDay') === 'on',
+        color: formData.get('eventColor')
       };
     } else {
       const startDateStr = formData.get('startDate');
@@ -474,7 +557,8 @@ document.addEventListener('DOMContentLoaded', function onReady() {
         start: startDateStr + 'T00:00:00',
         end: endDateDay + 'T00:00:00',
         content: formData.get('eventContent'),
-        allDay: formData.get('isAllDay') === 'on'
+        allDay: formData.get('isAllDay') === 'on',
+        color: formData.get('eventColor')
       };
     }
 
