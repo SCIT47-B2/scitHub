@@ -52,6 +52,7 @@
 
             
             #widget-date-title {
+                width: fit-content;
                 cursor: pointer;
                 transition: color 0.2s ease;
             }
@@ -268,6 +269,78 @@
                 }
             }
 
+            /* =========================
+            12. 종일(All-day) 일정 영역 추가
+            ========================= */
+
+            /* '終日' 텍스트 라벨 스타일 */
+
+            #mini-calendar .fc-daygrid-body {
+                position: relative;
+                min-height: 30px;
+                background: transparent;  /* 배경 투명으로 */
+                border: none !important;  /* 모든 테두리 제거 */
+                border-bottom: 1px solid #dee2e6 !important;
+                margin-bottom: 8px;
+                padding: 0px 0;
+            }
+
+            /* 종일 일정 이벤트 스타일 */
+            #mini-calendar .fc-daygrid-event {
+                border: none !important;
+                border-radius: 20px !important;
+                padding: 4px 8px !important;
+                margin: 0px 0 !important;
+                width: 100%;
+            }
+
+            /* 종일 일정 이벤트들을 오른쪽으로 밀기 */
+            #mini-calendar .fc-daygrid-event-harness {
+                margin-left: -10px !important;
+                margin-right: -10px !important;
+                margin-bottom: -5px !important;
+            }
+
+            #mini-calendar .fc-daygrid-day-events {
+                margin-left: 0 !important;
+            }
+            #mini-calendar .fc-all-day-text {
+                font-size: 0.75rem;      /* 시간 라벨과 동일한 글자 크기 */
+                font-weight: 600;        /* 시간 라벨보다 조금 더 강조 */
+                color: #495057;          /* 더 잘 보이는 진한 회색 */
+                position: absolute;      /* 위치를 직접 지정하기 위해 */
+                left: 8px;               /* 왼쪽 여백 주기 */
+                top: 50%;                /* 세로 중앙 정렬 */
+                transform: translateY(-50%); /* 세로 중앙 정렬을 위한 미세 조정 */
+            }
+
+            /* '終日' 텍스트의 위치 기준점을 설정 */
+            #mini-calendar .fc-daygrid {
+                position: relative;
+                padding-left: 50px; /* '終日' 텍스트가 들어갈 공간 확보 */
+                border: none !important;
+            }
+
+            /* 종일 이벤트가 표시되는 영역의 불필요한 좌측 여백 제거 */
+            #mini-calendar .fc-daygrid-day-frame {
+                padding-left: 0;
+                border: none !important;
+            }
+            #mini-calendar .fc-daygrid-day {
+                border: none !important;
+            }
+
+            /* 종일 일정이 없을 때 영역 숨기기 */
+            #mini-calendar .fc-daygrid-body:empty,
+            #mini-calendar .fc-daygrid-body:not(:has(.fc-daygrid-event)) {
+                display: none !important;
+            }
+
+            /* 컨테이너 상단 패딩 축소 */
+            #mini-calendar {
+                padding-top: 9px !important; /* 기존 값보다 작게 */
+            }
+
 
             /* --- D-Day 위젯  --- */
             .dday-widget {
@@ -281,7 +354,7 @@
                 gap: 10px; /* 카드 사이의 간격 */
 
                 /* 스크롤 기능 */
-                max-height: 150px; /* 위젯의 최대 높이 (카드 2개 정도) */
+                max-height: 200px; /* 위젯의 최대 높이 (카드 2개 정도) */
                 overflow-y: auto;  /* 내용이 max-height를 넘으면 자동으로 세로 스크롤 생성 */
             }
 
@@ -364,7 +437,7 @@
                 min-height: 150px; /* 최소 높이 지정 */
             }
             .dday-empty-state .dday-modal-body { flex-grow: 1; display: flex; align-items: center; justify-content: center; padding: 20px; font-size: 1.1em; }
-            .dday-empty-state .dday-modal-footer { text-align: right; padding: 20px; border-top: 1px solid #e9ecef; }
+            .dday-empty-state .dday-modal-footer { text-align: right; padding: 33px 20px 10px; border-top: 1px solid #e9ecef; }
             .dday-modal-footer { margin-top: 20px; padding-top: 20px; border-top: 1px solid #e9ecef; text-align: right; }
             .btn { padding: 10px 20px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
             .btn-primary { background: #4258BE; color: white; }
@@ -383,6 +456,9 @@
                 overflow: hidden;         /* (추가) 영역을 넘어가는 텍스트는 숨김 */
                 text-overflow: ellipsis;  /* (추가) 숨겨진 텍스트를 ... 으로 표시 */
             }
+
+
+
         </style>
     </head>
     <body>
@@ -769,7 +845,8 @@
                         headerToolbar: false,
                         slotDuration: '01:00:00', // 30분에서 1시간 단위로 변경
                         slotLabelInterval: '01:00:00', // 1시간마다 라벨 표시
-                        allDaySlot: false,
+                        allDaySlot: true,
+                        allDayText: '終日',
                         dayHeaders: false,
                         height: 'auto',
                         contentHeight: 'auto',
@@ -808,6 +885,64 @@
                                 });
                         },
                         eventContent: function(arg) {
+
+                            // 종일 일정 처리 추가
+                            if (arg.event.allDay) {
+                                const title = arg.event.title;
+                                const startDate = new Date(arg.event.start);
+                                const endDate = arg.event.end ? new Date(arg.event.end) : null;
+                                
+                                let dateStr = '';
+                                
+                                if (endDate) {
+                                    const nextDay = new Date(startDate);
+                                    nextDay.setDate(nextDay.getDate() + 1);
+                                    
+                                    if (endDate.toDateString() === nextDay.toDateString()) {
+                                        dateStr = `${startDate.getMonth()+1}/${startDate.getDate()}`;
+                                    } else {
+                                        const endDateForDisplay = new Date(endDate);
+                                        endDateForDisplay.setDate(endDateForDisplay.getDate() - 1);
+                                        dateStr = `${startDate.getMonth()+1}/${startDate.getDate()}-${endDateForDisplay.getMonth()+1}/${endDateForDisplay.getDate()}`;
+                                    }
+                                } else {
+                                    dateStr = `${startDate.getMonth()+1}/${startDate.getDate()}`;
+                                }
+                                
+                                const bgColor = arg.event.backgroundColor || 
+                                                arg.event.extendedProps.color || 
+                                                '#3788d8';
+                                
+                                return {
+                                    html: `
+                                        <div style="
+                                            background: ${bgColor};
+                                            color: white;
+                                            padding: 4px 8px;
+                                            border-radius: 4px;
+                                            font-size: 0.75rem;
+                                            display: flex;
+                                            align-items: center;
+                                            justify-content: space-between;
+                                            width: 100%;
+                                        ">
+                                            <span style="
+                                                font-weight: 600;
+                                                overflow: hidden;
+                                                text-overflow: ellipsis;
+                                                white-space: nowrap;
+                                                margin-right: 8px;
+                                            ">${title}</span>
+                                            <span style="
+                                                opacity: 0.8;
+                                                font-size: 0.7rem;
+                                                flex-shrink: 0;
+                                            ">${dateStr}</span>
+                                        </div>
+                                    `
+                                };
+                            }
+
 
                             const title = arg.event.title;
                             const start = arg.event.start;
