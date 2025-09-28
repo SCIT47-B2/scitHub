@@ -457,3 +457,73 @@
     color: #111827;
     text-decoration: none;
 }
+
+.instagram-feed {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* 화면 크기에 따라 열 개수 조절 */
+    gap: 16px;
+}
+.insta-post {
+    position: relative;
+    display: block;
+    aspect-ratio: 1 / 1; /* 1:1 정사각형 비율 */
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--shadow-soft);
+    text-decoration: none; /* 링크 밑줄 제거 */
+}
+/* 인스타그램 아이콘 오버레이 스타일 */
+.instagram-icon-overlay {
+    position: absolute;
+    top: 10px; /* 좌측 상단 여백 */
+    left: 10px; /* 좌측 상단 여백 */
+    background-color: rgba(0, 0, 0, 0.5); /* 반투명 배경 */
+    color: white;
+    font-size: 18px; /* 아이콘 크기 */
+    width: 36px; /* 아이콘 배경 크기 */
+    height: 36px; /* 아이콘 배경 크기 */
+    border-radius: 50%; /* 원형 배경 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0; /* 기본적으로 숨김 */
+    transition: opacity 0.3s ease-in-out;
+    z-index: 10; /* 다른 요소 위에 표시 */
+}
+.insta-post img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s;
+}
+.insta-post:hover img {
+    transform: scale(1.05);
+}
+.caption-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+    color: white;
+    padding: 24px 12px 12px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 13px;
+    line-height: 1.4;
+}
+.insta-post:hover .caption-overlay {
+    opacity: 1;
+}
+.insta-post:hover .instagram-icon-overlay {
+    opacity: 1; /* 호버 시 나타남 */
+}
+.caption-overlay p {
+    margin: 0;
+    /* 여러 줄 말줄임 처리 */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* 2줄까지 보이고 나머지는 ... 처리 */
+    -webkit-box-orient: vertical;
+}

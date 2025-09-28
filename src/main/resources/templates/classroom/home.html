@@ -23,28 +23,28 @@
                 <section class="stackCard" aria-label="운영실">
                     <a class="sectionHead" th:href="@{/admin}">運営室</a>
                     <div class="sectionBody">
-                    <ul class="noticeList">
-                        <li th:if="${#lists.isEmpty(latestAnnouncements)}">
-                            新しいお知らせはありません。
-                        </li>
-                        <li th:each="notice : ${latestAnnouncements}">
-                            <a th:href="@{/admin/announcement/read(postId=${notice.postId})}">
-                                <div class="notice-item">
-                                    <div class="notice-header">
-                                        <span th:switch="${notice.board}">
-                                            <i class="fa-solid fa-bullhorn"></i>
-                                            <span th:case="'announcement'">お知らせ</span>
-                                            <span th:case="'announcementIT'">お知らせ - IT</span>
-                                            <span th:case="'announcementJP'">お知らせ - 日本語</span>
-                                            <span th:case="*">[[${notice.board}]]</span>
-                                        </span>
-                                        <span class="date">[[${#temporals.format(notice.createdAt, 'MM月 dd日 HH:mm')}]]</span>
+                        <ul class="noticeList">
+                            <li th:if="${#lists.isEmpty(latestAnnouncements)}">
+                                新しいお知らせはありません。
+                            </li>
+                            <li th:each="notice : ${latestAnnouncements}">
+                                <a th:href="@{/admin/announcement/read(postId=${notice.postId})}">
+                                    <div class="notice-item">
+                                        <div class="notice-header">
+                                            <span th:switch="${notice.board}">
+                                                <i class="fa-solid fa-bullhorn"></i>
+                                                <span th:case="'announcement'">お知らせ</span>
+                                                <span th:case="'announcementIT'">お知らせ - IT</span>
+                                                <span th:case="'announcementJP'">お知らせ - 日本語</span>
+                                                <span th:case="*">[[${notice.board}]]</span>
+                                            </span>
+                                            <span class="date">[[${#temporals.format(notice.createdAt, 'MM月 dd日 HH:mm')}]]</span>
+                                        </div>
+                                        <p class="title">[[${notice.title}]]</p>
                                     </div>
-                                    <p class="title">[[${notice.title}]]</p>
-                                </div>
-                            </a>
-                        </li>
-                    </ul>
+                                </a>
+                            </li>
+                        </ul>
                     </div>
                 </section>
 
@@ -62,34 +62,10 @@
                         </div>
                     </nav>
                 </section>
-
-                <!-- /** 새로운 질문
-                    @desc   파란색 헤더(클릭 → question_submit.html) + 본문(입력창)
-                    @param  없음
-                    @return 없음(UI) */ -->
-                <!-- <section class="stackCard" aria-label="새로운 질문">
-                    <a class="sectionHead" href="question_submit.html">新しい質問</a>
-                    <div class="sectionBody">
-                        <div class="askBox" role="search">
-                            <input type="text" id="newQuestionInput" placeholder="回答する" aria-label="답변 입력" />
-                            <button class="btn-search" type="button" onclick="location.href='question_submit.html'">登録</button>
-                        </div>
-                    </div>
-                </section> -->
             </div>
 
             <!-- 중: 검색 → 좌석배치도(비율 유지) -->
             <div class="centerCol">
-
-                <!-- 검색(중앙 컬럼 너비 = 좌석배치도 너비) -->
-                <div class="search-row" role="search">
-                    <div class="search-input">
-                        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
-                        <input type="text" placeholder="検索ワードを入力してください" aria-label="검색어" />
-                    </div>
-                    <button class="btn-search" aria-label="검색 버튼">検索</button>
-                </div>
-
                 <!-- 좌석배치도 -->
                 <section class="seatmapCard card" aria-label="좌석배치도 카드">
                     <div class="seatmap" aria-label="강의실 좌석배치도" style="--cols:16; --rows:10;">
@@ -139,18 +115,26 @@
                         <div class="block"       style="grid-column:14 / span 3; grid-row:9 / span 2; border-radius:22px;">講義室9</div>
                     </div>
                 </section>
+                <div class="sectionBody">
+                    <!-- 인스타그램 피드 -->
+                    <div class="instagram-feed">
+                        <p th:if="${#lists.isEmpty(instagramPosts)}">
+                            インスタグラム投稿を読み込むことができません。
+                        </p>
+                        <a th:each="post : ${instagramPosts}" th:href="${post.permalink}" target="_blank" class="insta-post">
+                            <img th:src="${post.mediaUrl}" th:alt="${post.caption}" />
+                            <div class="instagram-icon-overlay">
+                                <i class="fa-brands fa-instagram"></i>
+                            </div>
+                            <div class="caption-overlay">
+                                <p th:text="${post.caption}"></p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
             </div>
 
-            <!-- 우: 일정 -->
-            <!-- <div class="rightCol">
-                <section class="card" aria-label="일정">
-                    <h3 class="sectionTitle">日程</h3>
-                    <ul class="scheduleList">
-                    <li>예시) 09/03(수) 팀 프로젝트 킥오프</li>
-                    <li>예시) 09/05(금) 과제 제출 마감</li>
-                    </ul>
-                </section>
-            </div> -->
+            <!-- 우: 디데이 + 일정 (2단 블록) -->
             <div class="rightCol">
                 <!-- 디데이 위젯 -->
                 <div id="ddayWidget" class="dday-widget" style="display: none;">
@@ -204,76 +188,76 @@
                         <button id="savePinnedDdays" class="btn btn-primary">選択内容を保存</button>
                     </div>
                 </div>
-            </div>
+            </div
 
             <!-- 일정 위젯용 모달 -->
             <div id="eventModal" class="modal">
                 <div class="modal-content">
-                <div class="modal-header">
-                    <h3 id="modalTitle">スケジュール登録</h3>
-                    <div id="colorPickerTrigger" class="color-swatch" style="background-color:#2C45BA;"></div>
-                </div>
-                <form id="eventForm" class="eventForm">
-
-                    <div style="display: none;">
-                    <div id="colorPalette">
-                        <div class="color-swatch selected" data-color="#2C45BA" style="background-color:#2C45BA;"></div>
-                        <div class="color-swatch" data-color="#43A5DE" style="background-color:#43A5DE;"></div>
-                        <div class="color-swatch" data-color="#0FC79F" style="background-color:#0FC79F;"></div>
-                        <div class="color-swatch" data-color="#C084FC" style="background-color:#C084FC;"></div>
-                        <div class="color-swatch" data-color="#FE5B00" style="background-color:#FE5B00;"></div>
-                        <div class="color-swatch" data-color="#757575" style="background-color:#757575;"></div>
+                    <div class="modal-header">
+                        <h3 id="modalTitle">スケジュール登録</h3>
+                        <div id="colorPickerTrigger" class="color-swatch" style="background-color:#2C45BA;"></div>
                     </div>
-                    </div>
-
-                    <input type="hidden" id="eventColor" name="eventColor" value="#2C45BA">
-                    <input type="hidden" id="eventId" name="eventId">
-
-                    <div class="form-group">
-                    <label for="eventTitle">題目:</label>
-                    <input type="text" id="eventTitle" name="eventTitle">
-                    </div>
-
-                    <div class="form-group">
-                    <label for="eventContent">内容:</label>
-                    <textarea id="eventContent" class="eventContent" name="eventContent"></textarea>
-                    </div>
-
-                    <div class="date-inputs-grid">
-                    <!-- 시간 포함 입력 (기본 표시) -->
-                    <div id="dateTimeInputs" class="form-group">
-                        <label for="eventStartDate">開始日時:</label>
-                        <input type="datetime-local" id="eventStartDate" name="eventStartDate">
-                    </div>
-
-                    <!-- 날짜만 입력 (숨김) -->
-                    <div id="dateOnlyInputs" class="form-group" style="display: none;">
-                        <label>開始日時:</label>
-                        <input type="date" id="startDate" name="startDate">
-                    </div>
-
-                    <div id="dateTimeEndInputs" class="form-group">
-                        <label for="eventEndDate">終了日時:</label>
-                        <input type="datetime-local" id="eventEndDate" name="eventEndDate">
-                    </div>
-
-                    <div id="dateOnlyEndInputs" class="form-group" style="display: none;">
-                        <label>終了日時:</label>
-                        <input type="date" id="endDate" name="endDate">
-                    </div>
-                    </div>
-
-                    <!-- 종일 일정 체크박스 -->
-                    <div class="form-group">
-                    <input type="checkbox" id="isAllDay" name="isAllDay">
-                    <label for="isAllDay">終日の日程</label>
-                    </div>
-
-                    <div id="modalButtons" class="modal-buttons"></div>
-                </form>
+                    <form id="eventForm" class="eventForm">
+    
+                        <div style="display: none;">
+                        <div id="colorPalette">
+                            <div class="color-swatch selected" data-color="#2C45BA" style="background-color:#2C45BA;"></div>
+                            <div class="color-swatch" data-color="#43A5DE" style="background-color:#43A5DE;"></div>
+                            <div class="color-swatch" data-color="#0FC79F" style="background-color:#0FC79F;"></div>
+                            <div class="color-swatch" data-color="#C084FC" style="background-color:#C084FC;"></div>
+                            <div class="color-swatch" data-color="#FE5B00" style="background-color:#FE5B00;"></div>
+                            <div class="color-swatch" data-color="#757575" style="background-color:#757575;"></div>
+                        </div>
+                        </div>
+    
+                        <input type="hidden" id="eventColor" name="eventColor" value="#2C45BA">
+                        <input type="hidden" id="eventId" name="eventId">
+    
+                        <div class="form-group">
+                        <label for="eventTitle">題目:</label>
+                        <input type="text" id="eventTitle" name="eventTitle">
+                        </div>
+    
+                        <div class="form-group">
+                        <label for="eventContent">内容:</label>
+                        <textarea id="eventContent" class="eventContent" name="eventContent"></textarea>
+                        </div>
+    
+                        <div class="date-inputs-grid">
+                        <!-- 시간 포함 입력 (기본 표시) -->
+                        <div id="dateTimeInputs" class="form-group">
+                            <label for="eventStartDate">開始日時:</label>
+                            <input type="datetime-local" id="eventStartDate" name="eventStartDate">
+                        </div>
+    
+                        <!-- 날짜만 입력 (숨김) -->
+                        <div id="dateOnlyInputs" class="form-group" style="display: none;">
+                            <label>開始日時:</label>
+                            <input type="date" id="startDate" name="startDate">
+                        </div>
+    
+                        <div id="dateTimeEndInputs" class="form-group">
+                            <label for="eventEndDate">終了日時:</label>
+                            <input type="datetime-local" id="eventEndDate" name="eventEndDate">
+                        </div>
+    
+                        <div id="dateOnlyEndInputs" class="form-group" style="display: none;">
+                            <label>終了日時:</label>
+                            <input type="date" id="endDate" name="endDate">
+                        </div>
+                        </div>
+    
+                        <!-- 종일 일정 체크박스 -->
+                        <div class="form-group">
+                        <input type="checkbox" id="isAllDay" name="isAllDay">
+                        <label for="isAllDay">終日の日程</label>
+                        </div>
+    
+                        <div id="modalButtons" class="modal-buttons"></div>
+                    </form>
                 </div>
             </div>
-        </section>
+        </div>
         <th:block layout:fragment="script">
             <script th:inline="javascript">
                 /*<![CDATA[*/
