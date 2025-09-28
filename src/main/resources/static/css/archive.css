@@ -41,9 +41,8 @@
 
 .table-container {
     background-color: #fff;
-    border-radius: 10px;
-    /* box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); */
-    box-shadow: var(--shadow);
+    border-radius: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); /* 그림자 줄임 */
     overflow: hidden;
 }
 
@@ -53,7 +52,7 @@ table {
 }
 
 thead {
-    background-color: #f5f5f5;
+    background-color: #0FC79F;
 }
 
 th, td {
@@ -64,8 +63,8 @@ th, td {
 }
 
 th {
-    font-weight: 500;
-    color: #555;
+    font-weight: 800;
+    color: #000000;
     position: relative;
 }
 
@@ -86,8 +85,8 @@ tbody tr:hover {
     border: none;
     cursor: pointer;
     font-size: 14px;
-    color: #555;
-    font-weight: 500;
+    color: #000000;
+    font-weight: 600;
     padding: 0;
 }
 
@@ -137,6 +136,11 @@ tbody tr:hover {
     gap: 10px;
 }
 
+.pagination a {
+    text-decoration: none; /* 밑줄 제거 */
+    color: inherit; /* 부모 요소의 색상을 상속받음 */
+}
+
 .pagination span {
     width: 30px;
     height: 30px;
@@ -151,8 +155,8 @@ tbody tr:hover {
 }
 
 .pagination span.active {
-    background-color: #e0f7ff;
-    color: #007bff;
+    background-color: #0FC79F;
+    color: #ffffff;
 }
 
 .pagination span:hover:not(.active) {
@@ -177,7 +181,20 @@ tbody tr:hover {
     justify-content: space-between;
     align-items: center;
     padding: 20px;
-    background-color: #d6dbe8;
+    /* background-color: #dadae2; */
+    background-color: #0FC79F;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.header_course {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    /* background-color: #dadae2; */
+    background-color: #A85DF3;
     border: 1px solid #e0e0e0;
     border-radius: 10px;
     margin-bottom: 30px;
@@ -205,19 +222,30 @@ tbody tr:hover {
 .name-rating {
     display: flex;
     align-items: center;
-    margin-bottom: 5px;
+    margin-bottom: 10px; /* 간격 조정 */
+}
+.name-rating-course {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px; /* 간격 조정 */
 }
 
 .name-rating h2 {
     margin: 0;
     font-size: 1.5rem;
     margin-right: 10px;
-    color: #333;
+    color: #1a1a1a;
+}
+.name-rating-course h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    margin-right: 10px;
+    color: #ffffff;
 }
 
 .rating-display {
     font-size: 1.2rem;
-    color: #666;
+    color: #1c1c1c;
 }
 
 /* Average Rating Stars */
@@ -225,22 +253,36 @@ tbody tr:hover {
     display: flex;
     align-items: center;
     font-size: 1.2rem;
-    color: #d1d1d1; /* 기본 별 색상 */
+    color: #dedede; /* 기본 별 색상 */
+}
+.avg-rating-stars-course {
+    display: flex;
+    align-items: center;
+    font-size: 1.2rem;
+    color: #b7a5c9; /* 기본 별 색상 */
 }
 
 .avg-rating-stars .fa-star.filled {
     color: #000000; /* 채워진 별 색상 */
 }
+.avg-rating-stars-course .fa-star.filled {
+    color: #ffffff; /* 채워진 별 색상 */
+}
 
 .avg-rating-stars span {
     margin-left: 5px;
     font-weight: bold;
-    color: #666;
+    color: #242424;
+}
+.avg-rating-stars-course span {
+    margin-left: 5px;
+    font-weight: bold;
+    color: #ffffff;
 }
 
 /* Company Meta Info (산업, 유형, 위치) */
 .meta-info span {
-    background-color: #B2C1E1;
+    background-color: #a4d9ce;
     padding: 3px 8px;
     border-radius: 15px;
     margin-right: 5px;
@@ -250,7 +292,21 @@ tbody tr:hover {
 
 /* Review Write Button */
 .review-write-button {
-    background-color: #5270AD;
+    background-color: #2c6256;
+    color: white;
+    border: none; /* 테두리 제거 */
+    padding: 10px 20px;
+    border-radius: 20px;
+    text-decoration: none;
+    font-weight: bold;
+    display: flex; /* 아이콘과 텍스트 정렬 */
+    align-items: center;
+    gap: 8px; /* 아이콘과 텍스트 사이 간격 */
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+}
+.review-write-button-course {
+    background-color: rgb(106, 67, 143);
     color: white;
     border: none; /* 테두리 제거 */
     padding: 10px 20px;
@@ -264,7 +320,10 @@ tbody tr:hover {
     cursor: pointer;
 }
 .review-write-button:hover {
-    background-color: #42609A; /* 호버 색상 */
+    background-color: #000000; /* 호버 색상 */
+}
+.review-write-button-course:hover {
+    background-color: #000000; /* 호버 색상 */
 }
 
 /* Review List Grid */
@@ -318,8 +377,19 @@ tbody tr:hover {
 
 .reviewer-info-chip {
     display: inline-block;
-    background-color: #e0e0e0; /* 칩 배경색 */
-    color: #555; /* 글자색 */
+    background-color: #cde2de; /* 칩 배경색 */
+    color: #2c6256; /* 글자색 */
+    padding: 4px 8px; /* 안쪽 여백 */
+    border-radius: 16px; /* 모서리를 둥글게 */
+    font-size: 12px;
+    font-weight: bold;
+    margin-bottom: 8px; /* 별점과의 간격 */
+    align-self: flex-start; /* 내용의 너비만큼만 차지하도록 설정 */
+}
+.reviewer-info-chip-course {
+    display: inline-block;
+    background-color: #e1d9ea; /* 칩 배경색 */
+    color: #000000; /* 글자색 */
     padding: 4px 8px; /* 안쪽 여백 */
     border-radius: 16px; /* 모서리를 둥글게 */
     font-size: 12px;
@@ -360,8 +430,18 @@ tbody tr:hover {
 
 /* Modal Content */
 .modal-content {
-    background-color: #4a5a8a;
-    color: white;
+    background-color: #0FC79F;
+    color: rgb(0, 0, 0);
+    padding: 25px 30px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+.modal-content-course {
+    background-color: #d1b5f1;
+    color: rgb(0, 0, 0);
     padding: 25px 30px;
     border-radius: 15px;
     width: 90%;
@@ -402,7 +482,7 @@ tbody tr:hover {
 }
 
 .star-rating-area .stars > i {
-    color: #dcdcdc; /* 비활성 별 색상 */
+    color: #d1d1d1; /* 비활성 별 색상 */
     cursor: pointer;
     transition: color 0.2s;
 }
@@ -440,7 +520,19 @@ tbody tr:hover {
     padding: 12px;
     border: none;
     border-radius: 10px;
-    background-color: #8a99c2; /* 버튼 배경색 */
+    background-color: #2c6256; /* 버튼 배경색 */
+    color: white;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+.submit-button-course {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    background-color: #000000; /* 버튼 배경색 */
     color: white;
     font-size: 1.1rem;
     font-weight: bold;
@@ -449,16 +541,18 @@ tbody tr:hover {
 }
 
 .submit-button:hover {
-    background-color: #7384b0;
+    background-color: #000000;
 }
-
+.submit-button-course:hover {
+    background-color: #732CBB;
+}
 
 
 .section {
     margin-bottom: 40px;
 }
 .section-title {
-    background-color: #4258BE;
+    background-color: #A85DF3;
     color: white;
     padding: 10px 20px;
     border-radius: 20px;

@@ -72,7 +72,7 @@ box-sizing: border-box;
   padding: 6px 12px;
   border: 1px solid #ddd;
   background: white;
-  border-radius: 4px;
+  border-radius: 10px;
   cursor: pointer;
   font-size: 14px;
   transition: background 0.2s;
@@ -97,11 +97,11 @@ box-sizing: border-box;
 }
 .view-btn:last-child { border-right: none; }
 .view-btn:hover { background: #f0f0f0; }
-.view-btn.active { background: #4258BE; color: white; }
+.view-btn.active { background: #FE5B00; color: white; }
 
 /* 요일 헤더 전체 영역 */
 .fc-col-header {
-  background-color: #4258BE;
+  background-color: #FE5B00;
   border-bottom: 2px solid #dee2e6;
   color: white;
 }
@@ -151,7 +151,7 @@ input[type="checkbox"] + label::before {
   width: 14px;
   height: 14px;
   border: 2px solid #ccc;
-  border-radius: 4px;
+  border-radius: 5px;
   background-color: #fff;
   transition: background-color 0.2s, border-color 0.2s;
 }
@@ -180,20 +180,21 @@ input[type="checkbox"]:checked + label::after {
   height: 36px;
   border: 1px solid #ddd;
   background: #fff;
-  border-radius: 4px;
+  border-radius: 10px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: background 0.2s;
   padding: 0;              /* 아이콘만 중앙 정렬 */
+  margin-left: 10px;
 }
 .eventAddBtn:hover{ background: #f0f0f0; }
 
 /* 아이콘 이미지 크기 */
 .eventAddBtn img{
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   object-fit: contain;
   display: block;
 }
@@ -297,10 +298,10 @@ input[type="checkbox"]:checked + label::after {
   transition: all 0.2s ease;
   min-width: 80px;
 }
-.btn-primary { background: #4258BE; color: white; }
-.btn-primary:hover { background: #2563eb; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
+.btn-primary { background: #FE5B00; color: white; }
+.btn-primary:hover { background: #000000; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
 .btn-secondary { background: #f1f5f9; color: #64748b; }
-.btn-secondary:hover { background: #e2e8f0; color: #475569; }
+.btn-secondary:hover { background: #000000; color: #ffffff; }
 .btn-danger { background: #ef4444; color: white; }
 .btn-danger:hover { background: #dc2626; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3); }
 
@@ -308,8 +309,8 @@ input[type="checkbox"]:checked + label::after {
 .leftSection {
   background-color: white;
   padding: 20px;
-  border-radius: 16px;
-  box-shadow: var(--shadow);
+  border-radius: 30px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); /* 그림자 줄임 */
   height: fit-content;
 }
 
