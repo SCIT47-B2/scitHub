@@ -1,3 +1,6 @@
+const currentScript = document.currentScript;
+const ddayPageUrl = currentScript.dataset.ddayUrl;
+
 document.addEventListener('DOMContentLoaded', function() {
     initializeDdayWidget();
     initializeCalendarWidget();
@@ -81,9 +84,15 @@ function renderDdayModal(ddayEvents) {
     listEl.innerHTML = ddayEvents.map(dday => {
         const { ddayString, targetDate } = calculateDday(dday.dday);
         const formattedDate = targetDate.toLocaleDateString('ja-JP');
+
+        const editUrl = `${ddayPageUrl}?action=edit&id=${dday.ddayId}`;
+
         return `<li>
                     <input type="checkbox" data-id="${dday.ddayId}" ${dday.pinned ? 'checked' : ''}>
-                    <div class="dday-info"><div class="dday-title">${dday.title}</div><div class="dday-date">${formattedDate}</div></div>
+                    <div class="dday-info">
+                        <a class="dday-title" href="${editUrl}">${dday.title}</a>
+                        <div class="dday-date">${formattedDate}</div>
+                    </div>
                     <div class="dday-counter">${ddayString}</div>
                 </li>`;
     }).join('');
