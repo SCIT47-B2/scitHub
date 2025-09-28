@@ -193,68 +193,68 @@
             <!-- 일정 위젯용 모달 -->
             <div id="eventModal" class="modal">
                 <div class="modal-content">
-                <div class="modal-header">
-                    <h3 id="modalTitle">スケジュール登録</h3>
-                    <div id="colorPickerTrigger" class="color-swatch" style="background-color:#2C45BA;"></div>
-                </div>
-                <form id="eventForm" class="eventForm">
-
-                    <div style="display: none;">
-                    <div id="colorPalette">
-                        <div class="color-swatch selected" data-color="#2C45BA" style="background-color:#2C45BA;"></div>
-                        <div class="color-swatch" data-color="#43A5DE" style="background-color:#43A5DE;"></div>
-                        <div class="color-swatch" data-color="#0FC79F" style="background-color:#0FC79F;"></div>
-                        <div class="color-swatch" data-color="#C084FC" style="background-color:#C084FC;"></div>
-                        <div class="color-swatch" data-color="#FE5B00" style="background-color:#FE5B00;"></div>
-                        <div class="color-swatch" data-color="#757575" style="background-color:#757575;"></div>
+                    <div class="modal-header">
+                        <h3 id="modalTitle">スケジュール登録</h3>
+                        <div id="colorPickerTrigger" class="color-swatch" style="background-color:#2C45BA;"></div>
                     </div>
-                    </div>
-
-                    <input type="hidden" id="eventColor" name="eventColor" value="#2C45BA">
-                    <input type="hidden" id="eventId" name="eventId">
-
-                    <div class="form-group">
-                    <label for="eventTitle">題目:</label>
-                    <input type="text" id="eventTitle" name="eventTitle">
-                    </div>
-
-                    <div class="form-group">
-                    <label for="eventContent">内容:</label>
-                    <textarea id="eventContent" class="eventContent" name="eventContent"></textarea>
-                    </div>
-
-                    <div class="date-inputs-grid">
-                    <!-- 시간 포함 입력 (기본 표시) -->
-                    <div id="dateTimeInputs" class="form-group">
-                        <label for="eventStartDate">開始日時:</label>
-                        <input type="datetime-local" id="eventStartDate" name="eventStartDate">
-                    </div>
-
-                    <!-- 날짜만 입력 (숨김) -->
-                    <div id="dateOnlyInputs" class="form-group" style="display: none;">
-                        <label>開始日時:</label>
-                        <input type="date" id="startDate" name="startDate">
-                    </div>
-
-                    <div id="dateTimeEndInputs" class="form-group">
-                        <label for="eventEndDate">終了日時:</label>
-                        <input type="datetime-local" id="eventEndDate" name="eventEndDate">
-                    </div>
-
-                    <div id="dateOnlyEndInputs" class="form-group" style="display: none;">
-                        <label>終了日時:</label>
-                        <input type="date" id="endDate" name="endDate">
-                    </div>
-                    </div>
-
-                    <!-- 종일 일정 체크박스 -->
-                    <div class="form-group">
-                    <input type="checkbox" id="isAllDay" name="isAllDay">
-                    <label for="isAllDay">終日の日程</label>
-                    </div>
-
-                    <div id="modalButtons" class="modal-buttons"></div>
-                </form>
+                    <form id="eventForm" class="eventForm">
+    
+                        <div style="display: none;">
+                        <div id="colorPalette">
+                            <div class="color-swatch selected" data-color="#2C45BA" style="background-color:#2C45BA;"></div>
+                            <div class="color-swatch" data-color="#43A5DE" style="background-color:#43A5DE;"></div>
+                            <div class="color-swatch" data-color="#0FC79F" style="background-color:#0FC79F;"></div>
+                            <div class="color-swatch" data-color="#C084FC" style="background-color:#C084FC;"></div>
+                            <div class="color-swatch" data-color="#FE5B00" style="background-color:#FE5B00;"></div>
+                            <div class="color-swatch" data-color="#757575" style="background-color:#757575;"></div>
+                        </div>
+                        </div>
+    
+                        <input type="hidden" id="eventColor" name="eventColor" value="#2C45BA">
+                        <input type="hidden" id="eventId" name="eventId">
+    
+                        <div class="form-group">
+                        <label for="eventTitle">題目:</label>
+                        <input type="text" id="eventTitle" name="eventTitle">
+                        </div>
+    
+                        <div class="form-group">
+                        <label for="eventContent">内容:</label>
+                        <textarea id="eventContent" class="eventContent" name="eventContent"></textarea>
+                        </div>
+    
+                        <div class="date-inputs-grid">
+                        <!-- 시간 포함 입력 (기본 표시) -->
+                        <div id="dateTimeInputs" class="form-group">
+                            <label for="eventStartDate">開始日時:</label>
+                            <input type="datetime-local" id="eventStartDate" name="eventStartDate">
+                        </div>
+    
+                        <!-- 날짜만 입력 (숨김) -->
+                        <div id="dateOnlyInputs" class="form-group" style="display: none;">
+                            <label>開始日時:</label>
+                            <input type="date" id="startDate" name="startDate">
+                        </div>
+    
+                        <div id="dateTimeEndInputs" class="form-group">
+                            <label for="eventEndDate">終了日時:</label>
+                            <input type="datetime-local" id="eventEndDate" name="eventEndDate">
+                        </div>
+    
+                        <div id="dateOnlyEndInputs" class="form-group" style="display: none;">
+                            <label>終了日時:</label>
+                            <input type="date" id="endDate" name="endDate">
+                        </div>
+                        </div>
+    
+                        <!-- 종일 일정 체크박스 -->
+                        <div class="form-group">
+                        <input type="checkbox" id="isAllDay" name="isAllDay">
+                        <label for="isAllDay">終日の日程</label>
+                        </div>
+    
+                        <div id="modalButtons" class="modal-buttons"></div>
+                    </form>
                 </div>
             </div>
         </div>
