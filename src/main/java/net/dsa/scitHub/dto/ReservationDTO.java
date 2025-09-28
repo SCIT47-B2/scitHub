@@ -17,6 +17,7 @@ public class ReservationDTO {
     private Integer classroomId;
     private Integer userId;
     private String username;
+    private String name;
     private Integer timeSlotId;
     private LocalDateTime startAt;
     private LocalDateTime endAt;
@@ -33,6 +34,7 @@ public class ReservationDTO {
                 .classroomId(reservation.getClassroom().getClassroomId())
                 .userId(reservation.getUser().getUserId())
                 .username(reservation.getUser().getUsername())
+                .name(reservation.getUser().getNameKor())
                 .timeSlotId(timeSlotId)
                 .startAt(reservation.getStartAt())
                 .endAt(reservation.getEndAt())

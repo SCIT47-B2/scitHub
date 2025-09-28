@@ -19,7 +19,7 @@
 
             <span class="time-range" th:text="${startHour} + ':00 - ' + (${startHour} + 1) + ':00'">18:00 - 19:00</span>
             
-            <span class="reserver-name" th:text="${startHour < currentHour or reservation == null} ? '-' : ${reservation.username}">-</span>
+            <span class="reserver-name" th:text="${startHour < currentHour or reservation == null} ? '-' : ${reservation.name}">-</span>
 
             <button th:if="${startHour < currentHour}" class="reservation-btn reserved" disabled>
                 終了
