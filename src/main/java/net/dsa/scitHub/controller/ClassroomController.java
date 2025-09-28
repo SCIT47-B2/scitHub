@@ -4,6 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +17,8 @@ import net.dsa.scitHub.dto.InstagramPostDTO;
 import net.dsa.scitHub.dto.MenuItem;
 import net.dsa.scitHub.dto.PostDTO;
 import net.dsa.scitHub.service.InstagramService;
+import net.dsa.scitHub.security.AuthenticatedUser;
+import net.dsa.scitHub.service.EventService;
 import net.dsa.scitHub.service.PostService;
 import net.dsa.scitHub.service.ReservationService;
 
@@ -27,6 +30,7 @@ public class ClassroomController {
     private final ReservationService rs;
     private final PostService ps;
     private final InstagramService is;
+    private final EventService es;
 
     @ModelAttribute("boardMap")
     public Map<String, String> boardMap() {
@@ -48,7 +52,7 @@ public class ClassroomController {
 
     // 클래스룸 페이지 요청
     @GetMapping({ "/classroom", "/classroom/home" })
-    public String classroomPage(Model model) {
+    public String classroomPage(Model model, @AuthenticationPrincipal AuthenticatedUser userDetails) {
 
         List<MenuItem> menuItems = List.of(
                 new MenuItem("ホーム", "/classroom/home")
@@ -58,6 +62,12 @@ public class ClassroomController {
         Map<Integer, ClassroomDTO> classroomMap = rs.getAllClassrooms();
         List<PostDTO> latestAnnouncements = ps.getLatestAnnouncements(3);
         List<InstagramPostDTO> instagramPosts = is.getRecentPosts();
+
+        Integer userId = es.convertUsernameToUserId(userDetails.getId());
+
+        model.addAttribute("currentUsername", userDetails.getId());
+        model.addAttribute("currentUserRole", userDetails.getRoleName());
+        model.addAttribute("currentUserId", userId);
 
         model.addAttribute("menuItems", menuItems);
         model.addAttribute("classroomMap", classroomMap);
