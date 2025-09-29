@@ -2,7 +2,8 @@
 .rightCol {
     display: flex;
     flex-direction: column;
-    gap: 0; /* 위젯 사이의 기본 간격은 0으로 하고 각 위젯의 margin으로 조절 */
+    gap: 10px; /* 위젯 사이의 기본 간격은 0으로 하고 각 위젯의 margin으로 조절 */
+    height: 100%;
 }
 
 /* ============================================
@@ -15,10 +16,15 @@
     background: #ffffff;
     border-radius: 16px;
     padding: 0;
-    margin: 20px 0;
+    margin: 0;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
     overflow: hidden;
     border: none;
+    /* 전체 높이에서 D-Day(130px)와 gap(20px) 빼기 */
+    height: calc(100% - 130px - 10px) !important;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 /* =========================
@@ -48,11 +54,13 @@
 ========================= */
 #mini-calendar {
     background: #ffffff;
-    padding: 20px;
+    padding: 0 20px;  /* 위아래 0, 좌우 20px */
     border: none;
-    max-height: 400px;  /* 최대 높이 설정 */
+    max-height: 530px;
+    min-height: 0;  /* flexbox 버그 방지 */
     overflow-y: auto;   /* 세로 스크롤 활성화 */
     overflow-x: hidden; /* 가로 스크롤 숨김 */
+    flex: 1;
 }
 /* =========================
 4. 모든 테두리 제거
@@ -90,7 +98,7 @@
 
 /* 다른 모든 border 제거 */
 #mini-calendar .fc-timegrid-slot {
-    height: 40px !important;
+    height: 50px !important;
     border: none !important;
 }
 
@@ -328,17 +336,25 @@
 .dday-widget {
     margin: 0;
     background-color: transparent;
-    padding: 0;
+    padding: 0px;
     cursor: pointer;
     display: flex;
     flex-direction: column;
     gap: 10px; /* 카드 사이의 간격 */
 
     /* 스크롤 기능 */
-    max-height: 200px; /* 위젯의 최대 높이 (카드 2개 정도) */
+    min-height: 130px;  /* height 대신 min-height 사용 */
+    height: 130px;      /* 둘 다 명시 */
+    max-height: 130px;  /* 최대 높이도 같게 설정 */
     overflow-y: auto;  /* 내용이 max-height를 넘으면 자동으로 세로 스크롤 생성 */
 }
 
+
+/* 카드가 1개만 있을 때 */
+.dday-widget:has(.dday-item:only-child) .dday-item {
+    padding: 45px 30px;
+    font-size: 1.1em;    /* 더 큰 글자 */
+}
 /* 새로운 D-Day 카드 아이템 스타일 */
 .dday-item {
     display: flex;
@@ -380,7 +396,12 @@
     border-radius: 16px;
     box-sizing: border-box;
     background-color: #ffffff;
-    box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.08); /* spread를 0으로 */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    height: 130px;
+
+    display: flex;
+    align-items: center;      /* 세로 중앙 */
+    justify-content: center;   /* 가로 중앙 */
 }
 
 /* D-Day 카운터 (D-54) 스타일 */

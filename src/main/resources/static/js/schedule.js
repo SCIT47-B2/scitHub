@@ -64,6 +64,11 @@ document.addEventListener('DOMContentLoaded', function onReady() {
     eventDisplay: 'block',
     allDayText: '終日',
 
+        // 종일 일정 관련
+    allDayMaintainDuration: true,
+    dayMaxEvents: false,
+    dayMaxEventRows: false,
+
     dayHeaderContent: function (arg) {
       const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
       return dayNames[arg.date.getDay()];
@@ -78,6 +83,16 @@ document.addEventListener('DOMContentLoaded', function onReady() {
     selectable: true,
     firstDay: 0,
     fixedWeekCount: false,
+
+    // 렌더링 후 스크롤 제거
+    viewDidMount: function() {
+        // 헤더와 종일 영역 스크롤 제거
+        document.querySelectorAll('#mini-calendar .fc-scrollgrid-section-header .fc-scroller, #mini-calendar .fc-daygrid-body .fc-scroller').forEach(el => {
+            el.style.overflow = 'visible';
+            el.style.overflowY = 'visible';
+            el.style.overflowX = 'visible';
+        });
+    },
 
     datesSet: function (info) {
       document.getElementById('calendarTitle').textContent = info.view.title;
