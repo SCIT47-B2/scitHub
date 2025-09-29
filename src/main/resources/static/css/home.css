@@ -516,6 +516,7 @@
 
 .instagram-feed {
     display: grid;
+    place-items: center;
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* 화면 크기에 따라 열 개수 조절 */
     gap: 16px;
     overflow-y: auto; /* 내용이 넘칠 경우 스크롤 생성 */
