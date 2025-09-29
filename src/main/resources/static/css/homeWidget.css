@@ -56,7 +56,7 @@
     background: #ffffff;
     padding: 0 20px;  /* 위아래 0, 좌우 20px */
     border: none;
-    max-height: 530px;
+    max-height: 560px; /* 내용 길이 */
     min-height: 0;  /* flexbox 버그 방지 */
     overflow-y: auto;   /* 세로 스크롤 활성화 */
     overflow-x: hidden; /* 가로 스크롤 숨김 */
