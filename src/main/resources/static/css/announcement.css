@@ -5,7 +5,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&display=swap');
 
 html, body{
-  font-family: 'Noto Sans JP', sans-serif;
+    font-family: 'Noto Sans JP', sans-serif;
 }
 
 /* 메인 콘텐츠 영역을 '왼쪽 콘텐츠'와 '오른쪽 사이드'로 분할 */
@@ -97,7 +97,7 @@ html, body{
     gap: 8px; /* 아이콘과 텍스트 사이 간격 */
     height: 40px;
     padding: 0 16px;
-    background-color: #43A5DE;
+    background-color: var(--primary);
     color: white;
     border: none;
     border-radius: 8px;
