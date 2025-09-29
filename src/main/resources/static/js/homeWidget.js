@@ -166,10 +166,12 @@ function initializeCalendarWidget() {
     titleEl.addEventListener('click', function() {
         window.location.href = '/scitHub/calendar/schedule';
     });
-    
+
     const calendar = new FullCalendar.Calendar(calendarEl, {
         locale: 'ja',
         initialView: 'timeGridDay',
+        height: '100%',
+        expandRows: true,
         initialDate: new Date(),
         slotEventOverlap: false,  // 이벤트가 겹치지 않게
         eventDisplay: 'block',    // 블록 형태로 표시
