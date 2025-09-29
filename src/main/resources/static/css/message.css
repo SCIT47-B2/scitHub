@@ -11,7 +11,7 @@
 :root {
   /* Color tokens (fallbacks in case tokens.css is missing) */
   --brandPrimary: var(--primary, #4f46e5);
-  --brandPrimaryHover: var(--primaryHover, #4338ca);
+  --brandPrimaryHover: var(--primaryHover, black);
   --brandDanger: var(--danger, #e11d48);
   --bgBody: var(--bg, #f7f7fb);
   --bgSurface: var(--surface, #ffffff);
@@ -406,6 +406,9 @@ section.message-box .pagination a.active {
   cursor: pointer;
   font-weight: bold;
   transition: background-color .2s ease;
+}
+.search-bar button:hover {
+  background-color: black;
 }
 
 /* 포커스 스타일 (선택 사항, 통일성 부여) */

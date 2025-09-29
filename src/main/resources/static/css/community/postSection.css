@@ -46,7 +46,7 @@
 
 .search-bar button#search-btn {
     border: none;
-    background-color: var(--primary);
+    background-color: #020202;
     color: white;
     font-size: 16px;
     width: 40px;
@@ -58,7 +58,7 @@
 }
 
 .search-bar button#search-btn:hover {
-    background-color: #3b50b0;
+    background-color: #4258BE;
 }
 
 
@@ -91,7 +91,7 @@
     gap: 8px;
     height: 40px;
     padding: 0 16px;
-    background-color: var(--primary);
+    background-color: #4258BE;
     color: white;
     border: none;
     border-radius: 8px;
@@ -104,7 +104,7 @@
 }
 
 .writeBtn:hover {
-    background-color: #3b50b0;
+    background-color: #000000;
 }
 
 /* 3. 게시글 테이블 */
@@ -273,6 +273,6 @@
 }
 
 .pagination-container b.active {
-    background-color: var(--primary);
-    color: white;
+    background-color: #732cbb00;
+    color: rgb(0, 0, 0);
 }

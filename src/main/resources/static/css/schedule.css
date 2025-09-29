@@ -70,9 +70,10 @@
   padding: 6px 12px;
   border: 1px solid #ddd;
   background: white;
-  border-radius: 4px;
+  border-radius: 10px;
   cursor: pointer;
   font-size: 14px;
+  font-weight: 500;
   transition: background 0.2s;
 }
 .today-btn:hover { background: #f0f0f0; }
@@ -148,35 +149,224 @@
   gap: 6px;
 }
 
-/** 일정 등록(펜) 아이콘 버튼 */
-.eventAddBtn {
+
+/* 체크박스와 라벨 감싸는 div에 Flexbox 적용 (선택사항) */
+.toggle-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* 실제 체크박스 숨기기 */
+input[type="checkbox"] { display: none; }
+
+/* 라벨을 커스텀 체크박스처럼 보이게 하기 */
+input[type="checkbox"] + label {
+  position: relative;
+  padding-left: 25px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #333;
+}
+
+/* 커스텀 체크박스 모양 */
+input[type="checkbox"] + label::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+  border: 2px solid #ccc;
+  border-radius: 5px;
+  background-color: #fff;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+/* 체크됐을 때 체크박스 색상 */
+input[type="checkbox"]:checked + label::before {
+  background-color: black;
+  border-color: black;
+}
+
+/* 체크 마크(V) */
+input[type="checkbox"]:checked + label::after {
+  content: '';
+  position: absolute;
+  top: 10%;
+  left: 5px;
+  width: 6px;
+  height: 10px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+/** 일정 등록(펜) 아이콘 버튼 — nav 버튼과 톤/사이즈 맞춤 */
+.eventAddBtn{
   width: 36px;
   height: 36px;
   border: 1px solid #ddd;
   background: #fff;
-  border-radius: 4px;
+  border-radius: 10px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: background 0.2s;
-  padding: 0;
+  padding: 0;              /* 아이콘만 중앙 정렬 */
+  margin-left: 10px;
+
 }
 .eventAddBtn:hover { background: #f0f0f0; }
 
 /* 아이콘 이미지 크기 */
-.eventAddBtn img {
-  width: 20px;
-  height: 20px;
+.eventAddBtn img{
+  width: 24px;
+  height: 24px;
   object-fit: contain;
   display: block;
 }
+
+/* ===== 모달 스타일 ===== */
+.modal {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+.modal.show { display: flex; }
+
+.modal-content {
+  background: white;
+  border-radius: 20px;
+  padding: 32px;
+  width: 90%;
+  max-width: 400px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+.modal-content h3 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 24px;
+}
+
+/* 폼 스타일 */
+.form-group {
+  margin-bottom: 16px;
+  max-width: 100%;
+  display: flex;
+  align-items: center;
+}
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  margin-right: auto;
+  color: #475569;
+  font-weight: 600;
+  font-size: 14px;
+}
+.form-group input[type="text"],
+.form-group input[type="datetime-local"],
+.form-group input[type="date"],
+.form-group textarea {
+  width: 80%;
+  padding: 10px 14px;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+.form-group textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-group.checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.date-inputs-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 12px;
+}
+
+/* 버튼 스타일 */
+.modal-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid #f1f5f9;
+}
+.btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 80px;
+}
+.btn-primary { background: #4258BE; color: white; }
+.btn-primary:hover { background: #000000; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
+.btn-secondary { background: #f1f5f9; color: #64748b; }
+.btn-secondary:hover { background: #000000; color: #ffffff; }
+.btn-danger { background: #ef4444; color: white; }
+.btn-danger:hover { background: #dc2626; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3); }
 
 /* 왼쪽 캘린더 섹션 카드 */
 .leftSection {
   background-color: white;
   padding: 20px;
-  border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  border-radius: 30px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); /* 그림자 줄임 */
   height: fit-content;
 }
+
+/* 날짜/시간 입력 필드의 너비 문제 해결 */
+
+/* 1. 날짜 입력 필드를 감싸는 그룹의 정렬 방식을 변경 */
+.date-inputs-grid .form-group {
+    display: flex;
+    flex-direction: column; /* 라벨과 입력창을 세로로 쌓음 */
+    align-items: flex-start; /* 왼쪽 정렬 */
+}
+
+/* 2. 라벨이 더 이상 공간을 차지하지 않도록 수정 */
+.date-inputs-grid .form-group label {
+    margin-bottom: 8px; /* 라벨과 입력창 사이 간격 */
+    margin-right: 0;    /* 오른쪽 자동 여백 제거 */
+}
+
+/* 3. 날짜/시간 입력창의 너비를 100%로 설정 */
+.date-inputs-grid .form-group input[type="datetime-local"],
+.date-inputs-grid .form-group input[type="date"] {
+    width: 100%; /* 너비를 꽉 채움 */
+    box-sizing: border-box; /* 패딩을 너비 계산에 포함 */
+    padding-left: 8px;
+    padding-right: 8px;
+}
+
+.toggle-item label {
+          font-weight: 600; /* 글씨를 더 진하게 설정 */
+        }

@@ -18,14 +18,14 @@ body {
 .leftSection{
   flex:0 0 auto; display:flex; flex-direction:column;
   justify-content:flex-start; align-items:flex-start;
-  padding:60px 20px; margin-left:clamp(200px,10vw,220px); background:#fff;
+  padding:120px 20px 60px; margin-left:clamp(200px,10vw,220px); background:#fff;
 }
 .rightSection{
   flex:0 0 auto; display:flex; flex-direction:column;
   justify-content:flex-start; align-items:center;
-  padding:60px 20px; margin-right:clamp(200px,10vw,200px); background:#fff;
+  padding:120px 20px 60px; margin-right:clamp(200px,10vw,200px); background:#fff;
 }
-.logo{ font-size:64px; font-weight:700; color:#000; margin-bottom:16px; letter-spacing:-2px; }
+.logo{ font-family: var(--font-brand);  font-size:64px; font-weight:700; color:#000; margin-bottom:16px; letter-spacing:-2px; }
 .description{ font-size:18px; color:#666; line-height:1.5; word-break: break-all; }
 
 /* =========================
@@ -69,10 +69,10 @@ body {
   width:300px; margin-top:40px; opacity:0; max-height:0; overflow:hidden; transform:translateY(-20px); transition:all .4s ease;
 }
 .signupForm{ margin-top:24px; }
-.loginForm.show, .signupForm.show{ opacity:1; max-height:800px; transform:translateY(0); }
+.loginForm.show, .signupForm.show{ opacity:1; max-height:900px; transform:translateY(0); }
 
-:root{ --inputHeight:56px; --inputRadius:9999px; }
-.formGroup{ margin-bottom:20px; position:relative; }
+:root{ --inputHeight:48px; --inputRadius:9999px; }
+.formGroup{ margin-bottom:16px; position:relative; }
 
 .formInput, .loginForm select, .signupForm select{
   width:100%; height:var(--inputHeight); border-radius:var(--inputRadius);
@@ -114,18 +114,16 @@ body {
 .genderGroup{ display:flex; gap:10px; }
 .radioPill{
   display:inline-flex; align-items:center; justify-content:center;
-  height:var(--inputHeight); padding:0; border:2px solid #111;
+  flex:1; height:var(--inputHeight); padding:0; border:2px solid #111;
   border-radius:var(--inputRadius); cursor:pointer; user-select:none; overflow:hidden;
 }
 .radioPill input{ display:none; }
 .radioPill span{
   display:flex; align-items:center; justify-content:center; height:100%;
-  padding:0; color:#111; background:transparent;
+  width:100%; padding:0; color:#111; background:transparent;
   transition:background-color .2s ease, color .2s ease; border-radius:var(--inputRadius); pointer-events:none;
 }
 .radioPill input:checked + span{ background:#111; color:#fff; }
-.addPadding { padding:0 20px; width: 80px; }
-.nonAddPadding { padding:0 10px; width: 140px; }
 
 /* =========================
    기타 UI

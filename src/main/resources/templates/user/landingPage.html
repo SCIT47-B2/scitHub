@@ -24,12 +24,12 @@
       <div class="authButtons">
         <button class="authBtn loginBtn" id="loginBtn" type="button" aria-controls="loginForm" aria-expanded="false">
           Login
-          <img th:src="@{/icons/arrow_left_alt.svg}" src="/icons/arrow_left_alt.svg" alt="" class="btnIcon" id="loginArrow" aria-hidden="true">
+          <img th:src="@{/icons/select_arrow.png}" src="/icons/select_arrow.png" alt="" class="btnIcon" id="loginArrow" aria-hidden="true">
         </button>
 
         <button class="authBtn signupBtn" id="signupBtn" type="button" aria-controls="signupForm" aria-expanded="false">
           Sign up
-          <img th:src="@{/icons/arrow_left_alt.svg}" src="/icons/arrow_left_alt.svg" alt="" class="btnIcon" id="signArrow" aria-hidden="true">
+          <img th:src="@{/icons/select_arrow.png}" src="/icons/select_arrow.png" alt="" class="btnIcon" id="signArrow" aria-hidden="true">
         </button>
       </div>
 
@@ -90,14 +90,14 @@
             <div class="formGroup">
               <div class="genderGroup" role="radiogroup" aria-label="성별">
                 <label class="radioPill">
-                  <input type="radio" name="gender" value="M" required><span class="addPadding">男</span>
+                  <input type="radio" name="gender" value="M" required><span>男</span>
                 </label>
                 <label class="radioPill">
-                  <input type="radio" name="gender" value="F" required><span class="addPadding">女</span>
+                  <input type="radio" name="gender" value="F" required><span>女</span>
                 </label>
-                <label class="radioPill">
+                <!-- <label class="radioPill">
                   <input type="radio" name="gender" value="N" required><span class="nonAddPadding">回答しない</span>
-                </label>
+                </label> -->
               </div>
             </div>
             <div class="formGroup">

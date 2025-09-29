@@ -3,7 +3,7 @@
     xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
     layout:decorate="~{layouts/defaultLayout}">
     <head>
-        <title>게시글 작성</title>
+        <title>Write Post</title>
         <th:block layout:fragment="css">
             <link rel="stylesheet" th:href="@{/css/ckeditor5/editorStyle.css}">
             <link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/46.0.3/ckeditor5.css" crossorigin>
@@ -16,7 +16,7 @@
             <div class="write-header">
                 <h2>新規投稿</h2>
                 <div class="header-buttons">
-                    <button class="actionBtn" type="button" id="cancelBtn">
+                    <button class="cancelBtn" type="button" id="cancelBtn">
                         投稿を辞める<i class="fa-solid fa-x"></i>
                     </button>
                     <button class="actionBtn" type="button" id="submitPostBtn">

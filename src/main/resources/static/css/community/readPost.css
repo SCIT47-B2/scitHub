@@ -163,10 +163,10 @@
 
 .likes, .comments { display: flex; align-items: center; gap: 6px; }
 .likes i { color: #ccc; font-size: 16px; cursor: pointer; transition: color 0.2s ease }
-.likes i.active { color: #4258be; font-size: 16px; }
+.likes i.active { color: #4258BE; font-size: 16px; }
 .likeCountDisplay, .commentCountDisplay { font-size: 18px; }
 .comments i { color: #ccc; font-size: 16px; }
-.bookmark i { color: #845ef7; font-size: 22px; cursor: pointer; }
+.bookmark i { color: #000000; font-size: 22px; cursor: pointer; }
 
 .likeCountDisplay, .commentCountDisplay {
             font-size: 16px; /* 폰트 크기를 약간 줄임 */

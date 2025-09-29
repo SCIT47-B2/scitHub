@@ -19,7 +19,7 @@
                 <div class="header" th:if="${course}">
                     <div class="info-box" style="align-items: flex-start;">
                         <div class="course-details" style="display: flex; flex-direction: column;">
-                            <div class="name-rating">
+                            <div class="name-rating-course">
                                 <h2 th:text="${course.name}">Course</h2>
                                 <div class="avg-rating-stars">
                                     <th:block th:with="avgRating=${course.averageRating != null ? T(java.lang.Math).round(course.averageRating) : 0}">
@@ -31,7 +31,7 @@
                                 </div>
                             </div>
                             <div style="margin-top: 10px;">
-                                <span th:text="${course.instructorName}">Instructor</span>
+                                <span th:text="${course.instructorName}" style="color:white;">Instructor</span>
                             </div>
                         </div>
                     </div>

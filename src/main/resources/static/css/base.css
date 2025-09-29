@@ -11,7 +11,10 @@ html,body{height:100%}
 body{
   margin:0;
   display:flex;              /* 좌: 사이드바, 우: 콘텐츠 */
-  background-color:#F7F8FA;
+  /* 파스텔톤 그라데이션 배경 */
+  background-color: #eceef1; /* 그라데이션 미지원 브라우저용 단색 배경 */
+  /* background-image: linear-gradient(135deg, #C3CEE9 0%, #CDDAE3 50%, #C3CEE9 100%); */
+  background-attachment: fixed; /* 스크롤 시 배경 고정 */
   color:var(--ink);
   font-family:'Noto Sans JP', sans-serif;
 }
