@@ -33,7 +33,7 @@ public class InstagramService {
                 log.info("인스타그램에서 {}개의 게시물을 성공적으로 가져왔습니다.", response.getData().size());
 
                 return response.getData().stream()
-                        .limit(5) // 최신 5개 게시물만 반환
+                        .limit(6) // 최신 6개 게시물만 반환
                         .collect(Collectors.toList());  // 다시 리스트로 변환
             }
         } catch (Exception e) {
