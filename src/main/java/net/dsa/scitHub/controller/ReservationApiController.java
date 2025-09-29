@@ -120,6 +120,7 @@ public class ReservationApiController {
         try {
             boolean newStatus = rs.toggleClassroomStatus(roomId);
             Map<String, Object> response = new HashMap<>();
+            response.put("classroomId", roomId);
             response.put("isActive", newStatus);
             response.put("message", newStatus ? "教室が有効化されました。" : "教室が無効化されました。");
             return ResponseEntity.ok(response);

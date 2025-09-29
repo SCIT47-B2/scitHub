@@ -181,7 +181,7 @@ async function toggleRoomStatus(buttonElement) {
     // 전달받은 버튼 요소의 dataset에서 roomId와 roomName을 추출합니다.
     const roomId = buttonElement.dataset.roomId;
     const roomName = buttonElement.dataset.roomName;
-
+    
     if(!confirm('本当にこの教室の状態を変更しますか。')) {
         return;
     }
@@ -197,6 +197,20 @@ async function toggleRoomStatus(buttonElement) {
         if (response.ok) {
             const result = await response.json();
             alert(result.message);
+
+            // 토글한 교실 요소 찾기
+            const roomElement = document.querySelector(`[data-room-id="${roomId}"]`);
+            
+            if (roomElement) {
+                if (result.isActive) {
+                    // 활성화 - 클래스 추가
+                    roomElement.classList.add('active-room');
+                } else {
+                    // 비활성화 - 클래스 제거
+                    roomElement.classList.remove('active-room');
+                }
+            }
+
             // 모달 새로고침
             openReservationModal(roomId,roomName);
         } else {
@@ -216,6 +230,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // 스터디룸 전체를 감싸는 부모 요소를 선택
     const seatmap = document.querySelector('.seatmap');
     console.log('seatmap:', seatmap);
+
     // ------------ 이벤트 리스너 -----------------
     // 부모 요소에 클릭 이벤트 리스너 등록
     seatmap.addEventListener('click', function(event) {
