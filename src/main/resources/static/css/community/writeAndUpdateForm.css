@@ -135,7 +135,7 @@
 }
 .cancelBtn {
     padding: 10px 20px;
-    background: #dbd7df; /* var(--primary) or a specific color */
+    background: #d7d7df; /* var(--primary) or a specific color */
     color: white;
     border: none;
     border-radius: 8px;
