@@ -75,6 +75,7 @@ box-sizing: border-box;
   border-radius: 10px;
   cursor: pointer;
   font-size: 14px;
+  font-weight: 500;
   transition: background 0.2s;
 }
 .today-btn:hover { background: #f0f0f0; }
@@ -97,11 +98,11 @@ box-sizing: border-box;
 }
 .view-btn:last-child { border-right: none; }
 .view-btn:hover { background: #f0f0f0; }
-.view-btn.active { background: #FE5B00; color: white; }
+.view-btn.active { background: #4258BE; color: white; }
 
 /* 요일 헤더 전체 영역 */
 .fc-col-header {
-  background-color: #FE5B00;
+  background-color: #4258BE;
   border-bottom: 2px solid #dee2e6;
   color: white;
 }
@@ -298,7 +299,7 @@ input[type="checkbox"]:checked + label::after {
   transition: all 0.2s ease;
   min-width: 80px;
 }
-.btn-primary { background: #FE5B00; color: white; }
+.btn-primary { background: #4258BE; color: white; }
 .btn-primary:hover { background: #000000; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
 .btn-secondary { background: #f1f5f9; color: #64748b; }
 .btn-secondary:hover { background: #000000; color: #ffffff; }
@@ -337,3 +338,7 @@ input[type="checkbox"]:checked + label::after {
     padding-left: 8px;
     padding-right: 8px;
 }
+
+.toggle-item label {
+          font-weight: 600; /* 글씨를 더 진하게 설정 */
+        }

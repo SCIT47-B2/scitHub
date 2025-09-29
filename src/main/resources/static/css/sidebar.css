@@ -46,7 +46,7 @@
   border-radius:30%;
   object-fit:cover;
   display:block;
-  box-shadow: var(--shadow);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); /* 그림자 약하게 변경 */
 }
 .sidebar .profile .name{
   margin:0;

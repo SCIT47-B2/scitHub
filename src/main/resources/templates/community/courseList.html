@@ -29,7 +29,7 @@
                                 <div class="card">
                                     <h4 th:text="${course.name}">Course</h4>
                                     <p th:text="${course.instructorName}">Professor</p>
-                                    <div class="avg-rating-stars">
+                                    <div class="avg-rating-stars-course">
                                         <th:block th:with="avgRating=${course.averageRating != null ? T(java.lang.Math).round(course.averageRating) : 0}">
                                             <th:block th:each="i : ${#numbers.sequence(1, 5)}">
                                                 <i class="fa fa-star" th:classappend="${i <= avgRating} ? 'filled' : ''"></i>
@@ -51,7 +51,7 @@
                                 <div class="card">
                                     <h4 th:text="${course.name}">Course</h4>
                                     <p th:text="${course.instructorName}">Professor</p>
-                                    <div class="avg-rating-stars">
+                                    <div class="avg-rating-stars-course">
                                         <th:block th:with="avgRating=${course.averageRating != null ? T(java.lang.Math).round(course.averageRating) : 0}">
                                             <th:block th:each="i : ${#numbers.sequence(1, 5)}">
                                                 <i class="fa fa-star" th:classappend="${i <= avgRating} ? 'filled' : ''"></i>
