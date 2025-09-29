@@ -46,11 +46,11 @@
 }
 /* 상태별 버튼 스타일 */
 .reservation-btn.available {
-    background-color: #4A6DFF; /* 진한 파란색 */
+    background-color: #4258BE; /* 진한 파란색 */
     color: white;
 }
 .reservation-btn.available:hover {
-    background-color: #3858d4;
+    background-color: #000000;
 }
 .reservation-btn.reserved {
     background-color: #F0F0F0; /* 연한 회색 */
@@ -59,7 +59,7 @@
 }
 .reservation-btn.cancelable {
     background-color: #E9ECFF; /* 연한 하늘색 */
-    color: #4A6DFF; /* 진한 파란색 */
+    color: #4258BE; /* 진한 파란색 */
 }
 .reservation-btn.cancelable:hover {
     background-color: #d8dff7;

@@ -254,7 +254,7 @@ tbody tr:hover {
     display: flex;
     align-items: center;
     font-size: 1.2rem;
-    color: #dddeea; /* 기본 별 색상 */
+    color: #e8e8ea; /* 기본 별 색상 */
 }
 .avg-rating-stars-course .fa-star.filled {
     color: #000000; /* 채워진 별 색상 */
