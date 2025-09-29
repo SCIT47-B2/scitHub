@@ -8,6 +8,9 @@
     <!-- 외부 CSS 불러오기 -->
     <th:block layout:fragment="css">
       <link rel="stylesheet" th:href="@{/css/schedule.css}">
+      <link rel="stylesheet" th:href="@{/css/scheduleModal.css}">
+      <script src="https://unpkg.com/@popperjs/core@2"></script>
+      <script src="https://unpkg.com/tippy.js@6"></script>
     </th:block>
   </head>
   <body>
@@ -55,8 +58,24 @@
       <!-- 일정등록 Modal -->
       <div id="eventModal" class="modal">
         <div class="modal-content">
-          <h3 id="modalTitle">スケジュール登録</h3>
+          <div class="modal-header">
+            <h3 id="modalTitle">スケジュール登録</h3>
+            <div id="colorPickerTrigger" class="color-swatch" style="background-color:#2C45BA;"></div>
+          </div>
           <form id="eventForm" class="eventForm">
+
+            <div style="display: none;">
+              <div id="colorPalette">
+                  <div class="color-swatch selected" data-color="#2C45BA" style="background-color:#2C45BA;"></div>
+                  <div class="color-swatch" data-color="#43A5DE" style="background-color:#43A5DE;"></div>
+                  <div class="color-swatch" data-color="#0FC79F" style="background-color:#0FC79F;"></div>
+                  <div class="color-swatch" data-color="#C084FC" style="background-color:#C084FC;"></div>
+                  <div class="color-swatch" data-color="#FE5B00" style="background-color:#FE5B00;"></div>
+                  <div class="color-swatch" data-color="#757575" style="background-color:#757575;"></div>
+              </div>
+            </div>
+
+            <input type="hidden" id="eventColor" name="eventColor" value="#2C45BA">
             <input type="hidden" id="eventId" name="eventId">
 
             <div class="form-group">
@@ -121,6 +140,7 @@
       <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.19/index.global.min.js"></script>
 
       <!-- 외부 JS 불러오기 -->
+      <script th:src="@{/js/scheduleModal.js}"></script>
       <script th:src="@{/js/schedule.js}"></script>
     </th:block>
   </body>

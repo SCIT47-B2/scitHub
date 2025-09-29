@@ -157,9 +157,10 @@
                     const bell = document.getElementById('notification-bell');
                     const panel = document.getElementById('notifications-panel');
                     const closeBtn = document.getElementById('notification-close-btn');
+                    const markAllReadBtn = document.getElementById('mark-all-as-read-btn');
 
                     // UI 요소가 없으면 실행 중지
-                    if (!bell || !panel || !closeBtn) return;
+                    if (!bell || !panel || !closeBtn || !markAllReadBtn) return;
 
                     // 1. 벨 클릭 시 body에 클래스를 추가/제거하여 패널 열기/닫기
                     bell.addEventListener('click', function(e) {
@@ -243,6 +244,26 @@
                             });
                         }
                     });
+
+                    // 5. '모두 읽음 처리' 버튼 클릭 이벤트 리스너 추가
+                    markAllReadBtn.addEventListener('click', function() {
+                        if (!confirm('すべての通知を既読にしますか？')) return;
+
+                        // '모두 읽음' 처리 API의 URL 생성
+                        const baseReadUrl = document.querySelector('[data-read-url]').dataset.readUrl;
+                        const url = `${baseReadUrl}/all`;
+
+                        fetch(url, {
+                            method: 'POST'
+                        }).then(response => {
+                            if (response.ok) {
+                                // 성공 시 UI 업데이트
+                                markAllNotificationsAsReadInUI();
+                            } else {
+                                alert('処理中にエラーが発生しました。');
+                            }
+                        }).catch(error => console.error("'すべて既読'処理中にエラー:", error));
+                    });
                 }
 
                 // 새 알림을 목록에 동적으로 추가하는 함수
@@ -315,6 +336,21 @@
                     interval = seconds / 60;
                     if (interval > 1) return Math.floor(interval) + "分前";
                     return "たった今";
+                }
+
+                // ✨ UI의 모든 알림을 읽음 상태로 변경하는 새 함수
+                function markAllNotificationsAsReadInUI() {
+                    // 1. 모든 'is-unread' 클래스를 가진 li 태그를 찾아 클래스 제거
+                    document.querySelectorAll('.notification-list .is-unread').forEach(li => {
+                        li.classList.remove('is-unread');
+                    });
+
+                    // 2. 뱃지 숫자를 0으로 만들고 숨김
+                    const badge = document.querySelector('.notification-badge');
+                    if (badge) {
+                        badge.textContent = '0';
+                        badge.style.display = 'none';
+                    }
                 }
             /*]]>*/
             </script>

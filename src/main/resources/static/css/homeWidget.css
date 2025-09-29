@@ -1,0 +1,440 @@
+/* 우측 위젯 컬럼 스타일 (dday, 일정)*/
+.rightCol {
+    display: flex;
+    flex-direction: column;
+    gap: 0; /* 위젯 사이의 기본 간격은 0으로 하고 각 위젯의 margin으로 조절 */
+}
+
+/* ============================================
+모던 캘린더 위젯 스타일 (FullCalendar 커스터마이징)
+============================================ */
+/* =========================
+1. 위젯 컨테이너
+========================= */
+.home-schedule-widget {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 0;
+    margin: 20px 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+    border: none;
+}
+
+/* =========================
+2. 헤더 영역
+========================= */
+.widget-header {
+    background: #ffffff;
+    padding: 20px 24px;
+    border-bottom: 1px solid #f1f3f5;
+}
+.widget-header h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0;
+    color: #212529;
+}
+#widget-date-title {
+    width: fit-content;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+#widget-date-title:hover {
+    color: #4258BE;
+}
+/* =========================
+3. 캘린더 본체
+========================= */
+#mini-calendar {
+    background: #ffffff;
+    padding: 20px;
+    border: none;
+    max-height: 400px;  /* 최대 높이 설정 */
+    overflow-y: auto;   /* 세로 스크롤 활성화 */
+    overflow-x: hidden; /* 가로 스크롤 숨김 */
+}
+/* =========================
+4. 모든 테두리 제거
+========================= */
+#mini-calendar .fc-scrollgrid,
+#mini-calendar .fc-scrollgrid-section,
+#mini-calendar .fc-scrollgrid-section > td,
+#mini-calendar .fc-scrollgrid-section-body > td,
+#mini-calendar .fc-scrollgrid-sync-table,
+#mini-calendar .fc-timegrid-body,
+#mini-calendar .fc-timegrid-slots,
+#mini-calendar .fc-timegrid-slots table,
+#mini-calendar .fc-timegrid-slots td,
+#mini-calendar .fc-timegrid-axis,
+#mini-calendar .fc-timegrid-axis-frame,
+#mini-calendar .fc-timegrid-axis-chunk,
+#mini-calendar .fc-timegrid-slot-label-frame,
+#mini-calendar .fc-timegrid-cols,
+#mini-calendar .fc-timegrid-cols table,
+#mini-calendar .fc-timegrid-col,
+#mini-calendar .fc-scroller,
+#mini-calendar .fc-scroller-liquid,
+#mini-calendar .fc-scroller-liquid-absolute,
+#mini-calendar .fc-col-header {
+    border: none !important;
+    outline: none !important;
+}
+/* =========================
+5. 시간 구분선 설정
+========================= */
+/* 각 시간 슬롯이 확실히 구분되도록 - 이것만 사용 */
+#mini-calendar .fc-timegrid-slots tr {
+    border-bottom: 1px solid #dee2e6 !important;
+}
+
+/* 다른 모든 border 제거 */
+#mini-calendar .fc-timegrid-slot {
+    height: 40px !important;
+    border: none !important;
+}
+
+#mini-calendar .fc-timegrid-slot-label-frame {
+    border: none !important;  /* 이 부분 제거! */
+}
+
+#mini-calendar .fc-timegrid-slot-lane {
+    border: none !important;
+}
+
+/* 마지막 시간 슬롯의 선 제거 */
+#mini-calendar .fc-timegrid-slots tr:last-child {
+    border-bottom: none !important;
+}
+
+/* 30분 단위 슬롯 숨기기 */
+#mini-calendar .fc-timegrid-slot-minor {
+    display: none;
+}
+
+/* 선이 전체 너비로 연결되도록 설정 */
+#mini-calendar .fc-timegrid-slots table {
+    width: 100%;
+}
+
+/* =========================
+6. 시간 라벨 스타일
+========================= */
+#mini-calendar .fc-timegrid-slot-label {
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: #6c757d;
+    vertical-align: top;
+    padding-top: 4px;
+    border-top: none !important;
+    border-left: none !important;
+    border-right: none !important;
+}
+
+#mini-calendar .fc-timegrid-slot-label-cushion {
+    padding: 8px 4px;
+}
+
+/* 시간축과 이벤트 영역 사이 세로선 제거 */
+#mini-calendar .fc-timegrid-axis,
+#mini-calendar .fc-timegrid-divider {
+    border: none !important;
+    display: none;
+}
+
+/* =========================
+7. 배경색 설정
+========================= */
+#mini-calendar .fc-day,
+#mini-calendar .fc-timegrid-col,
+#mini-calendar .fc-timegrid-col-bg,
+#mini-calendar .fc-day-today {
+    background: #ffffff !important;
+}
+
+#mini-calendar .fc-timegrid-col-events { 
+    /* 이벤트가 그려지는 영역의 왼쪽 여백을 50px로 설정하여 시간 라벨 공간을 확보합니다. */
+    margin-left: 50px !important; 
+    /* 우측에도 약간의 여백을 줍니다. */
+    margin-right: 4px !important;
+}
+
+/* =========================
+8. 이벤트 스타일
+========================= */
+#mini-calendar .fc-event {
+    border: none !important;
+    background: transparent !important;
+    padding: 2px !important;
+    margin: 1px !important;
+}
+
+#mini-calendar .fc-event:hover {
+    transform: translateY(-1px);
+    transition: transform 0.2s ease;
+}
+
+/* FullCalendar 기본 스타일 제거 */
+#mini-calendar .fc-event-main {
+    background: transparent !important;
+    border: none !important;
+}
+
+#mini-calendar .fc-timegrid-event {
+    margin: 1px;
+    z-index: auto !important;
+}
+
+/* =========================
+9. 추가 기능 스타일
+========================= */
+/* 현재 시간 표시선 */
+#mini-calendar .fc-timegrid-now-indicator-line {
+    border: 2px solid #ef4444;
+    border-radius: 2px;
+}
+
+#mini-calendar .fc-timegrid-now-indicator-arrow {
+    border-color: #ef4444;
+}
+
+/* 빈 슬롯 hover 효과 */
+#mini-calendar .fc-timegrid-slot-lane:hover {
+    background: rgba(102, 126, 234, 0.03);
+    transition: background 0.2s ease;
+}
+
+/* 스크롤바 */
+#mini-calendar::-webkit-scrollbar {
+    width: 6px;
+}
+
+#mini-calendar::-webkit-scrollbar-thumb {
+    background: #dee2e6;
+    border-radius: 10px;
+}
+
+#mini-calendar::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 10px;
+}
+
+/* =========================
+10. 애니메이션
+========================= */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* =========================
+11. 반응형 디자인
+========================= */
+@media (max-width: 768px) {
+    .home-schedule-widget {
+        margin: 10px 0;
+        border-radius: 16px;
+    }
+    .widget-header {
+        padding: 16px 20px;
+    }
+    #mini-calendar {
+        padding: 16px;
+    }
+}
+
+/* =========================
+12. 종일(All-day) 일정 영역 추가
+========================= */
+
+/* '終日' 텍스트 라벨 스타일 */
+
+#mini-calendar .fc-daygrid-body {
+    position: relative;
+    min-height: 30px;
+    background: transparent;  /* 배경 투명으로 */
+    border: none !important;  /* 모든 테두리 제거 */
+    border-bottom: 1px solid #dee2e6 !important;
+    margin-bottom: 8px;
+    padding: 0px 0;
+}
+
+/* 종일 일정 이벤트 스타일 */
+#mini-calendar .fc-daygrid-event {
+    border: none !important;
+    border-radius: 20px !important;
+    padding: 4px 8px !important;
+    margin: 0px 0 !important;
+    width: 100%;
+}
+
+/* 종일 일정 이벤트들을 오른쪽으로 밀기 */
+#mini-calendar .fc-daygrid-event-harness {
+    margin-left: -10px !important;
+    margin-right: -10px !important;
+    margin-bottom: -5px !important;
+}
+
+#mini-calendar .fc-daygrid-day-events {
+    margin-left: 0 !important;
+}
+#mini-calendar .fc-all-day-text {
+    font-size: 0.75rem;      /* 시간 라벨과 동일한 글자 크기 */
+    font-weight: 600;        /* 시간 라벨보다 조금 더 강조 */
+    color: #495057;          /* 더 잘 보이는 진한 회색 */
+    position: absolute;      /* 위치를 직접 지정하기 위해 */
+    left: 8px;               /* 왼쪽 여백 주기 */
+    top: 50%;                /* 세로 중앙 정렬 */
+    transform: translateY(-50%); /* 세로 중앙 정렬을 위한 미세 조정 */
+}
+
+/* '終日' 텍스트의 위치 기준점을 설정 */
+#mini-calendar .fc-daygrid {
+    position: relative;
+    padding-left: 50px; /* '終日' 텍스트가 들어갈 공간 확보 */
+    border: none !important;
+}
+
+/* 종일 이벤트가 표시되는 영역의 불필요한 좌측 여백 제거 */
+#mini-calendar .fc-daygrid-day-frame {
+    padding-left: 0;
+    border: none !important;
+}
+#mini-calendar .fc-daygrid-day {
+    border: none !important;
+}
+
+/* 종일 일정이 없을 때 영역 숨기기 */
+#mini-calendar .fc-daygrid-body:empty,
+#mini-calendar .fc-daygrid-body:not(:has(.fc-daygrid-event)) {
+    display: none !important;
+}
+
+/* 컨테이너 상단 패딩 축소 */
+#mini-calendar {
+    padding-top: 9px !important; /* 기존 값보다 작게 */
+}
+
+
+/* =======================
+--- D-Day 위젯  ---
+==========================*/
+.dday-widget {
+    margin: 0;
+    background-color: transparent;
+    padding: 0;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* 카드 사이의 간격 */
+
+    /* 스크롤 기능 */
+    max-height: 200px; /* 위젯의 최대 높이 (카드 2개 정도) */
+    overflow-y: auto;  /* 내용이 max-height를 넘으면 자동으로 세로 스크롤 생성 */
+}
+
+/* 새로운 D-Day 카드 아이템 스타일 */
+.dday-item {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    border-radius: 16px;
+    background-color: #E1E4EF; /* 연한 파란색 배경 */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s;
+}
+.dday-item:hover {
+    transform: translateY(-2px);
+}
+
+/* D-Day 카운터 (D-54) 스타일 */
+.dday-counter {
+    font-size: 1.2em;
+    font-weight: 700;
+    color: #495057;
+    margin-right: 15px;
+    min-width: 4em;      /* 최소 너비를 글자 크기의 4배로 지정 (값 조절 가능) */
+    display: inline-block; /* span 태그에 너비 속성을 적용하기 위해 필요 */
+}
+
+/* D-Day 제목 스타일 */
+.dday-title {
+    font-size: 1em;
+    font-weight: 500;
+    color: #495057;
+}
+
+/* D-Day 없을 때 안내 문구 스타일 */
+.dday-item-empty {
+    width: 100%;
+    text-align: center;
+    color: #868e96;
+    font-size: 0.9em;
+    padding: 20px;
+    border-radius: 16px;
+    box-sizing: border-box;
+    background-color: #ffffff;
+    box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.08); /* spread를 0으로 */
+}
+
+/* D-Day 카운터 (D-54) 스타일 */
+.dday-counter {
+    font-size: 1.2em;
+    font-weight: 700;
+    color: #495057;
+    margin-right: 15px;
+}
+
+/* D-Day 제목 스타일 */
+.dday-title {
+    font-size: 1em;
+    font-weight: 500;
+    color: #495057;
+}
+/* --- D-Day 모달 --- */
+.dday-modal-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 10000;
+}
+.dday-modal-content {
+    background: white; border-radius: 20px; padding: 24px; width: 90%; max-width: 450px;
+}
+.dday-modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #e9ecef; padding-bottom: 16px; }
+.dday-modal-header h3 { margin: 0; font-size: 1.2em; }
+.close-button { background: none; border: none; font-size: 1.8em; cursor: pointer; overflow-x: hidden;}
+.dday-list { list-style: none; padding: 0; margin: 0; max-height: 300px; overflow-x: hidden; overflow-y: auto; }
+.dday-list li { display: flex; align-items: center; padding: 12px 8px; border-bottom: 1px solid #f1f3f5; }
+.dday-list li:last-child { border-bottom: none; }
+.dday-list input[type="checkbox"] { margin-right: 15px; width: 20px; height: 20px; }
+.dday-list .dday-date { font-size: 0.8em; color: #868e96; } 
+.dday-empty-state {
+    display: flex;
+    flex-direction: column; /* 자식 요소들을 세로로 정렬 */
+    min-height: 150px; /* 최소 높이 지정 */
+}
+.dday-empty-state .dday-modal-body { flex-grow: 1; display: flex; align-items: center; justify-content: center; padding: 20px; font-size: 1.1em; }
+.dday-empty-state .dday-modal-footer { text-align: right; padding: 33px 20px 10px; border-top: 1px solid #e9ecef; }
+.dday-modal-footer { margin-top: 20px; padding-top: 20px; border-top: 1px solid #e9ecef; text-align: right; }
+.btn { padding: 10px 20px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
+.btn-primary { background: #4258BE; color: white; }
+
+/* D-Day 정보 영역 (제목 + 날짜) */
+.dday-list .dday-info {
+    flex-grow: 1;       /* 기존 속성 유지 */
+    overflow: hidden;     /* (추가) 자식 요소(제목)가 영역을 넘치면 숨김 처리 */
+    margin-right: 10px; /* (추가) 제목과 우측 카운터 사이의 간격을 줌 */
+    min-width: 0; /* <<<<<<< ✨ 이 한 줄이 핵심입니다! */
+}
+
+/* D-Day 제목 스타일 */
+.dday-list .dday-title {
+    white-space: nowrap;      /* (추가) 제목이 길어도 줄바꿈하지 않음 */
+    overflow: hidden;         /* (추가) 영역을 넘어가는 텍스트는 숨김 */
+    text-overflow: ellipsis;  /* (추가) 숨겨진 텍스트를 ... 으로 표시 */
+}

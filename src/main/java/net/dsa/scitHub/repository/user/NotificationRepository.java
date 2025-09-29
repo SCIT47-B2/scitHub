@@ -25,4 +25,6 @@ public interface NotificationRepository extends JpaRepository<Notification, Inte
      * @return 알림 목록
      */
     List<Notification> findByUserOrderByCreatedAtDesc(User user, Pageable pageable);
+
+    List<Notification> findAllByUserAndIsReadFalse(User user);
 }

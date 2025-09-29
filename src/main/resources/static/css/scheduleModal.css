@@ -1,0 +1,194 @@
+/* ===== 모달 배경 및 기본 컨테이너 ===== */
+#eventModal {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+#eventModal.show {
+  display: flex;
+}
+
+#eventModal .modal-content {
+  background: white;
+  border-radius: 20px;
+  padding: 32px;
+  width: 90%;
+  max-width: 450px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+/* ===== 모달 헤더 ===== */
+#eventModal .modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+#eventModal .modal-content h3 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0; /* 기존 margin-bottom 제거, 헤더에서 직접 제어 */
+}
+
+/* ===== 폼 스타일 ===== */
+#eventModal .eventForm {
+  margin-top: 24px; /* 헤더와의 간격 */
+}
+
+#eventModal .form-group {
+  margin-bottom: 16px;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+#eventModal .form-group label {
+  margin-bottom: 8px;
+  color: #475569;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+#eventModal .form-group input[type="text"],
+#eventModal .form-group input[type="datetime-local"],
+#eventModal .form-group input[type="date"],
+#eventModal .form-group textarea {
+  width: 100%;
+  padding: 10px 14px;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+#eventModal .form-group textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+#eventModal .form-group input:focus,
+#eventModal .form-group textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* 날짜 입력 필드 그리드 */
+#eventModal .date-inputs-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* 종일 체크박스 그룹 */
+#eventModal .form-group.checkbox-group {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ===== 커스텀 체크박스 스타일 ===== */
+#eventModal input[type="checkbox"] {
+  display: none;
+}
+#eventModal input[type="checkbox"] + label {
+  position: relative;
+  padding-left: 25px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 0;
+}
+#eventModal input[type="checkbox"] + label::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  background-color: #fff;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+#eventModal input[type="checkbox"]:checked + label::before {
+  background-color: black;
+  border-color: black;
+}
+#eventModal input[type="checkbox"]:checked + label::after {
+  content: '';
+  position: absolute;
+  top: 10%;
+  left: 5px;
+  width: 6px;
+  height: 10px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+/* ===== 버튼 스타일 ===== */
+#eventModal .modal-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid #f1f5f9;
+}
+
+#eventModal .btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 80px;
+}
+
+
+#eventModal .btn-primary { background: #4258BE; color: white; }
+#eventModal .btn-primary:hover { background: #2563eb; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
+#eventModal .btn-secondary { background: #f1f5f9; color: #64748b; }
+#eventModal .btn-secondary:hover { background: #e2e8f0; color: #475569; }
+#eventModal .btn-danger { background: #ef4444; color: white; }
+#eventModal .btn-danger:hover { background: #dc2626; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3); }
+
+/* ===== 색상 선택기 스타일 ===== */
+#colorPalette { /* ID는 고유하므로 #eventModal을 붙이지 않아도 괜찮습니다 */
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  /* width: 130px; */
+  padding: 5px;
+}
+
+.color-swatch {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid transparent;
+  box-sizing: border-box;
+}
+
+.color-swatch.selected {
+  border-color: #007bff;
+}
+

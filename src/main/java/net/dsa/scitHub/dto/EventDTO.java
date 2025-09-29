@@ -41,6 +41,9 @@ public class EventDTO {
     @NotNull(message = "終日かどうかの指定は必須です。")
     private Boolean allDay;
 
+    @NotNull(message = "色を選択してください。")
+    private String color;
+
     /**
      * Entity -> DTO 변환 메서드
      * @param entity 변환할 eventEntity
@@ -54,6 +57,7 @@ public class EventDTO {
                         .title(event.getTitle())
                         .content(event.getContent())
                         .start(event.getStartAt())
+                        .color(event.getColor())
                         .end(event.getEndAt())
                         .allDay(event.getIsAllDay())
                         .build();

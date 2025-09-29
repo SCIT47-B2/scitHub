@@ -50,11 +50,17 @@ public class Event {
     /** 이벤트 종료 시간 */
     @Column(name = "end_at")
     private LocalDateTime endAt;
+
+    // 색상 지정
+    @Builder.Default
+    @Column(name = "color", length = 7)
+    private String color = "#3788d8";
     
     /** 종일 이벤트 여부 */
     @Builder.Default
     @Column(name = "is_all_day", nullable = false, columnDefinition = "TINYINT(1)")
     private Boolean isAllDay = false;
+    
     
     @Override
     public boolean equals(Object o) {
