@@ -8,7 +8,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&display=swap');
 
 html, body{
-  font-family: 'Noto Sans JP', sans-serif;
+    font-family: 'Noto Sans JP', sans-serif;
 }
 
 .detail-container {
@@ -202,7 +202,10 @@ html, body{
     gap: 12px;
 }
 .comment-form-container textarea {
+    box-sizing: border-box; /* 패딩 포함 크기 계산 */
     width: 100%;
+    max-width: 100%;
+    min-width: 0;
     min-height: 120px;
     padding: 12px 14px;
     border: 1px solid #e5e7eb;
