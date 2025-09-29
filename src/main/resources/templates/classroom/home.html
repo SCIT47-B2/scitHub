@@ -115,23 +115,25 @@
                         <div class="block"       style="grid-column:14 / span 3; grid-row:9 / span 2; border-radius:22px;">講義室9</div>
                     </div>
                 </section>
-                <div class="sectionBody">
-                    <!-- 인스타그램 피드 -->
-                    <div class="instagram-feed">
-                        <p th:if="${#lists.isEmpty(instagramPosts)}">
-                            インスタグラム投稿を読み込むことができません。
-                        </p>
-                        <a th:each="post : ${instagramPosts}" th:href="${post.permalink}" target="_blank" class="insta-post">
-                            <img th:src="${post.mediaUrl}" th:alt="${post.caption}" />
-                            <div class="instagram-icon-overlay">
-                                <i class="fa-brands fa-instagram"></i>
-                            </div>
-                            <div class="caption-overlay">
-                                <p th:text="${post.caption}"></p>
-                            </div>
-                        </a>
+                <!-- 인스타그램 피드 -->
+                <section class="stackCard instagramCard" aria-label="인스타그램 피드">
+                    <div class="sectionBody">
+                        <div class="instagram-feed">
+                            <p th:if="${#lists.isEmpty(instagramPosts)}">
+                                インスタグラム投稿を読み込むことができません。
+                            </p>
+                            <a th:each="post : ${instagramPosts}" th:href="${post.permalink}" target="_blank" class="insta-post">
+                                <img th:src="${post.mediaUrl}" th:alt="${post.caption}" />
+                                <div class="instagram-icon-overlay">
+                                    <i class="fa-brands fa-instagram"></i>
+                                </div>
+                                <div class="caption-overlay">
+                                    <p th:text="${post.caption}"></p>
+                                </div>
+                            </a>
+                        </div>
                     </div>
-                </div>
+                </section>
             </div>
 
             <!-- 우: 디데이 + 일정 (2단 블록) -->
