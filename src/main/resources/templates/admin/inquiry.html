@@ -106,7 +106,7 @@
                                 <label for="inquiry-content">内容</label>
                                 <textarea id="inquiry-content" name="content" rows="10" placeholder="内容"></textarea>
                             </div>
-                            <button type="submit" class="submit-btn">投稿する</button>
+                            <button type="submit" id="submitInquiryBtn" class="submit-btn">投稿する</button>
                         </form>
                     </div>
                 </aside>
@@ -125,6 +125,17 @@
                     document.querySelector("#page").value = pageNum;
                     document.querySelector("#pagingForm").submit();
                 }
+
+                // 문의하기 폼 제출 시 제목과 내용이 비어있는지 확인
+                document.getElementById("submitInquiryBtn").addEventListener("click", function(event) {
+                    var title = document.getElementById("inquiry-title").value.trim();
+                    var content = document.getElementById("inquiry-content").value.trim();
+
+                    if (title === "" || content === "") {
+                        alert("タイトルと内容を入力してください。");
+                        event.preventDefault(); // 폼 제출 방지
+                    }
+                });
             </script>
         </th:block>
     </body>
