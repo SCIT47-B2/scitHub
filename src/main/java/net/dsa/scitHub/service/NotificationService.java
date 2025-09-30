@@ -87,6 +87,11 @@ public class NotificationService {
             // if (post.getUser().equals(recipient)) {
             //     return null;
             // }
+            // 만약 게시물이 공지사항이고, 작성자가 수신자라면 알림 생성하지 않음
+            if (List.of("announcement", "announcementIT", "announcementJP").contains(post.getBoard().getName())
+                && post.getUser().equals(recipient)) {
+                return null;
+            }
             String content = createNotificationContent(type, entity);
             String url = createNotificationUrl(type, entity);
 
@@ -183,6 +188,12 @@ public class NotificationService {
                 String eventContent = "タイトル: " + event.getTitle();
                 yield checkContentLength(eventContent, 30);
             }
+            case NEW_ANNOUNCEMENT -> {
+                String announcementName = ((Post) entity).getBoard().getName();
+                String announcementContent = announcementName.equals("announcement") ? "お知らせ - " : announcementName.equals("announcementIT") ? "ITお知らせ - " : "日本語お知らせ - ";
+                announcementContent += ((Post) entity).getTitle();
+                yield checkContentLength(announcementContent, 30);
+            }
         };
     }
 
@@ -215,6 +226,10 @@ public class NotificationService {
             }
             case NEW_MESSAGE -> "/mypage/messages";
             case NEW_EVENT -> "/calendar/schedule";
+            case NEW_ANNOUNCEMENT -> {
+                Post post = (Post) entity;
+                yield resolvePostUrlByBoard(post);
+            }
         };
     }
 
@@ -226,6 +241,14 @@ public class NotificationService {
     private String resolvePostUrlByBoard(Post post) {
         if (post.getBoard().getBoardId() == br.findByName("inquiry").get().getBoardId()) {
             return "/admin/inquiryRead?postId=" + post.getPostId();
+        } else if (
+            List.of(
+                br.findByName("announcement").get().getBoardId(),
+                br.findByName("announcementIT").get().getBoardId(),
+                br.findByName("announcementJP").get().getBoardId()
+            ).contains(post.getBoard().getBoardId())
+        ) {
+            return "/admin/announcement/read?postId=" + post.getPostId();
         } else {
             return "/community/readPost?postId=" + post.getPostId();
         }

@@ -109,7 +109,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     @Query("SELECT DISTINCT u.cohortNo FROM User u WHERE u.cohortNo IS NOT NULL ORDER BY u.cohortNo DESC")
     List<Integer> findDistinctCohortNos();
 
-    // userId가 특정 값이 아닌 모든 사용자 조회
-    List<User> findByUserIdNot(Integer userId);
+    // userId가 특정 값이 아니면서 활성화되어 있는 모든 사용자 조회
+    List<User> findByUserIdNotAndIsActiveTrue(Integer userId);
 }
 

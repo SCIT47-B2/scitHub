@@ -70,7 +70,7 @@ public class EventService {
         // 알림 전송
         // 생성자가 관리자이고, 생성된 일정이 전체 공개(PUBLIC) 일정인 경우에만 알림 전송
         if (isAdmin && savedEvent.getVisibility() == Visibility.PUBLIC) {
-            List<User> allUsersExceptCreator = ur.findByUserIdNot(eventUser.getUserId());
+            List<User> allUsersExceptCreator = ur.findByUserIdNotAndIsActiveTrue(eventUser.getUserId());
             for (User recipient : allUsersExceptCreator) {
                 ns.send(recipient, NotificationType.NEW_EVENT, savedEvent);
             }

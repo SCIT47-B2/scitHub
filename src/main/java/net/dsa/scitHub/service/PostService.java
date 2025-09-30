@@ -133,7 +133,20 @@ public class PostService {
 
         Post post = PostDTO.convertToPostEntity(postDTO, user, board);
 
-        return pr.save(post);
+        Post savedPost = pr.save(post);
+
+        // 공지사항 게시판에 글이 작성되면 모든 사용자에게 알림 전송
+        if (List.of("announcement", "announcementIT", "announcementJP").contains(board.getName())) {
+            log.debug("공지사항 보드 이름: " + board.getName());
+            List<User> allUsersExceptCreator = ur.findByUserIdNotAndIsActiveTrue(user.getUserId());
+            for (User recipient : allUsersExceptCreator) {
+                ns.send(recipient, NotificationType.NEW_ANNOUNCEMENT, post);
+                log.debug("공지사항 알림 전송: {} -> {}", recipient.getUserId(), post.getPostId());
+            }
+            log.info("관리자가 공지사항을 등록하여 {}명에게 알림을 전송했습니다.", allUsersExceptCreator.size());
+        }
+
+        return savedPost;
     }
 
     /**
