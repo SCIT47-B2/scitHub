@@ -47,8 +47,8 @@
 }
 
 /* 프로필 사진 공통 스타일 */
-.profile-pic { width: 42px; height: 42px; border-radius: 50%; }
-.profile-pic-small { width: 34px; height: 34px; border-radius: 50%; }
+.profile-pic { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; }
+.profile-pic-small { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; }
 
 /* --- 게시글 상단 --- */
 .post-header {
