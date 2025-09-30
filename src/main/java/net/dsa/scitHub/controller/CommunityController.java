@@ -468,7 +468,7 @@ public class CommunityController {
      * @param model
      * @return courseReview.html
      */
-    @GetMapping("courseReview")
+    @GetMapping("courseList/readReview")
     public String courseReview(
         @RequestParam(name="id", required=true) Integer courseId,
         Model model,

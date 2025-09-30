@@ -12,20 +12,20 @@
         <section class="mainGrid" aria-label="메인 영역" layout:fragment="content">
             <div class="container">
                 <!-- 검색바 -->
-                 <div class="search-box">
+                <div class="search-box">
                     <form th:action="@{/community/courseList}" method="get">
                         <i class="fa fa-search"></i>
                         <input type="text" name="name" placeholder="コース名で探す">
                         <button type="submit" style="display: none;"></button>
                     </form>
-                 </div>
+                </div>
 
                 <!-- 일본어 수업 -->
                 <div class="section">
                     <div class="section-title">日本語</div>
                     <div class="card-container">
                         <th:block th:each="course : ${courseList}" th:if="${course.courseType.name() == 'JP'}">
-                            <a th:href="@{/community/courseReview(id=${course.courseId})}" class="card-link" style="text-decoration: none; color: inherit;">
+                            <a th:href="@{/community/courseList/readReview(id=${course.courseId})}" class="card-link" style="text-decoration: none; color: inherit;">
                                 <div class="card">
                                     <h4 th:text="${course.name}">Course</h4>
                                     <p th:text="${course.instructorName}">Professor</p>
@@ -47,7 +47,7 @@
                     <div class="section-title">IT</div>
                     <div class="card-container">
                         <th:block th:each="course : ${courseList}" th:if="${course.courseType.name() == 'IT'}">
-                            <a th:href="@{/community/courseReview(id=${course.courseId})}" class="card-link" style="text-decoration: none; color: inherit;">
+                            <a th:href="@{/community/courseList/readReview(id=${course.courseId})}" class="card-link" style="text-decoration: none; color: inherit;">
                                 <div class="card">
                                     <h4 th:text="${course.name}">Course</h4>
                                     <p th:text="${course.instructorName}">Professor</p>
