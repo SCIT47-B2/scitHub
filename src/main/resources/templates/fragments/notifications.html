@@ -7,9 +7,6 @@
                 <button type="button" id="notification-close-btn" title="閉じる">&times;</button>
             </div>
             <ul class="notification-list" id="notification-list">
-                <li th:if="${notifications == null or #lists.isEmpty(notifications)}" class="no-notifications">
-                    <p>新しい通知はありません。</p>
-                </li>
                 <li th:each="noti : ${notifications}" th:classappend="${!noti.isRead} ? 'is-unread' : ''"
                     th:data-notification-id="${noti.notificationId}">
                     <a th:href="@{${noti.targetUrl}}" class="notification-link" th:data-notification-id="${noti.notificationId}">
