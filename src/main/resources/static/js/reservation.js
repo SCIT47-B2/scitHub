@@ -99,7 +99,7 @@ async function makeReservation(clickedButton, roomId, timeSlotId) {
                 // 이름(span)을 찾아 현재 로그인한 사용자 이름으로 변경합니다.
                 // 예약자가 들어갈 span 지정
                 const reserverNameSpan = timeSlotItem.querySelector('.reserver-name');
-                reserverNameSpan.textContent = newReservation.username;
+                reserverNameSpan.textContent = newReservation.name;
 
                 // '예약취소' 버튼을 새로 생성하고 필요한 속성을 설정
                 const newCancelButton = document.createElement('button');
