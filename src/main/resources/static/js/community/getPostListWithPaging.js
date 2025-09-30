@@ -145,6 +145,7 @@ function translateBoardNameToJp() {
         case "hobby": result = "趣味&旅行&グルメ情報"; break;
         case "certificate": result = "資格情報"; break;
         case "graduated": result = "卒業生掲示板"; break;
+        case "qna": result = "Q&A掲示板"; break;
         default: result = "掲示板"; break;
     }
     $('.boardName').text(result);
