@@ -20,7 +20,7 @@ async function openReservationModal(roomId, roomName) {
         return;
     }
 
-    modalTitle.textContent = `${roomName}`;
+    modalTitle.textContent = `スタディルーム${roomId}`;
 
     try {
         // 서버에 해당 roomId의 예약 현황 HTML 조각을 요청합니다.

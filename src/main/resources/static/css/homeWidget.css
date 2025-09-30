@@ -213,16 +213,19 @@
 }
 
 /* 스크롤바 */
-#mini-calendar::-webkit-scrollbar {
+#mini-calendar::-webkit-scrollbar,
+.dday-widget::-webkit-scrollbar {
     width: 6px;
 }
 
-#mini-calendar::-webkit-scrollbar-thumb {
+#mini-calendar::-webkit-scrollbar-thumb,
+.dday-widget::-webkit-scrollbar-thumb {
     background: #dee2e6;
     border-radius: 10px;
 }
 
-#mini-calendar::-webkit-scrollbar-track {
+#mini-calendar::-webkit-scrollbar-track,
+.dday-widget::-webkit-scrollbar-track {
     background: #f1f5f9;
     border-radius: 10px;
 }
