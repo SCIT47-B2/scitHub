@@ -98,7 +98,7 @@ function loadPosts(boardId, pageIndex = 0, searchType = null, keyword = null, so
     // URL을 업데이트할 때는 1-based 페이지 번호로 변환
     updateURL(pageIndex + 1, searchType, keyword);
 
-    const sortArray = sort ? [sort, 'postId,desc'] : ['createdAt,desc', 'postId,desc'];
+    const sortArray = sort ? [sort, 'createdAt,desc', 'postId,desc'] : ['createdAt,desc', 'postId,desc'];
 
     let requestData = {
         boardId: boardId,
