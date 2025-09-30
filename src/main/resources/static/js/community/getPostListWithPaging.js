@@ -126,7 +126,7 @@ function loadPosts(boardId, pageIndex = 0, searchType = null, keyword = null, so
         },
         error: function (xhr, status, error) {
             console.error('データのロードに失敗しました:', error);
-            $('#post-list-body').html('<tr class="no-posts-message"><td colspan="6">게시글을 불러오는 데 실패했습니다.</td></tr>');
+            $('#post-list-body').html('<tr class="no-posts-message"><td colspan="6">ポストの読み込もに失敗しました.</td></tr>');
         }
     });
 }
